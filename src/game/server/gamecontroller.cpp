@@ -31,10 +31,6 @@ IGameController::IGameController(class CGameContext *pGameServer)
 
 	m_UnbalancedTick = -1;
 	m_ForceBalanced = false;
-
-	m_aNumSpawnPoints[0] = 0;
-	m_aNumSpawnPoints[1] = 0;
-	m_aNumSpawnPoints[2] = 0;
 }
 
 IGameController::~IGameController()
@@ -62,7 +58,7 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos)
 void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type)
 {
 	// get spawn point
-	for(int i = 0; i < m_aNumSpawnPoints[Type]; i++)
+	for(int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
 	{
 		// check if the position is occupado
 		CCharacter *aEnts[MAX_CLIENTS];
@@ -94,7 +90,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type)
 	}
 }
 
-bool IGameController::CanSpawn(int Team, vec2 *pOutPos)
+bool IGameController::CanSpawn(int Team, vec2 *pOutPos, bool Human)
 {
 	CSpawnEval Eval;
 
@@ -104,14 +100,7 @@ bool IGameController::CanSpawn(int Team, vec2 *pOutPos)
 
 	Eval.m_FriendlyTeam = Team;
 
-	// first try own team spawn, then normal spawn and then enemy
-	EvaluateSpawnType(&Eval, 1+(Team&1));
-	if(!Eval.m_Got)
-	{
-		EvaluateSpawnType(&Eval, 0);
-		if(!Eval.m_Got)
-			EvaluateSpawnType(&Eval, 1+((Team+1)&1));
-	}
+	EvaluateSpawnType(&Eval, (int)Human);
 
 	*pOutPos = Eval.m_Pos;
 	return Eval.m_Got;
@@ -123,12 +112,10 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	int Type = -1;
 	int SubType = 0;
 
-	if(Index == ENTITY_SPAWN)
-		m_aaSpawnPoints[0][m_aNumSpawnPoints[0]++] = Pos;
-	else if(Index == ENTITY_SPAWN_RED)
-		m_aaSpawnPoints[1][m_aNumSpawnPoints[1]++] = Pos;
+	if(Index == ENTITY_SPAWN_RED)
+		m_aaSpawnPoints[0].add(Pos);
 	else if(Index == ENTITY_SPAWN_BLUE)
-		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
+		m_aaSpawnPoints[1].add(Pos);
 
 	return false;
 }
