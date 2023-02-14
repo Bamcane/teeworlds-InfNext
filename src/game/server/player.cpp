@@ -178,7 +178,7 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
-	StrToInts(&pClientInfo->m_Clan0, 3, !m_pClass ? "????" : GameServer()->Localize(m_aLanguage, m_pClass->m_ClassName));
+	StrToInts(&pClientInfo->m_Clan0, 3, !m_pClass ? "????" : GameServer()->Localize(GameServer()->GetPlayerLanguage(SnappingClient), m_pClass->m_ClassName));
 	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_TeeInfos.m_aSkinName);
 	pClientInfo->m_UseCustomColor = m_TeeInfos.m_UseCustomColor;
@@ -189,7 +189,7 @@ void CPlayer::Snap(int SnappingClient)
 	Server()->GetClientInfo(m_ClientID, &Info);
 
 	int Latency = SnappingClient == -1 ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aActLatency[m_ClientID];
-	int Score = abs(m_Score) * -1;
+	int Score = m_Score;
 
 	if(!Server()->IsSixup(SnappingClient))
 	{
@@ -492,10 +492,15 @@ void CPlayer::CureToDefault()
 	}
 }
 
-void CPlayer::Infect()
+void CPlayer::Infect(int From)
 {
 	if(IsInfect())
 		return;
+
+	if(From != -1 && GameServer()->m_apPlayers[From])
+	{
+		GameServer()->m_apPlayers[From]->m_Score += 3;
+	}
 	
 	if(m_pCharacter)
 	{

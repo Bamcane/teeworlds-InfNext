@@ -79,6 +79,23 @@ void CGameControllerNext::Tick()
 	IGameController::Tick();
 }
 
+int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
+{
+	if(!pKiller || Weapon == WEAPON_GAME)
+		return 0;
+
+	if(pVictim->GetPlayer() != pKiller)
+	{
+		if(pKiller->IsInfect())
+		{
+			pKiller->m_Score += 3;
+		}else
+		{
+			pKiller->m_Score += 1;
+		}
+	}
+}
+
 int CGameControllerNext::RoundTick() const
 {
 	return Server()->Tick() - m_RoundStartTick;

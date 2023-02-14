@@ -45,7 +45,7 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos)
 	{
 		// team mates are not as dangerous as enemies
 		float Scoremod = 1.0f;
-		if(pEval->m_FriendlyTeam != -1 && pC->GetPlayer()->GetTeam() == pEval->m_FriendlyTeam)
+		if(pEval->m_FriendlyTeam != -1 && pC->GetPlayer()->IsHuman() == pEval->m_FriendlyTeam)
 			Scoremod = 0.5f;
 
 		float d = distance(Pos, pC->m_Pos);
@@ -98,7 +98,7 @@ bool IGameController::CanSpawn(int Team, vec2 *pOutPos, bool Human)
 	if(Team == TEAM_SPECTATORS)
 		return false;
 
-	Eval.m_FriendlyTeam = Team;
+	Eval.m_FriendlyTeam = (int)Human;
 
 	EvaluateSpawnType(&Eval, (int)Human);
 

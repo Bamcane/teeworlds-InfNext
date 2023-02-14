@@ -131,7 +131,7 @@ public:
 
 	void SetClass(CClass *pClass);
 	void CureToDefault();
-	void Infect();
+	void Infect(int From = -1);
 };
 
 #endif

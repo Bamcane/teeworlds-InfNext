@@ -292,7 +292,7 @@ void CGameContext::SendChatTarget_Localization(int To, const char *pText, ...)
 			Buffer.clear();
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
 			
-			SendChatTarget(To, Buffer.buffer());
+			SendChatTarget(i, Buffer.buffer());
 		}
 	}
 	
@@ -2037,6 +2037,17 @@ void CGameContext::SetClientLanguage(int ClientID, const char *pLanguage)
 const char* CGameContext::Localize(const char *pLanguageCode, const char* pText) const
 {
 	return Server()->Localization()->Localize(pLanguageCode, pText);
+}
+
+const char* CGameContext::GetPlayerLanguage(int ClientID) const
+{
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS)
+		return "en";
+
+	if(!m_apPlayers[ClientID])
+		return "en";
+	
+	return m_apPlayers[ClientID]->GetLanguage();
 }
 
 void CGameContext::ConsoleOutputCallback_Chat(const char *pLine, void *pUser)

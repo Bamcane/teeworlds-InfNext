@@ -15,6 +15,8 @@ public:
 	~CGameControllerNext();
 
 	void Tick() override;
+	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon) override;
+
 	int RoundTick() const;
 	int RoundSecond() const;
 
