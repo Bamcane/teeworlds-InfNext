@@ -28,6 +28,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_RespawnTick = Server()->Tick();
 	m_DieTick = Server()->Tick();
 	m_ScoreStartTick = Server()->Tick();
+	m_LastScore = 0;
 	m_pCharacter = 0;
 	m_ClientID = ClientID;
 	m_Team = Team;
@@ -129,7 +130,7 @@ void CPlayer::Tick()
 				m_pCharacter = 0;
 			}
 		}
-		else if(m_Spawning && m_RespawnTick <= Server()->Tick() && m_Team != TEAM_SPECTATORS)
+		else if(m_Spawning && !GameServer()->m_pController->IsGameOver() && m_RespawnTick <= Server()->Tick() && m_Team != TEAM_SPECTATORS)
 			TryRespawn();
 	}
 	else
@@ -403,7 +404,7 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 
-	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos, IsHuman()))
+	if(!GameServer()->m_pController->PreSpawn(this, &SpawnPos))
 		return;
 		
 	m_Spawning = false;

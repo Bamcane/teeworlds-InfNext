@@ -75,6 +75,7 @@ public:
 	int m_RespawnTick;
 	int m_DieTick;
 	int m_Score;
+	int m_LastScore;
 	int m_ScoreStartTick;
 	bool m_ForceBalanced;
 	int m_LastActionTick;

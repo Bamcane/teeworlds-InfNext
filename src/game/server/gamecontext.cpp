@@ -607,6 +607,13 @@ void CGameContext::OnTick()
 	// check tuning
 	CheckPureTuning();
 
+	// copy tuning
+	m_World.m_Core.m_Tuning = m_Tuning;
+	m_World.Tick();
+
+	//if(world.paused) // make sure that the game object always updates
+	m_pController->Tick();
+
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
 		if(m_apPlayers[i])
@@ -615,13 +622,6 @@ void CGameContext::OnTick()
 			m_apPlayers[i]->PostTick();
 		}
 	}
-
-	// copy tuning
-	m_World.m_Core.m_Tuning = m_Tuning;
-	m_World.Tick();
-
-	//if(world.paused) // make sure that the game object always updates
-	m_pController->Tick();
 
 	// update voting
 	if(m_VoteCloseTime)
@@ -853,6 +853,8 @@ void CGameContext::OnClientConnected(int ClientID)
 
 	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, StartTeam);
 
+	if (m_pController->IsInfectionStarted())
+		m_apPlayers[ClientID]->Infect();
 	(void)m_pController->CheckTeamBalance();
 	//players[client_id].init(client_id);
 	//players[client_id].client_id = client_id;

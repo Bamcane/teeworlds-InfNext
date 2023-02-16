@@ -46,13 +46,13 @@ void CGameControllerNext::Tick()
 		GameServer()->SendBroadcast_VL(_("Wait game start!"), -1);
 	}
 
-	if(RoundSecond() < 10) // send class chooser
+	if(!IsInfectionStarted() && (Infects + Humans) >= 2) // send class chooser
 	{
 		SendClassChooser();
 	}
 
 	// start infection
-	if((Server()->Tick()-m_RoundStartTick) == 500)
+	if((Server()->Tick()-m_RoundStartTick) == 500 && (Infects + Humans) >= 2)
 	{
 		CreateInfects();
 		CheckNoClass();
@@ -243,18 +243,44 @@ void CGameControllerNext::CreateInfects()
 	else if(m_LastPlayersNum > 4)
 		InfectNum = 2;
 	else
-		InfectNum = 2;
+		InfectNum = 1;
 
 	array<int> tmpList;
 
 	for(int i = 0;i < InfectNum;i ++)
 	{
-		int InfectID=-1;
-		do
-		{
-			InfectID = random_int(0, MAX_CLIENTS-1);
-		}while(PlayerInfected(InfectID));
+		int BestScore=0;
 
+		int InfectID=-1;
+
+		for(int j = 0; j < MAX_CLIENTS; j ++)
+		{
+			if(!GameServer()->m_apPlayers[j])
+				continue;
+
+			for(int k = 0;k < tmpList.size();k ++)
+			{
+				if(tmpList[k] == j)
+					continue;
+			}
+
+			float Scoremod = 1.0f;
+			int Score = 10;
+			
+			if(PlayerInfected(j))
+			{
+				Scoremod = 0.4f;
+				if(GameServer()->m_apPlayers[j]->m_LastScore)
+					Scoremod -= max(0.f, GameServer()->m_apPlayers[j]->m_LastScore/120.0f);
+			}
+			
+			Score *= Scoremod;
+			if(Score > BestScore)
+			{
+				InfectID = j;
+				BestScore = Score;
+			}
+		};
 		GameServer()->m_apPlayers[InfectID]->Infect();
 		tmpList.add(InfectID);
 	}
@@ -275,5 +301,60 @@ bool CGameControllerNext::PlayerInfected(int ClientID)
 		if(m_LastInfect[i] == ClientID)
 			return true;
 	}
+	return false;
+}
+
+bool CGameControllerNext::IsSpawnable(vec2 Pos)
+{
+	//First check if there is a tee too close
+	CCharacter *aEnts[MAX_CLIENTS];
+	int Num = GameServer()->m_World.FindEntities(Pos, 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+	
+	for(int c = 0; c < Num; ++c)
+	{
+		if(distance(aEnts[c]->m_Pos, Pos) <= 60)
+			return false;
+	}
+	
+	//Check the center
+	if(GameServer()->Collision()->CheckPoint(Pos))
+		return false;
+
+	//Check the border of the tee. Kind of extrem, but more precise
+	for(int i=0; i<16; i++)
+	{
+		float Angle = i * (2.0f * pi / 16.0f);
+		vec2 CheckPos = Pos + vec2(cos(Angle), sin(Angle)) * 30.0f;
+		
+		if(GameServer()->Collision()->CheckPoint(CheckPos))
+			return false;
+	}
+	
+	return true;
+}
+
+bool CGameControllerNext::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
+{
+	// spectators can't spawn
+	if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+		return false;
+	
+	if(IsInfectionStarted())
+		pPlayer->Infect();
+			
+	int Type = (pPlayer->IsInfect() ? TEAM_RED : TEAM_BLUE);
+
+	// get spawn point
+	int RandomShift = random_int(0, m_aaSpawnPoints[Type].size()-1);
+	for(int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
+	{
+		int I = (i + RandomShift)%m_aaSpawnPoints[Type].size();
+		if(IsSpawnable(m_aaSpawnPoints[Type][I]))
+		{
+			*pOutPos = m_aaSpawnPoints[Type][I];
+			return true;
+		}
+	}
+	
 	return false;
 }

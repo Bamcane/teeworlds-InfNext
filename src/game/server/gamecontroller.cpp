@@ -37,73 +37,27 @@ IGameController::~IGameController()
 {
 }
 
-float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos)
+bool IGameController::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 {
-	float Score = 0.0f;
-	CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
-	for(; pC; pC = (CCharacter *)pC->TypeNext())
-	{
-		// team mates are not as dangerous as enemies
-		float Scoremod = 1.0f;
-		if(pEval->m_FriendlyTeam != -1 && pC->GetPlayer()->IsHuman() == pEval->m_FriendlyTeam)
-			Scoremod = 0.5f;
-
-		float d = distance(Pos, pC->m_Pos);
-		Score += Scoremod * (d == 0 ? 1000000000.0f : 1.0f/d);
-	}
-
-	return Score;
-}
-
-void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type)
-{
-	// get spawn point
-	for(int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
-	{
-		// check if the position is occupado
-		CCharacter *aEnts[MAX_CLIENTS];
-		int Num = GameServer()->m_World.FindEntities(m_aaSpawnPoints[Type][i], 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };	// start, left, up, right, down
-		int Result = -1;
-		for(int Index = 0; Index < 5 && Result == -1; ++Index)
-		{
-			Result = Index;
-			for(int c = 0; c < Num; ++c)
-				if(GameServer()->Collision()->CheckPoint(m_aaSpawnPoints[Type][i]+Positions[Index]) ||
-					distance(aEnts[c]->m_Pos, m_aaSpawnPoints[Type][i]+Positions[Index]) <= aEnts[c]->m_ProximityRadius)
-				{
-					Result = -1;
-					break;
-				}
-		}
-		if(Result == -1)
-			continue;	// try next spawn point
-
-		vec2 P = m_aaSpawnPoints[Type][i]+Positions[Result];
-		float S = EvaluateSpawnPos(pEval, P);
-		if(!pEval->m_Got || pEval->m_Score > S)
-		{
-			pEval->m_Got = true;
-			pEval->m_Score = S;
-			pEval->m_Pos = P;
-		}
-	}
-}
-
-bool IGameController::CanSpawn(int Team, vec2 *pOutPos, bool Human)
-{
-	CSpawnEval Eval;
-
+	int Team = pPlayer->GetTeam();
+	
 	// spectators can't spawn
 	if(Team == TEAM_SPECTATORS)
 		return false;
 
-	Eval.m_FriendlyTeam = (int)Human;
+	int Type = (pPlayer->IsInfect() ? TEAM_RED : TEAM_BLUE);
 
-	EvaluateSpawnType(&Eval, (int)Human);
-
-	*pOutPos = Eval.m_Pos;
-	return Eval.m_Got;
+	// get spawn point
+	for(int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
+	{
+		if(IsSpawnable(m_aaSpawnPoints[Type][i]))
+		{
+			*pOutPos = m_aaSpawnPoints[Type][i];
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 
@@ -155,15 +109,6 @@ void IGameController::StartRound()
 {
 	ResetGame();
 
-	
-	for (auto player : m_pGameServer->m_apPlayers) 
-	{
-		if (player) 
-		{
-			player->CureToDefault();
-		}
-	}
-
 	m_RoundStartTick = Server()->Tick();
 	m_SuddenDeath = 0;
 	m_GameOverTick = -1;
@@ -175,6 +120,14 @@ void IGameController::StartRound()
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "start round type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+
+	for (auto player : m_pGameServer->m_apPlayers) 
+	{
+		if (player) 
+		{
+			player->CureToDefault();
+		}
+	}
 }
 
 void IGameController::ChangeMap(const char *pToMap)
@@ -259,6 +212,7 @@ void IGameController::PostReset()
 		if(GameServer()->m_apPlayers[i])
 		{
 			GameServer()->m_apPlayers[i]->Respawn();
+			GameServer()->m_apPlayers[i]->m_LastScore = GameServer()->m_apPlayers[i]->m_Score;
 			GameServer()->m_apPlayers[i]->m_Score = 0;
 			GameServer()->m_apPlayers[i]->m_ScoreStartTick = Server()->Tick();
 			GameServer()->m_apPlayers[i]->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
@@ -658,4 +612,9 @@ int IGameController::ClampTeam(int Team)
 		return TEAM_SPECTATORS;
 	return Team&1;
 	return 0;
+}
+
+bool IGameController::IsInfectionStarted()
+{
+	return (m_RoundStartTick + Server()->TickSpeed()*10 <= Server()->Tick());
 }

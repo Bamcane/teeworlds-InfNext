@@ -440,21 +440,20 @@ void CCharacter::HandleEvents()
 		m_Core.m_MaxJumps = m_pPlayer->GetClass()->m_MaxJumpNum;
 	else m_Core.m_MaxJumps = 2;
 
-	// handle infect-tiles
-	if(m_pPlayer->IsHuman())
+	if(m_Alive && !GameServer()->m_pController->IsGameOver())
 	{
-		if(IsCollisionTile(CCollision::COLFLAG_INFECT))
+		// handle infect-tiles
+		if(IsCollisionTile(CCollision::COLFLAG_INFECT) && m_pPlayer->IsHuman())
 		{
 			m_pPlayer->Infect();
 		}
-	}
 
-	// handle dead tiles
-	if(IsCollisionTile(CCollision::COLFLAG_DEATH))
-	{
-		Die(GetCID(), WEAPON_SELF);
+		// handle dead tiles
+		if(IsCollisionTile(CCollision::COLFLAG_DEATH))
+		{
+			Die(GetCID(), WEAPON_SELF);
+		}
 	}
-	
 
 	if(m_DeepFreeze)
 	{
@@ -491,11 +490,11 @@ void CCharacter::Tick()
 {
 	HandleInput();
 
-	m_Core.m_Input = m_Input;
-	m_Core.Tick(true, m_pPlayer->GetNextTuningParams());
-
 	// handle events
 	HandleEvents();
+
+	m_Core.m_Input = m_Input;
+	m_Core.Tick(true, m_pPlayer->GetNextTuningParams());
 
 	// Previnput
 	m_PrevInput = m_Input;
@@ -693,7 +692,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 	if(Mode == DAMAGEMODE_INFECTION)
 	{
-		m_pPlayer->Infect();
+		m_pPlayer->Infect(From);
 		return false;
 	}
 

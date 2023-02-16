@@ -15,7 +15,11 @@ public:
 	~CGameControllerNext();
 
 	void Tick() override;
+	
 	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon) override;
+
+	bool PreSpawn(CPlayer* pPlayer, vec2 *pPos) override;
+	bool IsSpawnable(vec2 Pos) override;
 
 	int RoundTick() const;
 	int RoundSecond() const;

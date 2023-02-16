@@ -13,33 +13,15 @@
 */
 class IGameController
 {
-	array<vec2> m_aaSpawnPoints[2];
-
 	class CGameContext *m_pGameServer;
 	class IServer *m_pServer;
 
 protected:
+	array<vec2> m_aaSpawnPoints[2];
+
 	CGameContext *GameServer() const { return m_pGameServer; }
 	IServer *Server() const { return m_pServer; }
 
-	struct CSpawnEval
-	{
-		CSpawnEval()
-		{
-			m_Got = false;
-			m_FriendlyTeam = -1;
-			m_Pos = vec2(100,100);
-		}
-
-		vec2 m_Pos;
-		bool m_Got;
-		int m_FriendlyTeam;
-		float m_Score;
-	};
-
-	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos);
-	void EvaluateSpawnType(CSpawnEval *pEval, int Type);
-	bool EvaluateSpawn(class CPlayer *pP, vec2 *pPos);
 
 	void CycleMap();
 	void ResetGame();
@@ -130,9 +112,6 @@ public:
 
 	virtual void OnPlayerInfoChange(class CPlayer *pP);
 
-	//
-	virtual bool CanSpawn(int Team, vec2 *pPos, bool Human);
-
 	virtual void UpdateGameInfo(int ClientID);
 	/*
 
@@ -146,6 +125,11 @@ public:
 
 	virtual class CClass *OnPlayerInfect(class CPlayer *pPlayer) = 0;
 	virtual void PostReset();
+
+	virtual bool PreSpawn(CPlayer* pPlayer, vec2 *pPos);
+	virtual bool IsSpawnable(vec2 Pos) = 0;
+
+	bool IsInfectionStarted();
 };
 
 #endif
