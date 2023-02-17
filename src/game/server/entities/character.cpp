@@ -671,7 +671,8 @@ void CCharacter::Die(int Killer, int Weapon)
 	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
 
 	// class check
-	m_pPlayer->GetClass()->OnPlayerDeath(GetCID(), Killer, m_Pos);
+	if(m_pPlayer->GetClass())
+		m_pPlayer->GetClass()->OnPlayerDeath(GetCID(), Killer, m_Pos);
 
 	// infection
 	if(m_pPlayer->IsHuman())
