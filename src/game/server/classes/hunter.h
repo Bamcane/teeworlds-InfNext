@@ -6,7 +6,7 @@
 class CClassHunter : public CClass
 {
 public:
-    CClassHunter(class CGameContext *pGameServer);
+    CClassHunter(CGameContext *pGameServer);
 };
 
 #endif

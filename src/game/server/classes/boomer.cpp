@@ -42,3 +42,9 @@ CClassBoomer::CClassBoomer(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[4] = HSLtoint(0, 100, 0);
     m_Skin.m_aSkinPartColors[5] = -8229413;
 }
+
+void CClassBoomer::OnPlayerDeath(int ClientID, int KillerID, vec2 Pos)
+{
+    GameServer()->CreateSound(Pos, SOUND_GRENADE_EXPLODE);
+	GameServer()->CreateExplosion(Pos, ClientID, WEAPON_HAMMER, false, -1L, DAMAGEMODE_INFECTION);
+}

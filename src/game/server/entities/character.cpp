@@ -670,6 +670,9 @@ void CCharacter::Die(int Killer, int Weapon)
 	// a nice sound
 	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
 
+	// class check
+	m_pPlayer->GetClass()->OnPlayerDeath(GetCID(), Killer, m_Pos);
+
 	// infection
 	if(m_pPlayer->IsHuman())
 		m_pPlayer->Infect();
@@ -685,10 +688,10 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 {
-	m_Core.m_Vel += Force;
-
 	if(Mode != DAMAGEMODE_DMGALL && GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
 		return false;
+
+	m_Core.m_Vel += Force;
 
 	if(Mode == DAMAGEMODE_INFECTION)
 	{

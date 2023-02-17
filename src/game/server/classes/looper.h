@@ -6,7 +6,7 @@
 class CClassLooper : public CClass
 {
 public:
-    CClassLooper(class CGameContext *pGameServer);
+    CClassLooper(CGameContext *pGameServer);
 };
 
 #endif

@@ -69,6 +69,9 @@ void CProjectile::Tick()
 
 	if(TargetChr || Collide || m_LifeSpan < 0 || GameLayerClipped(CurPos))
 	{
+		if(TargetChr && GameServer()->m_pController->IsFriendlyFire(m_Owner, TargetChr->GetCID()))
+			return;
+
 		if(m_LifeSpan >= 0 || m_Weapon == WEAPON_GRENADE)
 			GameServer()->CreateSound(CurPos, m_SoundImpact);
 

@@ -26,6 +26,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	CCharacter *pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pOwnerChar);
 	if(!pHit)
 		return false;
+	else if(GameServer()->m_pController->IsFriendlyFire(m_Owner, pHit->GetCID()))
 
 	m_From = From;
 	m_Pos = At;

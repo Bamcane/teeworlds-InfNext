@@ -6,7 +6,7 @@
 class CClassSniper : public CClass
 {
 public:
-    CClassSniper(class CGameContext *pGameServer);
+    CClassSniper(CGameContext *pGameServer);
 };
 
 #endif
