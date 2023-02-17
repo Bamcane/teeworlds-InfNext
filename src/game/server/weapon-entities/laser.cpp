@@ -27,6 +27,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	if(!pHit)
 		return false;
 	else if(GameServer()->m_pController->IsFriendlyFire(m_Owner, pHit->GetCID()))
+		return false;
 
 	m_From = From;
 	m_Pos = At;
