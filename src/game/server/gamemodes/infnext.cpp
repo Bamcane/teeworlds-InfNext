@@ -111,6 +111,7 @@ void CGameControllerNext::InitClasses()
 {
 	InitHumanClass(new CClassLooper(GameServer()), true);
 	InitHumanClass(new CClassSniper(GameServer()), true);
+	InitHumanClass(new CClassMedic(GameServer()), true);
 
 	InitInfectClass(new CClassHunter(GameServer()), 50);
 	InitInfectClass(new CClassBoomer(GameServer()), 50);
@@ -170,6 +171,9 @@ void CGameControllerNext::SendClassChooser()
 			continue;
 		
 		if(pPlayer->GetClass())
+			continue;
+
+		if(pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU || pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD)
 			continue;
 
 		const char *pLanguage = GameServer()->m_apPlayers[i]->GetLanguage();

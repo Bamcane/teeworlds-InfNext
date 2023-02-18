@@ -2610,3 +2610,8 @@ void CServer::InitClientBot(int ClientID)
 
 	SendConnectionReady(ClientID);
 }
+
+void CServer::ReloadMap()
+{
+	m_MapReload = 1;
+}

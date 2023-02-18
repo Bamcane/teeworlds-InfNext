@@ -663,7 +663,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	CNetMsg_Sv_KillMsg Msg;
 	Msg.m_Killer = Killer;
 	Msg.m_Victim = m_pPlayer->GetCID();
-	Msg.m_Weapon = m_ActiveWeapon;
+	Msg.m_Weapon = Weapon;
 	Msg.m_ModeSpecial = ModeSpecial;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
 

@@ -21,6 +21,7 @@ protected:
 public:
 	CWeapon(class CGameContext *pGameServer);
     
+	class IServer *Server();
 	class CGameContext *GameServer() { return m_pGameServer; }
 	class CGameWorld *GameWorld();
 
