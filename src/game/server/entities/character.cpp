@@ -688,7 +688,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// infection
 	if(m_pPlayer->IsHuman())
-		m_pPlayer->Infect();
+		m_pPlayer->Infect(Killer);
 
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
