@@ -7,5 +7,6 @@
 
 #include <game/server/classes/hunter.h>
 #include <game/server/classes/boomer.h>
+#include <game/server/classes/smoker.h>
 
 #endif

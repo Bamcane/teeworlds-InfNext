@@ -66,6 +66,8 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_FreezeStartTick = 0;
 	m_FreezeEndTick = 0;
 
+	m_LastHookDmgTick = 0;
+
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
 
@@ -436,10 +438,6 @@ void CCharacter::ResetInput()
 
 void CCharacter::HandleEvents()
 {
-	if(m_pPlayer->GetClass())
-		m_Core.m_MaxJumps = m_pPlayer->GetClass()->m_MaxJumpNum;
-	else m_Core.m_MaxJumps = 2;
-
 	if(m_Alive && !GameServer()->m_pController->IsGameOver())
 	{
 		// handle infect-tiles
@@ -486,9 +484,23 @@ void CCharacter::HandleInput()
 	}
 }
 
+void CCharacter::HandleClass()
+{
+	m_Core.m_MaxJumps = 2;
+
+	if(!m_pPlayer->GetClass())
+		return;
+
+	m_Core.m_MaxJumps = m_pPlayer->GetClass()->m_MaxJumpNum;
+	
+	m_pPlayer->GetClass()->OnTick(this);
+}
+
 void CCharacter::Tick()
 {
 	HandleInput();
+
+	HandleClass();
 
 	// handle events
 	HandleEvents();
