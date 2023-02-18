@@ -165,6 +165,9 @@ void CGameControllerNext::SendClassChooser()
 
 		if(!pPlayer) 
 			continue;
+
+		if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+			continue;
 		
 		if(pPlayer->GetClass())
 			continue;
@@ -214,6 +217,9 @@ void CGameControllerNext::CheckNoClass()
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
 
 		if(!pPlayer) 
+			continue;
+
+		if(pPlayer->GetTeam() == TEAM_SPECTATORS)
 			continue;
 		
 		if(pPlayer->GetClass())

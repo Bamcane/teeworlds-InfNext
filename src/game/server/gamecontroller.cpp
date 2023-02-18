@@ -121,12 +121,15 @@ void IGameController::StartRound()
 	str_format(aBuf, sizeof(aBuf), "start round type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
-	for (auto player : m_pGameServer->m_apPlayers) 
+	for (auto pPlayer : m_pGameServer->m_apPlayers) 
 	{
-		if (player) 
-		{
-			player->CureToDefault();
-		}
+		if (!pPlayer) 
+			continue;
+
+		if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+			continue;
+
+		pPlayer->CureToDefault();
 	}
 }
 
