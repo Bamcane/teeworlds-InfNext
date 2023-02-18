@@ -93,11 +93,11 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 		if(pKiller->IsInfect())
 		{
 			pKiller->m_Score += 3;
-		
 		}else
 		{
 			pKiller->m_Score += 1;
 		}
+		GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(pKiller->GetCID()));
 	}
 }
 

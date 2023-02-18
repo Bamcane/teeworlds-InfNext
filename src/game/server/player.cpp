@@ -493,17 +493,10 @@ void CPlayer::CureToDefault()
 	}
 }
 
-void CPlayer::Infect(int From)
+void CPlayer::Infect()
 {
 	if(IsInfect())
 		return;
-
-	if(From != -1 && GameServer()->m_apPlayers[From])
-	{
-		GameServer()->m_apPlayers[From]->m_Score += 3;
-		GameServer()->SendChatTarget_Localization(From, _("You infected '%s'"), Server()->ClientName(GetCID()));
-		GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '%s'"), Server()->ClientName(From));
-	}
 	
 	if(m_pCharacter)
 	{

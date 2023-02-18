@@ -688,7 +688,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// infection
 	if(m_pPlayer->IsHuman())
-		m_pPlayer->Infect(Killer);
+		m_pPlayer->Infect();
 
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
@@ -708,8 +708,27 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 	if(Mode == DAMAGEMODE_INFECTION)
 	{
-		m_pPlayer->Infect(From);
+		m_pPlayer->Infect();
+		GameServer()->m_apPlayers[From]->m_Score += 3;
+		GameServer()->SendChatTarget_Localization(From, _("You infected '%s'"), Server()->ClientName(GetCID()));
+		GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '%s'"), Server()->ClientName(From));
 		return false;
+		
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "kill killer='%s' victim='%s' weapon=%d",
+			Server()->ClientName(From),
+			Server()->ClientName(m_pPlayer->GetCID()), Weapon);
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+		
+		CNetMsg_Sv_KillMsg Msg;
+		Msg.m_Killer = From;
+		Msg.m_Victim = m_pPlayer->GetCID();
+		Msg.m_Weapon = Weapon;
+		Msg.m_ModeSpecial = 0;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+
+		if(GameServer()->m_apPlayers[From])
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(From));
 	}
 
 	// m_pPlayer only inflicts half damage on self
