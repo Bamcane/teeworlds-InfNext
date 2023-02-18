@@ -712,7 +712,6 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 		GameServer()->m_apPlayers[From]->m_Score += 3;
 		GameServer()->SendChatTarget_Localization(From, _("You infected '%s'"), Server()->ClientName(GetCID()));
 		GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '%s'"), Server()->ClientName(From));
-		return false;
 		
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "kill killer='%s' victim='%s' weapon=%d",
@@ -729,6 +728,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 		if(GameServer()->m_apPlayers[From])
 			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(From));
+		return false;
 	}
 
 	// m_pPlayer only inflicts half damage on self
