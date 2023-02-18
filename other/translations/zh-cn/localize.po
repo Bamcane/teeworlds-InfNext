@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-13 20:33+0800\n"
-"PO-Revision-Date: 2023-02-13 20:33+0800\n"
+"POT-Creation-Date: 2023-02-18 17:42+0800\n"
+"PO-Revision-Date: 2023-02-18 17:43+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -27,6 +27,14 @@ msgstr "猎人"
 msgid "Looper"
 msgstr "循环者"
 
+#: game/server/classes/medic.cpp:9
+msgid "Medic"
+msgstr "医疗兵"
+
+#: game/server/classes/smoker.cpp:7
+msgid "Smoker"
+msgstr "吸烟者"
+
 #: game/server/classes/sniper.cpp:9
 msgid "Sniper"
 msgstr "狙击手"
@@ -48,173 +56,193 @@ msgstr "投票否决"
 msgid "'%s' entered and joined the %s"
 msgstr "'%s' 连接并加入了%s"
 
-#: game/server/gamecontext.cpp:1192
+#: game/server/gamecontext.cpp:1194
 msgid "Spectators aren't allowed to start a vote."
 msgstr "旁观者不能发起投票."
 
-#: game/server/gamecontext.cpp:1198
+#: game/server/gamecontext.cpp:1200
 msgid "Wait for current vote to end before calling a new one."
 msgstr "等待当前投票结束创建新投票."
 
-#: game/server/gamecontext.cpp:1206
+#: game/server/gamecontext.cpp:1208
 #, c-format
 msgid "You must wait %d seconds before making another vote"
 msgstr "你必须等待%d秒才能发起另一个投票"
 
-#: game/server/gamecontext.cpp:1223
+#: game/server/gamecontext.cpp:1225
 #, c-format
 msgid "'%s' called vote to change server option '%s' (%s)"
 msgstr "'%s'提议修改服务器设置'%s'(%s)"
 
-#: game/server/gamecontext.cpp:1236
+#: game/server/gamecontext.cpp:1238
 #, c-format
 msgid "'%s' isn't an option on this server"
 msgstr "'%s'在此服务器上不是一个选项"
 
-#: game/server/gamecontext.cpp:1244
+#: game/server/gamecontext.cpp:1246
 msgid "Server does not allow voting to kick players"
 msgstr "服务器不允许投票踢出玩家"
 
-#: game/server/gamecontext.cpp:1257
+#: game/server/gamecontext.cpp:1259
 #, c-format
 msgid "Kick voting requires %d players on the server"
 msgstr "踢出投票在此服务器上需要%d名玩家"
 
-#: game/server/gamecontext.cpp:1265
+#: game/server/gamecontext.cpp:1267
 msgid "Invalid client id to kick"
 msgstr "未知的客户端ID"
 
-#: game/server/gamecontext.cpp:1270
+#: game/server/gamecontext.cpp:1272
 msgid "You can't kick yourself"
 msgstr "你不能踢出你自己"
 
-#: game/server/gamecontext.cpp:1279
+#: game/server/gamecontext.cpp:1281
 msgid "You can't kick admins"
 msgstr "你不能踢出管理员"
 
-#: game/server/gamecontext.cpp:1280
+#: game/server/gamecontext.cpp:1282
 #, c-format
 msgid "'%s' called for vote to kick you"
 msgstr "'%s'发起投票踢出你"
 
-#: game/server/gamecontext.cpp:1284
+#: game/server/gamecontext.cpp:1286
 #, c-format
 msgid "'%s' called for vote to kick '%s' (%s)"
 msgstr "'%s'发起投票踢出'%s'(%s)"
 
-#: game/server/gamecontext.cpp:1300
+#: game/server/gamecontext.cpp:1302
 msgid "Server does not allow voting to move players to spectators"
 msgstr "服务器不允许投票移动玩家到旁观"
 
-#: game/server/gamecontext.cpp:1307
+#: game/server/gamecontext.cpp:1309
 msgid "Invalid client id to move"
 msgstr "未知的客户端ID"
 
-#: game/server/gamecontext.cpp:1312
+#: game/server/gamecontext.cpp:1314
 msgid "You can't move yourself"
 msgstr "你不能移动你自己"
 
-#: game/server/gamecontext.cpp:1318
+#: game/server/gamecontext.cpp:1320
 #, c-format
 msgid "'%s' called for vote to move '%s' to spectators (%s)"
 msgstr "'%s'发起投票移动'%s'到旁观(%s)"
 
-#: game/server/gamecontext.cpp:1361
+#: game/server/gamecontext.cpp:1363
 #, c-format
 msgid "Time to wait before changing team: %02d:%02d"
 msgstr "等待%02d:%02d才能切换队伍"
 
-#: game/server/gamecontext.cpp:1375
+#: game/server/gamecontext.cpp:1377
 msgid "Teams must be balanced, please join other team"
 msgstr "队伍必须平衡, 请加入另一个队伍"
 
-#: game/server/gamecontext.cpp:1379
+#: game/server/gamecontext.cpp:1381
 #, c-format
 msgid "Only %d active players are allowed"
 msgstr "只允许%d名玩家游玩"
 
-#: game/server/gamecontext.cpp:1398
+#: game/server/gamecontext.cpp:1400
 msgid "Invalid spectator id used"
 msgstr "未知的客户端ID"
 
-#: game/server/gamecontext.cpp:1418
+#: game/server/gamecontext.cpp:1420
 #, c-format
 msgid "'%s' changed name to '%s'"
 msgstr "'%s' 改名为'%s'"
 
-#: game/server/gamecontext.cpp:1847
+#: game/server/gamecontext.cpp:1849
 #, c-format
 msgid "admin forced server option '%s' (%s)"
 msgstr "管理员修改服务器设置'%s'(%s)"
 
-#: game/server/gamecontext.cpp:1892
+#: game/server/gamecontext.cpp:1894
 #, c-format
 msgid "admin moved '%s' to spectator (%s)"
 msgstr "管理员移动'%s'到旁观(%s)"
 
-#: game/server/gamecontext.cpp:1922
+#: game/server/gamecontext.cpp:1924
 msgid "admin forced vote yes"
 msgstr "管理员通过投票"
 
-#: game/server/gamecontext.cpp:1927
+#: game/server/gamecontext.cpp:1929
 msgid "admin forced vote no"
 msgstr "管理员否决投票"
 
-#: game/server/gamecontext.cpp:1965
+#: game/server/gamecontext.cpp:1967
 #, c-format
 msgid "%s by %s"
 msgstr "%s 由 %s制作"
 
-#: game/server/gamecontext.cpp:1967
+#: game/server/gamecontext.cpp:1969
 #, c-format
 msgid "Thanks %s"
 msgstr "感谢 %s"
 
-#: game/server/gamecontext.cpp:1968
+#: game/server/gamecontext.cpp:1970
 msgid "Based on the concept of infNext mod by pure_luck"
 msgstr "概念基于pure_luck的infNext(ddnet-infclass)"
 
-#: game/server/gamecontext.cpp:2001
+#: game/server/gamecontext.cpp:2003
 msgid "Language successfully switched to English"
 msgstr "语言已切换为中文"
 
-#: game/server/gamecontext.cpp:2009
+#: game/server/gamecontext.cpp:2011
 msgid "Unknown language or no input language code"
 msgstr "未知的语言或未输入语言代码"
 
-#: game/server/gamecontext.cpp:2021
+#: game/server/gamecontext.cpp:2023
 #, c-format
 msgid "Available languages: %s"
 msgstr "可用的语言: %s"
 
-#: game/server/gamecontroller.cpp:156
+#: game/server/gamecontroller.cpp:97
 msgid "red team"
 msgstr "红队"
 
-#: game/server/gamecontroller.cpp:158
+#: game/server/gamecontroller.cpp:99
 msgid "blue team"
 msgstr "蓝队"
 
-#: game/server/gamecontroller.cpp:160
+#: game/server/gamecontroller.cpp:101
 msgid "game"
 msgstr "游戏"
 
-#: game/server/gamecontroller.cpp:162
+#: game/server/gamecontroller.cpp:103
 msgid "spectators"
 msgstr "旁观者"
 
-#: game/server/gamemodes/infnext.cpp:46
+#: game/server/gamemodes/infnext.cpp:50
 msgid "Wait game start!"
 msgstr "等待游戏开始!"
 
-#: game/server/gamemodes/infnext.cpp:66
+#: game/server/gamemodes/infnext.cpp:70
 msgid "INF| Infects win!"
 msgstr "INF| 感染胜利!"
 
-#: game/server/gamemodes/infnext.cpp:71
+#: game/server/gamemodes/infnext.cpp:75
 msgid "HUM| Humans win!"
 msgstr "HUM| 人类胜利!"
 
-#: game/server/gamemodes/infnext.cpp:160
+#: game/server/gamemodes/infnext.cpp:95
+#, c-format
+msgid "You infected '%s'"
+msgstr "你感染了'%s'"
+
+#: game/server/gamemodes/infnext.cpp:96
+#, c-format
+msgid "You're infected by '%s'"
+msgstr "你被'%s'感染了"
+
+#: game/server/gamemodes/infnext.cpp:192
 msgid "Class Chooser"
 msgstr "角色选择器"
+
+#: game/server/player.cpp:284
+#, c-format
+msgid "'%s' has left the game"
+msgstr "'%s'离开了游戏"
+
+#: game/server/player.cpp:369
+#, c-format
+msgid "'%s' joined the %s"
+msgstr "'%s' 加入了%s"
