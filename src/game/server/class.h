@@ -12,6 +12,7 @@ private:
     CGameContext *m_pGameServer;
 
 protected:
+    IServer *Server();
     CGameContext *GameServer() { return m_pGameServer; }
 
 public:
@@ -19,6 +20,7 @@ public:
     CClass() {};
     ~CClass();
 
+    virtual void OnTick(class CCharacter *pOwner) {};
     virtual void OnPlayerDeath(int ClientID, int KillerID, vec2 Pos) {};
 
     char m_ClassName[32];

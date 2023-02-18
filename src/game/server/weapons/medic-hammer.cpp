@@ -1,12 +1,12 @@
 #include <game/server/gamecontext.h>
-#include "infect-hammer.h"
+#include "medic-hammer.h"
 
-CWeaponInfectHammer::CWeaponInfectHammer(CGameContext *pGameServer)
+CWeaponMedicHammer::CWeaponMedicHammer(CGameContext *pGameServer)
     : CWeaponHammer(pGameServer)
 {
 }
 
-void CWeaponInfectHammer::Fire(vec2 Pos, vec2 Direction, int Owner)
+void CWeaponMedicHammer::Fire(vec2 Pos, vec2 Direction, int Owner)
 {
     CCharacter *pOwnerChr = GameServer()->GetPlayerChar(Owner);
     if(!pOwnerChr)
@@ -38,14 +38,14 @@ void CWeaponInfectHammer::Fire(vec2 Pos, vec2 Direction, int Owner)
         else
             Dir = vec2(0.f, -1.f);
 
-        if(pTarget->GetPlayer()->IsHuman())
-            pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
-                pOwnerChr->GetPlayer()->GetCID(), WEAPON_HAMMER, DAMAGEMODE_INFECTION);
+        if(pTarget->GetPlayer()->IsInfect())
+            pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, 20,
+                pOwnerChr->GetPlayer()->GetCID(), WEAPON_HAMMER, DAMAGEMODE_DMG);
         else
         {
-            if(pTarget->IncreaseHealth(3))
+            if(pTarget->IncreaseHealth(2))
                 pTarget->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
-            else if(pTarget->IncreaseArmor(3))
+            else if(pTarget->IncreaseArmor(2))
                 pTarget->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
         }
         Hits++;

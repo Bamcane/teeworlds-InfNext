@@ -43,6 +43,7 @@ public:
 	void HandleNinja();
 	void HandleEvents();
 	void HandleInput();
+	void HandleClass();
 
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);
@@ -158,6 +159,8 @@ public:
 	void SaturateVelocity(vec2 Force, float MaxSpeed);
 	void InitClassWeapon();
 	bool m_DeepFreeze;
+
+	int m_LastHookDmgTick;
 
 };
 

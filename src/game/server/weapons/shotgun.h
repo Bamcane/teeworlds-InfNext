@@ -1,5 +1,5 @@
 #ifndef GAME_SERVER_WEAPONS_SHOTGUN_H
-#define GAME_SERVER__WEAPONS_SHOTGUN_H
+#define GAME_SERVER_WEAPONS_SHOTGUN_H
 
 #include <game/server/weapon.h>
 

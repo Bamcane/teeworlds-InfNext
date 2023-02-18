@@ -36,7 +36,7 @@ CClassBoomer::CClassBoomer(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aUseCustomColors[5] = false;
 
     m_Skin.m_aSkinPartColors[0] = HSLtoint(58, 255, 40);
-    m_Skin.m_aSkinPartColors[1] = HSLtoint(58, 255, 40);
+    m_Skin.m_aSkinPartColors[1] = HSLtoint(58, 255, 10);
     m_Skin.m_aSkinPartColors[2] = -8229413;
     m_Skin.m_aSkinPartColors[3] = HSLtoint(58, 255, 40);
     m_Skin.m_aSkinPartColors[4] = HSLtoint(0, 100, 0);

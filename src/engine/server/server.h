@@ -313,6 +313,8 @@ class CCache
 	void *SnapNewItem(int Type, int ID, int Size) override;
 	void SnapSetStaticsize(int ItemType, int Size);
 	
+	void ReloadMap() override;
+
 public:
 	const char* GetClientLanguage(int ClientID) override;
 	void SetClientLanguage(int ClientID, const char* pLanguage) override;

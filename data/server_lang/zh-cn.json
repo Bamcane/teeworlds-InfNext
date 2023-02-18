@@ -12,6 +12,14 @@
 		"value": "循环者"
 	},
 	{
+		"key": "Medic",
+		"value": "医疗兵"
+	},
+	{
+		"key": "Smoker",
+		"value": "吸烟者"
+	},
+	{
 		"key": "Sniper",
 		"value": "狙击手"
 	},
@@ -184,7 +192,23 @@
 		"value": "HUM| 人类胜利!"
 	},
 	{
+		"key": "You infected '%s'",
+		"value": "你感染了'%s'"
+	},
+	{
+		"key": "You're infected by '%s'",
+		"value": "你被'%s'感染了"
+	},
+	{
 		"key": "Class Chooser",
 		"value": "角色选择器"
+	},
+	{
+		"key": "'%s' has left the game",
+		"value": "'%s'离开了游戏"
+	},
+	{
+		"key": "'%s' joined the %s",
+		"value": "'%s' 加入了%s"
 	},
 ]}

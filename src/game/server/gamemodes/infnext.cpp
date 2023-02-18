@@ -18,6 +18,10 @@ CGameControllerNext::CGameControllerNext(class CGameContext *pGameServer)
 
 CGameControllerNext::~CGameControllerNext()
 {
+	for(int i = 0;i < m_HumanClasses.size(); i++)
+		delete m_HumanClasses[i].m_pClass;
+	for(int i = 0;i < m_InfectClasses.size(); i++)
+		delete m_InfectClasses[i].m_pClass;
 }
 
 void CGameControllerNext::Tick()
@@ -88,7 +92,10 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 	{
 		if(pKiller->IsInfect())
 		{
+			GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '%s'"), Server()->ClientName(pVictim->GetCID()));
+			GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You're infected by '%s'"), Server()->ClientName(pKiller->GetCID()));
 			pKiller->m_Score += 3;
+		
 		}else
 		{
 			pKiller->m_Score += 1;
@@ -111,9 +118,11 @@ void CGameControllerNext::InitClasses()
 {
 	InitHumanClass(new CClassLooper(GameServer()), true);
 	InitHumanClass(new CClassSniper(GameServer()), true);
+	InitHumanClass(new CClassMedic(GameServer()), true);
 
-	InitInfectClass(new CClassHunter(GameServer()), 50);
-	InitInfectClass(new CClassBoomer(GameServer()), 50);
+	InitInfectClass(new CClassHunter(GameServer()), 33);
+	InitInfectClass(new CClassBoomer(GameServer()), 33);
+	InitInfectClass(new CClassSmoker(GameServer()), 33);
 }
 
 // Humans
@@ -165,8 +174,14 @@ void CGameControllerNext::SendClassChooser()
 
 		if(!pPlayer) 
 			continue;
+
+		if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+			continue;
 		
 		if(pPlayer->GetClass())
+			continue;
+
+		if(pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU || pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD)
 			continue;
 
 		const char *pLanguage = GameServer()->m_apPlayers[i]->GetLanguage();
@@ -214,6 +229,9 @@ void CGameControllerNext::CheckNoClass()
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
 
 		if(!pPlayer) 
+			continue;
+
+		if(pPlayer->GetTeam() == TEAM_SPECTATORS)
 			continue;
 		
 		if(pPlayer->GetClass())

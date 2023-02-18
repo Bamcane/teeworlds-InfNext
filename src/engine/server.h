@@ -228,6 +228,8 @@ public:
 	virtual bool IsSixup(int ClientID) const = 0;
 	
 	virtual void ExpireServerInfo() = 0;
+
+	virtual void ReloadMap() = 0;
 };
 
 class IGameServer : public IInterface
