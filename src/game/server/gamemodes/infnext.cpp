@@ -92,8 +92,8 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 	{
 		if(pKiller->IsInfect())
 		{
-			GameServer()->SendChatTarget_Localization(From, _("You infected '%s'"), Server()->ClientName(GetCID()));
-			GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '%s'"), Server()->ClientName(From));
+			GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '%s'"), Server()->ClientName(pVictim->GetCID()));
+			GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You're infected by '%s'"), Server()->ClientName(pKiller->GetCID()));
 			pKiller->m_Score += 3;
 		}else
 		{
