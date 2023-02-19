@@ -252,16 +252,7 @@ void CGameControllerNext::CheckNoClass()
 void CGameControllerNext::CreateInfects()
 {
 	int InfectNum;
-	if(m_LastPlayersNum > 32)
-		InfectNum = 5;
-	else if(m_LastPlayersNum > 16)
-		InfectNum = 4;
-	else if(m_LastPlayersNum > 8)
-		InfectNum = 3;
-	else if(m_LastPlayersNum > 4)
-		InfectNum = 2;
-	else
-		InfectNum = 1;
+	InfectNum = m_LastPlayersNum/5+1;
 
 	array<int> tmpList;
 
