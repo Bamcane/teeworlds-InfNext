@@ -84,6 +84,8 @@ class CGameContext : public IGameServer
 
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
+	void AddVote(const char *pDescription, const char *pCommand);
+	static int MapScan(const char *pName, int IsDir, int DirType, void *pUserData);
 
 	bool m_Resetting;
 
@@ -241,6 +243,8 @@ public:
 	inline bool IsOptionVote() const { return m_VoteType == VOTE_TYPE_OPTION; }
 	inline bool IsKickVote() const { return m_VoteType == VOTE_TYPE_KICK; }
 	inline bool IsSpecVote() const { return m_VoteType == VOTE_TYPE_SPECTATE; }
+
+	void AddMapVotes();
 };
 
 inline int64_t CmaskAll() { return -1LL; }

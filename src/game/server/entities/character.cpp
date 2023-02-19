@@ -706,7 +706,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 	m_Core.m_Vel += Force;
 
-	if(Mode == DAMAGEMODE_INFECTION)
+	if(Mode == DAMAGEMODE_INFECTION && From != m_pPlayer->GetCID())
 	{
 		m_pPlayer->Infect();
 		GameServer()->m_apPlayers[From]->m_Score += 3;
