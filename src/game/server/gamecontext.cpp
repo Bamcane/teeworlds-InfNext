@@ -2366,6 +2366,8 @@ void CGameContext::AddMapVotes()
 		str_escape(&pDst, Item.m_aName, aMapEscaped + sizeof(aMapEscaped));
 		str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", aMapEscaped);
 
+		str_format(g_Config.m_SvMaprotation, sizeof(g_Config.m_SvMaprotation), "%s %s", g_Config.m_SvMaprotation, aMapEscaped);
+
 		AddVote(aDescription, aCommand);
 	}
 
