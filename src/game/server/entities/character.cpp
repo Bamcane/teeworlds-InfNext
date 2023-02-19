@@ -706,9 +706,28 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 	m_Core.m_Vel += Force;
 
-	if(Mode == DAMAGEMODE_INFECTION)
+	if(Mode == DAMAGEMODE_INFECTION && From != m_pPlayer->GetCID())
 	{
-		m_pPlayer->Infect(From);
+		m_pPlayer->Infect();
+		GameServer()->m_apPlayers[From]->m_Score += 3;
+		GameServer()->SendChatTarget_Localization(From, _("You infected '%s'"), Server()->ClientName(GetCID()));
+		GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '%s'"), Server()->ClientName(From));
+		
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "kill killer='%s' victim='%s' weapon=%d",
+			Server()->ClientName(From),
+			Server()->ClientName(m_pPlayer->GetCID()), Weapon);
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+		
+		CNetMsg_Sv_KillMsg Msg;
+		Msg.m_Killer = From;
+		Msg.m_Victim = m_pPlayer->GetCID();
+		Msg.m_Weapon = Weapon;
+		Msg.m_ModeSpecial = 0;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+
+		if(GameServer()->m_apPlayers[From])
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(From));
 		return false;
 	}
 

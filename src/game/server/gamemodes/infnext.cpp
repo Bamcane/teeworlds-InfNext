@@ -95,11 +95,11 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 			GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '%s'"), Server()->ClientName(pVictim->GetCID()));
 			GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You're infected by '%s'"), Server()->ClientName(pKiller->GetCID()));
 			pKiller->m_Score += 3;
-		
 		}else
 		{
 			pKiller->m_Score += 1;
 		}
+		GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(pKiller->GetCID()));
 	}
 }
 
@@ -252,16 +252,7 @@ void CGameControllerNext::CheckNoClass()
 void CGameControllerNext::CreateInfects()
 {
 	int InfectNum;
-	if(m_LastPlayersNum > 32)
-		InfectNum = 5;
-	else if(m_LastPlayersNum > 16)
-		InfectNum = 4;
-	else if(m_LastPlayersNum > 8)
-		InfectNum = 3;
-	else if(m_LastPlayersNum > 4)
-		InfectNum = 2;
-	else
-		InfectNum = 1;
+	InfectNum = m_LastPlayersNum/5+1;
 
 	array<int> tmpList;
 

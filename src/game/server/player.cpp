@@ -493,15 +493,10 @@ void CPlayer::CureToDefault()
 	}
 }
 
-void CPlayer::Infect(int From)
+void CPlayer::Infect()
 {
 	if(IsInfect())
 		return;
-
-	if(From != -1 && GameServer()->m_apPlayers[From])
-	{
-		GameServer()->m_apPlayers[From]->m_Score += 3;
-	}
 	
 	if(m_pCharacter)
 	{

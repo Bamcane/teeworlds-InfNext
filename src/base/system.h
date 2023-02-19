@@ -921,6 +921,99 @@ int str_length(const char *str);
 void str_format(char *buffer, int buffer_size, const char *format, ...);
 
 /*
+       Function: str_startswith_nocase
+               Checks case insensitive whether the string begins with a certain prefix.
+
+       Parameter:
+               str - String to check.
+               prefix - Prefix to look for.
+
+       Returns:
+               A pointer to the string str after the string prefix, or 0 if
+               the string prefix isn't a prefix of the string str.
+
+       Remarks:
+               - The strings are treated as zero-terminated strings.
+*/
+const char *str_startswith_nocase(const char *str, const char *prefix);
+
+/**
+ * Checks case sensitive whether the string begins with a certain prefix.
+ *
+ * @ingroup Strings
+ *
+ * @param str String to check.
+ * @param prefix Prefix to look for.
+ *
+ * @return A pointer to the string str after the string prefix, or 0 if
+ *		   the string prefix isn't a prefix of the string str.
+ *
+ * @remark The strings are treated as zero-terminated strings.
+ */
+const char *str_startswith(const char *str, const char *prefix);
+
+/*
+       Function: str_endswith_nocase
+               Checks case insensitive whether the string ends with a certain suffix.
+
+       Parameter:
+               str - String to check.
+               suffix - Suffix to look for.
+
+       Returns:
+               A pointer to the beginning of the suffix in the string str, or
+               0 if the string suffix isn't a suffix of the string str.
+
+       Remarks:
+               - The strings are treated as zero-terminated strings.
+*/
+const char *str_endswith_nocase(const char *str, const char *suffix);
+
+/*
+	Function: str_endswith
+		Checks case sensitive whether the string ends with a certain suffix.
+
+	Parameter:
+		str - String to check.
+		suffix - Suffix to look for.
+
+	Returns:
+		A pointer to the beginning of the suffix in the string str, or
+		0 if the string suffix isn't a suffix of the string str.
+
+	Remarks:
+		- The strings are treated as zero-terminated strings.
+*/
+const char *str_endswith(const char *str, const char *suffix);
+
+/*
+	Function: str_escape
+		Escapes \ and " characters in a string.
+
+	Parameters:
+		dst - Destination array pointer, gets increased, will point to
+		      the terminating null.
+		src - Source array
+		end - End of destination array
+*/
+void str_escape(char **dst, const char *src, const char *end);
+
+/**
+ * Truncates a string to a given length.
+ *
+ * @ingroup Strings
+ *
+ * @param dst Pointer to a buffer that shall receive the string.
+ * @param dst_size Size of the buffer dst.
+ * @param src String to be truncated.
+ * @param truncation_len Maximum length of the returned string (not
+ * counting the zero termination).
+ *
+ * @remark The strings are treated as zero-terminated strings.
+ * @remark Guarantees that dst string will contain zero-termination.
+ */
+void str_truncate(char *dst, int dst_size, const char *src, int truncation_len);
+/*
 	Function: str_sanitize_strong
 		Replaces all characters below 32 and above 127 with whitespace.
 

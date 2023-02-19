@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <vector>
+
 #include <new>
 #include <base/math.h>
 #include <engine/shared/config.h>
@@ -1703,18 +1705,23 @@ void CGameContext::ConAddVote(IConsole::IResult *pResult, void *pUserData)
 	const char *pDescription = pResult->GetString(0);
 	const char *pCommand = pResult->GetString(1);
 
-	if(pSelf->m_NumVoteOptions == MAX_VOTE_OPTIONS)
+	pSelf->AddVote(pDescription, pCommand);
+}
+
+void CGameContext::AddVote(const char *pDescription, const char *pCommand)
+{
+	if(m_NumVoteOptions == MAX_VOTE_OPTIONS)
 	{
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "maximum number of vote options reached");
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "maximum number of vote options reached");
 		return;
 	}
 
 	// check for valid option
-	if(!pSelf->Console()->LineIsValid(pCommand) || str_length(pCommand) >= VOTE_CMD_LENGTH)
+	if(!Console()->LineIsValid(pCommand) || str_length(pCommand) >= VOTE_CMD_LENGTH)
 	{
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "skipped invalid command '%s'", pCommand);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 		return;
 	}
 	while(*pDescription && *pDescription == ' ')
@@ -1723,47 +1730,47 @@ void CGameContext::ConAddVote(IConsole::IResult *pResult, void *pUserData)
 	{
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "skipped invalid option '%s'", pDescription);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 		return;
 	}
 
 	// check for duplicate entry
-	CVoteOptionServer *pOption = pSelf->m_pVoteOptionFirst;
+	CVoteOptionServer *pOption = m_pVoteOptionFirst;
 	while(pOption)
 	{
 		if(str_comp_nocase(pDescription, pOption->m_aDescription) == 0)
 		{
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "option '%s' already exists", pDescription);
-			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 			return;
 		}
 		pOption = pOption->m_pNext;
 	}
 
 	// add the option
-	++pSelf->m_NumVoteOptions;
+	++m_NumVoteOptions;
 	int Len = str_length(pCommand);
 
-	pOption = (CVoteOptionServer *)pSelf->m_pVoteOptionHeap->Allocate(sizeof(CVoteOptionServer) + Len);
+	pOption = (CVoteOptionServer *)m_pVoteOptionHeap->Allocate(sizeof(CVoteOptionServer) + Len);
 	pOption->m_pNext = 0;
-	pOption->m_pPrev = pSelf->m_pVoteOptionLast;
+	pOption->m_pPrev = m_pVoteOptionLast;
 	if(pOption->m_pPrev)
 		pOption->m_pPrev->m_pNext = pOption;
-	pSelf->m_pVoteOptionLast = pOption;
-	if(!pSelf->m_pVoteOptionFirst)
-		pSelf->m_pVoteOptionFirst = pOption;
+	m_pVoteOptionLast = pOption;
+	if(!m_pVoteOptionFirst)
+		m_pVoteOptionFirst = pOption;
 
 	str_copy(pOption->m_aDescription, pDescription);
 	mem_copy(pOption->m_aCommand, pCommand, Len+1);
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "added option '%s' '%s'", pOption->m_aDescription, pOption->m_aCommand);
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 
 	// inform clients about added option
 	CNetMsg_Sv_VoteOptionAdd OptionMsg;
 	OptionMsg.m_pDescription = pOption->m_aDescription;
-	pSelf->Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, -1);
+	Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, -1);
 }
 
 void CGameContext::ConRemoveVote(IConsole::IResult *pResult, void *pUserData)
@@ -2164,7 +2171,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
 	m_pTiles = (CTile *)Kernel()->RequestInterface<IMap>()->GetData(pTileMap->m_Data);
 
-
+	AddMapVotes();
 
 
 	/*
@@ -2320,4 +2327,49 @@ void CGameContext::OnUpdatePlayerServerInfo(char *aBuf, int BufSize, int ID)
 		aJsonSkin,
 		JsonBool(0),
 		m_apPlayers[ID]->GetTeam());
+}
+
+struct CMapNameItem
+{
+	char m_aName[IO_MAX_PATH_LENGTH - 4];
+
+	bool operator<(const CMapNameItem &Other) const { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
+};
+
+int CGameContext::MapScan(const char *pName, int IsDir, int DirType, void *pUserData)
+{
+	if(IsDir || !str_endswith(pName, ".map"))
+		return 0;
+
+	CMapNameItem Item;
+	str_truncate(Item.m_aName, sizeof(Item.m_aName), pName, str_length(pName) - str_length(".map"));
+	static_cast<std::vector<CMapNameItem> *>(pUserData)->push_back(Item);
+
+	return 0;
+}
+
+void CGameContext::AddMapVotes()
+{
+	std::vector<CMapNameItem> vMapList;
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "maps", MapScan, &vMapList);
+
+	AddVote("=======Map=======", "echo ?");
+
+	for(auto &Item : vMapList)
+	{
+		char aDescription[64];
+		str_format(aDescription, sizeof(aDescription), "%s", Item.m_aName);
+
+		char aCommand[IO_MAX_PATH_LENGTH * 2 + 10];
+		char aMapEscaped[IO_MAX_PATH_LENGTH * 2];
+		char *pDst = aMapEscaped;
+		str_escape(&pDst, Item.m_aName, aMapEscaped + sizeof(aMapEscaped));
+		str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", aMapEscaped);
+
+		str_format(g_Config.m_SvMaprotation, sizeof(g_Config.m_SvMaprotation), "%s %s", g_Config.m_SvMaprotation, aMapEscaped);
+
+		AddVote(aDescription, aCommand);
+	}
+
+	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "added maps to votes");
 }
