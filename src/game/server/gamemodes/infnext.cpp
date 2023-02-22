@@ -184,6 +184,18 @@ void CGameControllerNext::SendClassChooser()
 		if(pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU || pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD)
 			continue;
 
+		pPlayer->m_ClassChooserLine = abs(pPlayer->m_ClassChooserLine%m_HumanClasses.size());
+
+		if(m_HumanClasses[pPlayer->m_ClassChooserLine].m_Value && pPlayer->GetCharacter() && pPlayer->GetCharacter()->GetLatestInput()->m_Fire&1)
+		{
+			pPlayer->SetClass(m_HumanClasses[pPlayer->m_ClassChooserLine].m_pClass);
+			GameServer()->SendMotd(i, "");
+			continue;
+		}
+
+		if(Server()->Tick() % 50)
+			continue;
+
 		const char *pLanguage = GameServer()->m_apPlayers[i]->GetLanguage();
 		
 		std::string Buffer;
@@ -191,8 +203,6 @@ void CGameControllerNext::SendClassChooser()
 		Buffer.append("=====");
 		Buffer.append(GameServer()->Localize(pLanguage, _("Class Chooser")));
 		Buffer.append("=====");
-
-		pPlayer->m_ClassChooserLine = abs(pPlayer->m_ClassChooserLine%m_HumanClasses.size());
 
 		for(int j = 0; j < m_HumanClasses.size(); j ++)
 		{
@@ -211,13 +221,8 @@ void CGameControllerNext::SendClassChooser()
 			if(j == pPlayer->m_ClassChooserLine)
 				Buffer.append("]");
 		}
-
-		if(m_HumanClasses[pPlayer->m_ClassChooserLine].m_Value && pPlayer->GetCharacter() && pPlayer->GetCharacter()->GetLatestInput()->m_Fire&1)
-		{
-			pPlayer->SetClass(m_HumanClasses[pPlayer->m_ClassChooserLine].m_pClass);
-			GameServer()->SendMotd(i, "");
-		}
-		else GameServer()->SendMotd(i, Buffer.c_str());
+		
+		GameServer()->SendMotd(i, Buffer.c_str());
 	}
 
 }
@@ -252,7 +257,13 @@ void CGameControllerNext::CheckNoClass()
 void CGameControllerNext::CreateInfects()
 {
 	int InfectNum;
-	InfectNum = m_LastPlayersNum/5+1;
+	if(InfectNum > 24)
+		InfectNum = 4;
+	else if(InfectNum > 8)
+		InfectNum = 3;
+	else if(InfectNum > 4)
+		InfectNum = 2;
+	else InfectNum = 1;
 
 	array<int> tmpList;
 
