@@ -514,6 +514,8 @@ file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
 
 file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
 
+file(GLOB_RECURSE INFNEXT "src/infnext/*.cpp" "src/infnext/*.h")
+
 file(GLOB_RECURSE TEEUNIVERSES "src/teeuniverses/*.cpp" "src/teeuniverses/*.h")
 
 set(GAME_GENERATED_SERVER
@@ -521,7 +523,7 @@ set(GAME_GENERATED_SERVER
   "src/game/generated/server_data.h"
 )
 
-set(SERVER_SRC ${ENGINE_SERVER} ${TEEUNIVERSES} ${GAME_SERVER} ${GAME_GENERATED_SERVER})
+set(SERVER_SRC ${ENGINE_SERVER} ${TEEUNIVERSES} ${GAME_SERVER} ${INFNEXT} ${GAME_GENERATED_SERVER})
 if(TARGET_OS STREQUAL "windows")
   set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
 else()

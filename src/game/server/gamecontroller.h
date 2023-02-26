@@ -128,6 +128,7 @@ public:
 
 	virtual bool PreSpawn(CPlayer* pPlayer, vec2 *pPos);
 	virtual bool IsSpawnable(vec2 Pos) = 0;
+	virtual void OnPlayerSelectClass(CPlayer* pPlayer) = 0;
 
 	bool IsInfectionStarted();
 };

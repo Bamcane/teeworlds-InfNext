@@ -12,10 +12,15 @@ CLayers::CLayers()
 	m_pGameLayer = 0;
 	m_pMap = 0;
 }
-
 void CLayers::Init(class IKernel *pKernel)
 {
-	m_pMap = pKernel->RequestInterface<IMap>();
+	IMap *pMap = pKernel->RequestInterface<IMap>();
+	Init(pMap);
+}
+
+void CLayers::Init(IMap *pMap)
+{
+	m_pMap = pMap;
 	m_pMap->GetType(MAPITEMTYPE_GROUP, &m_GroupsStart, &m_GroupsNum);
 	m_pMap->GetType(MAPITEMTYPE_LAYER, &m_LayersStart, &m_LayersNum);
 
@@ -54,6 +59,10 @@ void CLayers::Init(class IKernel *pKernel)
 			}
 		}
 	}
+	
+	
+	if(!m_pGameLayer)
+		dbg_msg("InfNext", "CLayer::Init: no Game Layer found");
 }
 
 CMapItemGroup *CLayers::GetGroup(int Index) const

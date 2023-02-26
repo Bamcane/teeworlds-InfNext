@@ -9,6 +9,7 @@
 #include <engine/shared/memheap.h>
 
 #include <teeuniverses/components/localization.h>
+#include <base/tl/array.h>
 
 #include <game/layers.h>
 #include <game/voting.h>
@@ -92,6 +93,25 @@ class CGameContext : public IGameServer
 public:
 	int m_ChatResponseTargetID;
 	int m_ChatPrintCBIndex;
+
+private:
+	class CBroadcast
+	{
+	public:
+		std::string m_Broadcast;
+		int64_t m_StartTick;
+		float m_BroadcastTime;
+	};
+
+	struct CPlayerBroadcast
+	{
+		array<CBroadcast> m_aBroadcast;
+		int64_t m_LastBroadcast;
+	};
+
+	CPlayerBroadcast m_aBroadcast[MAX_CLIENTS];
+
+	void AddBroadCast(int ClientID, CBroadcast Broadcast);
 
 public:
 	IServer *Server() const { return m_pServer; }
@@ -178,10 +198,10 @@ public:
 	void SendChat(int ClientID, int Team, const char *pText);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
-	void SendBroadcast(const char *pText, int ClientID);
+	void SendBroadcast(int ClientID, const char *pText, float Time=3.0f);
 	void SendSkinChange(int ClientID, int TargetID);
 	void SendClanChange(int ClientID, int TargetID, const char *pClan);
-	void SendBroadcast_VL(const char *pText, int ClientID, ...);
+	void SendBroadcast_Localization(int ClientID, const char *pText, float Time, ...);
 	void SetClientLanguage(int ClientID, const char *pLanguage);
 
 	const char* Localize(const char *pLanguageCode, const char* pText) const;
@@ -226,6 +246,8 @@ public:
 	const char *NetVersion() override;
 
 	void OnUpdatePlayerServerInfo(char *aBuf, int BufSize, int ID) override;
+
+	CGameContext *GameContext() override { return this; }
 
 	enum
 	{

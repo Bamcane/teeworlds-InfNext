@@ -3,7 +3,9 @@
 #include <game/server/gamecontext.h>
 #include <engine/shared/config.h>
 
-#include "class-define.h"
+#include <engine/server/mapconverter.h>
+#include <infnext/classes.h>
+
 #include "infnext.h"
 
 CGameControllerNext::CGameControllerNext(class CGameContext *pGameServer)
@@ -12,16 +14,15 @@ CGameControllerNext::CGameControllerNext(class CGameContext *pGameServer)
 	m_pGameType = "InfNext";
 
 	m_LastPlayersNum = 0;
-
-	InitClasses();
 }
 
 CGameControllerNext::~CGameControllerNext()
 {
-	for(int i = 0;i < m_HumanClasses.size(); i++)
-		delete m_HumanClasses[i].m_pClass;
-	for(int i = 0;i < m_InfectClasses.size(); i++)
-		delete m_InfectClasses[i].m_pClass;
+}
+
+CClasses *CGameControllerNext::Classes()
+{
+	return Server()->Classes();
 }
 
 void CGameControllerNext::Tick()
@@ -42,12 +43,12 @@ void CGameControllerNext::Tick()
 
 	if(m_LastPlayersNum < 2 && (Infects + Humans) >= 2)
 	{
-		GameServer()->SendBroadcast("", -1);
 		EndRound();
 	}
-	else if(m_LastPlayersNum < 2 && (Server()->Tick()%25) == 0) 
+	else if(m_LastPlayersNum < 2) 
 	{
-		GameServer()->SendBroadcast_VL(_("Wait game start!"), -1);
+		GameServer()->SendBroadcast_Localization(-1, _("Wait game start!"), 0.5f);
+		m_RoundStartTick++;
 	}
 
 	if(!IsInfectionStarted() && (Infects + Humans) >= 2) // send class chooser
@@ -113,44 +114,14 @@ int CGameControllerNext::RoundSecond() const
 	return RoundTick()/Server()->TickSpeed();
 }
 
-// Init Class
-void CGameControllerNext::InitClasses()
-{
-	InitHumanClass(new CClassLooper(GameServer()), true);
-	InitHumanClass(new CClassSniper(GameServer()), true);
-	InitHumanClass(new CClassMedic(GameServer()), true);
-
-	InitInfectClass(new CClassHunter(GameServer()), 33);
-	InitInfectClass(new CClassBoomer(GameServer()), 33);
-	InitInfectClass(new CClassSmoker(GameServer()), 33);
-}
-
-// Humans
-void CGameControllerNext::InitHumanClass(CClass *pClass, bool Enable)
-{
-	CClassStatus NewStatus;
-	NewStatus.m_pClass = pClass;
-	NewStatus.m_Value = Enable;
-	m_HumanClasses.add(NewStatus);
-}
-
-// Infects
-void CGameControllerNext::InitInfectClass(CClass *pClass, int Proba)
-{
-	CClassStatus NewStatus;
-	NewStatus.m_pClass = pClass;
-	NewStatus.m_Value = Proba;
-	m_InfectClasses.add(NewStatus);
-}
-
 CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 {
-	int ClassesNum = m_InfectClasses.size();
+	int ClassesNum = Classes()->m_InfectClasses.size();
 	double Probability[ClassesNum];
 
 	for(int i = 0;i < ClassesNum; i ++)
 	{
-		Probability[i] = (double)m_InfectClasses[i].m_Value;
+		Probability[i] = (double)Classes()->m_InfectClasses[i].m_Value;
 	}
 
 	int Seconds = (Server()->Tick()-m_RoundStartTick)/((float)Server()->TickSpeed());
@@ -159,72 +130,105 @@ CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "infected victim='%s' duration='%d' newclass='%s'", 
-		Server()->ClientName(pPlayer->GetCID()), Seconds, m_InfectClasses[ClassID].m_pClass->m_ClassName);
+		Server()->ClientName(pPlayer->GetCID()), Seconds, Classes()->m_InfectClasses[ClassID].m_pClass->m_ClassName);
 
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
-	return m_InfectClasses[ClassID].m_pClass;
+	return Classes()->m_InfectClasses[ClassID].m_pClass;
 }
 
 void CGameControllerNext::SendClassChooser()
 {
-	for(int i = 0;i < MAX_CLIENTS; i ++)
+}
+
+// from infclass
+void CGameControllerNext::Snap(int SnappingClient)
+{
+	CNetObj_GameInfo *pGameInfoObj = (CNetObj_GameInfo *)Server()->SnapNewItem(NETOBJTYPE_GAMEINFO, 0, sizeof(CNetObj_GameInfo));
+	if(!pGameInfoObj)
+		return;
+
+	pGameInfoObj->m_GameFlags = m_GameFlags;
+	pGameInfoObj->m_GameStateFlags = 0;
+	if(m_GameOverTick != -1)
+		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_GAMEOVER;
+	if(m_SuddenDeath)
+		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_SUDDENDEATH;
+	if(GameServer()->m_World.m_Paused)
+		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_PAUSED;
+	pGameInfoObj->m_RoundStartTick = m_RoundStartTick;
+	pGameInfoObj->m_WarmupTimer = GameServer()->m_World.m_Paused ? m_UnpauseTimer : m_Warmup;
+
+	pGameInfoObj->m_ScoreLimit = g_Config.m_SvScorelimit;
+	pGameInfoObj->m_TimeLimit = g_Config.m_SvTimelimit;
+
+	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
+	pGameInfoObj->m_RoundCurrent = m_RoundCount+1;
+	
+	int ClassMask = 0;
+	for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
 	{
-		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
-
-		if(!pPlayer) 
-			continue;
-
-		if(pPlayer->GetTeam() == TEAM_SPECTATORS)
-			continue;
-		
-		if(pPlayer->GetClass())
-			continue;
-
-		if(pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU || pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD)
-			continue;
-
-		pPlayer->m_ClassChooserLine = abs(pPlayer->m_ClassChooserLine%m_HumanClasses.size());
-
-		if(m_HumanClasses[pPlayer->m_ClassChooserLine].m_Value && pPlayer->GetCharacter() && pPlayer->GetCharacter()->GetLatestInput()->m_Fire&1)
-		{
-			pPlayer->SetClass(m_HumanClasses[pPlayer->m_ClassChooserLine].m_pClass);
-			GameServer()->SendMotd(i, "");
-			continue;
-		}
-
-		if(Server()->Tick() % 50)
-			continue;
-
-		const char *pLanguage = GameServer()->m_apPlayers[i]->GetLanguage();
-		
-		std::string Buffer;
-
-		Buffer.append("=====");
-		Buffer.append(GameServer()->Localize(pLanguage, _("Class Chooser")));
-		Buffer.append("=====");
-
-		for(int j = 0; j < m_HumanClasses.size(); j ++)
-		{
-			Buffer.append("\n");
-
-			if(!m_HumanClasses[j].m_Value)
-			{
-				Buffer.append("----");
-			}
-
-			if(j == pPlayer->m_ClassChooserLine)
-				Buffer.append("[");
-
-			Buffer.append(GameServer()->Localize(pLanguage, m_HumanClasses[j].m_pClass->m_ClassName));
-			
-			if(j == pPlayer->m_ClassChooserLine)
-				Buffer.append("]");
-		}
-		
-		GameServer()->SendMotd(i, Buffer.c_str());
+		if(Classes()->m_HumanClasses[i].m_Value)
+			ClassMask |= 1<<i;
 	}
 
+	if(SnappingClient != -1)
+	{
+		if(GameServer()->m_apPlayers[SnappingClient])
+		{
+			int Page = -1;
+			
+			if(!GameServer()->m_apPlayers[SnappingClient]->GetClass())
+			{
+				int Item = GameServer()->m_apPlayers[SnappingClient]->m_MapMenuItem;
+				Page = TIMESHIFT_MENUCLASS + 3*((Item+1) + ClassMask*(Classes()->m_HumanClasses.size()+1)) + 1;
+			}
+			
+			if(Page >= 0)
+			{
+				double PageShift = static_cast<double>(Page * Server()->GetTimeShiftUnit())/1000.0f;
+				double CycleShift = fmod(static_cast<double>(Server()->Tick() - pGameInfoObj->m_RoundStartTick)/Server()->TickSpeed(), Server()->GetTimeShiftUnit()/1000.0);
+				int TimeShift = (PageShift + CycleShift)*Server()->TickSpeed();
+				
+				pGameInfoObj->m_RoundStartTick = Server()->Tick() - TimeShift;
+				pGameInfoObj->m_TimeLimit += (TimeShift/Server()->TickSpeed())/60;
+			}
+		}
+	}
+
+	CNetObj_GameInfoEx* pGameInfoEx = (CNetObj_GameInfoEx*)Server()->SnapNewItem(NETOBJTYPE_GAMEINFOEX, 0, sizeof(CNetObj_GameInfoEx));
+	if(!pGameInfoEx)
+		return;
+
+	pGameInfoEx->m_Flags = GAMEINFOFLAG_ALLOW_EYE_WHEEL | GAMEINFOFLAG_ALLOW_HOOK_COLL | GAMEINFOFLAG_ENTITIES_FNG | GAMEINFOFLAG_PREDICT_VANILLA;
+	pGameInfoEx->m_Flags2 = GAMEINFOFLAG2_NO_WEAK_HOOK_AND_BOUNCE | GAMEINFOFLAG2_HUD_DDRACE | GAMEINFOFLAG2_HUD_AMMO | GAMEINFOFLAG2_HUD_HEALTH_ARMOR;
+	pGameInfoEx->m_Version = GAMEINFO_CURVERSION;
+
+	if(Server()->IsSixup(SnappingClient))
+	{
+		protocol7::CNetObj_GameData *pGameData = static_cast<protocol7::CNetObj_GameData *>(Server()->SnapNewItem(-protocol7::NETOBJTYPE_GAMEDATA, 0, sizeof(protocol7::CNetObj_GameData)));
+		if(!pGameData)
+			return;
+
+		pGameData->m_GameStartTick = m_RoundStartTick;
+		pGameData->m_GameStateFlags = 0;
+		if(m_GameOverTick != -1)
+			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_GAMEOVER;
+		if(m_SuddenDeath)
+			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_SUDDENDEATH;
+		if(GameServer()->m_World.m_Paused)
+			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_PAUSED;
+
+		pGameData->m_GameStateEndTick = 0;
+
+		if(GameServer()->m_apPlayers[SnappingClient])
+		{
+			if(!GameServer()->m_apPlayers[SnappingClient]->GetClass())
+			{
+				pGameData->m_GameStartTick = Server()->Tick();
+			}
+		}
+	}
 }
 
 void CGameControllerNext::CheckNoClass()
@@ -245,10 +249,10 @@ void CGameControllerNext::CheckNoClass()
 		int Class = 0;
 		do
 		{
-			Class = random_int(0, m_HumanClasses.size()-1);
-		}while(!m_HumanClasses[Class].m_Value);
+			Class = random_int(0, Classes()->m_HumanClasses.size()-1);
+		}while(!Classes()->m_HumanClasses[Class].m_Value);
 
-		pPlayer->SetClass(m_HumanClasses[Class].m_pClass);
+		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass);
 		
 		GameServer()->SendMotd(i, "");
 	}
@@ -377,4 +381,26 @@ bool CGameControllerNext::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 	}
 	
 	return false;
+}
+
+void CGameControllerNext::OnPlayerSelectClass(CPlayer* pPlayer)
+{
+	if(!pPlayer)
+		return;
+	if(!pPlayer->GetCharacter())
+		return;
+
+	int Class = pPlayer->m_MapMenuItem;
+	int ClientID = pPlayer->GetCID();
+
+	CCharacter *pChr = pPlayer->GetCharacter();
+
+	if(pChr->GetLatestInput()->m_Fire&1)
+	{
+		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass);
+	}
+	else 
+	{
+		GameServer()->SendBroadcast_Localization(ClientID, Classes()->m_HumanClasses[Class].m_pClass->m_ClassName, 0.5f);
+	}
 }

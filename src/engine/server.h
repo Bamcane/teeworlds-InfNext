@@ -20,6 +20,8 @@ protected:
 
 public:
 	class CLocalization* m_pLocalization;
+	class CClasses *m_pClasses;
+
 	enum
 	{
 		AUTHED_NO=0,
@@ -39,6 +41,7 @@ public:
 	};
 
 	inline class CLocalization* Localization() { return m_pLocalization; }
+	inline class CClasses *Classes() { return m_pClasses; };
 
 	int Tick() const { return m_CurrentGameTick; }
 	int TickSpeed() const { return m_TickSpeed; }
@@ -230,6 +233,8 @@ public:
 	virtual void ExpireServerInfo() = 0;
 
 	virtual void ReloadMap() = 0;
+	
+	virtual int GetTimeShiftUnit() const = 0; //In ms
 };
 
 class IGameServer : public IInterface
@@ -272,6 +277,8 @@ public:
 	 * @param i The client id.
 	 */
 	virtual void OnUpdatePlayerServerInfo(char *aBuf, int BufSize, int ID) = 0;
+
+	virtual class CGameContext *GameContext() = 0;
 };
 
 extern IGameServer *CreateGameServer();
