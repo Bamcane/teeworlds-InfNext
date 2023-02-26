@@ -41,11 +41,7 @@ void CGameControllerNext::Tick()
 			Humans++;
 	}
 
-	if(m_LastPlayersNum < 2 && (Infects + Humans) >= 2)
-	{
-		EndRound();
-	}
-	else if(m_LastPlayersNum < 2) 
+	if(m_LastPlayersNum < 2) 
 	{
 		GameServer()->SendBroadcast_Localization(-1, _("Wait game start!"), 0.5f);
 		m_RoundStartTick++;
