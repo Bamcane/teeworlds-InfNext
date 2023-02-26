@@ -2,10 +2,14 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
 #include <engine/shared/config.h>
+#include <engine/server/mapconverter.h>
+
 #include <game/server/gamecontext.h>
 #include <game/server/infdefine.h>
 #include <game/mapitems.h>
-#include <game/server/weapons/hammer.h>
+
+#include <infnext/classes.h>
+#include <infnext/weapons/hammer.h>
 
 #include "character.h"
 
@@ -211,20 +215,6 @@ void CCharacter::HandleWeaponSwitch()
 	// select Weapon
 	int Next = CountInput(m_LatestPrevInput.m_NextWeapon, m_LatestInput.m_NextWeapon).m_Presses;
 	int Prev = CountInput(m_LatestPrevInput.m_PrevWeapon, m_LatestInput.m_PrevWeapon).m_Presses;
-	
-	if(!m_pPlayer->GetClass())
-	{
-		if(Next < 128 && Next > 0) // make sure we only try sane stuff
-		{
-			m_pPlayer->m_ClassChooserLine++;
-		}
-
-		if(Prev < 128 && Prev > 0) // make sure we only try sane stuff
-		{
-			m_pPlayer->m_ClassChooserLine--;
-		}
-		return;
-	}
 
 	if(Next < 128) // make sure we only try sane stuff
 	{
@@ -496,11 +486,34 @@ void CCharacter::HandleClass()
 	m_pPlayer->GetClass()->OnTick(this);
 }
 
+void CCharacter::HandleMenu()
+{
+	if(m_pPlayer->GetClass())
+		return;
+	vec2 CursorPos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
+			
+	bool Broadcast = false;
+
+	m_pPlayer->m_MapMenuItem = -1;
+	
+	if(length(CursorPos) > 80.0f)
+	{
+		float Angle = 2.0f*pi+atan2(CursorPos.x, -CursorPos.y);
+		float AngleStep = 2.0f*pi/static_cast<float>(Server()->Classes()->m_HumanClasses.size());
+		m_pPlayer->m_MapMenuItem = ((int)((Angle+AngleStep/2.0f)/AngleStep))%Server()->Classes()->m_HumanClasses.size();
+		
+		GameServer()->m_pController->OnPlayerSelectClass(m_pPlayer);
+	}
+
+}
+
 void CCharacter::Tick()
 {
 	HandleInput();
 
 	HandleClass();
+
+	HandleMenu();
 
 	// handle events
 	HandleEvents();

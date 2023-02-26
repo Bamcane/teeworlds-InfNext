@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
 #include <engine/shared/config.h>
-#include "classes/looper.h"
 #include "player.h"
 #include "infdefine.h"
 
@@ -41,7 +40,6 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 
 	m_PrevTuningParams = *pGameServer->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
-	m_ClassChooserLine = 0;
 
 	int* idMap = Server()->GetIdMap(ClientID);
 	for (int i = 1;i < VANILLA_MAX_CLIENTS;i++)
@@ -452,6 +450,9 @@ void CPlayer::SetClass(CClass *pClass)
 		}
 	}
 	
+	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '%s'"), 2,
+		pClass->m_ClassName);
+
 	if(m_pCharacter)
 	{
 		GameServer()->CreatePlayerSpawn(m_pCharacter->m_Pos);

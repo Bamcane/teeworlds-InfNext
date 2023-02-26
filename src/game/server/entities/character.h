@@ -44,6 +44,7 @@ public:
 	void HandleEvents();
 	void HandleInput();
 	void HandleClass();
+	void HandleMenu();
 
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);

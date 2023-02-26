@@ -19,9 +19,8 @@
 
 #include <teeuniverses/components/localization.h>
 
-#include "classes/looper.h"
-
 #include "gamemodes/infnext.h"
+
 enum
 {
 	RESET,
@@ -34,8 +33,10 @@ void CGameContext::Construct(int Resetting)
 	m_pServer = 0;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
 		m_apPlayers[i] = 0;
-
+		m_aBroadcast[i].m_aBroadcast.clear();
+	}
 	m_pController = 0;
 	m_VoteCloseTime = 0;
 	m_pVoteOptionFirst = 0;
@@ -90,6 +91,11 @@ void CGameContext::Clear()
 	m_pVoteOptionLast = pVoteOptionLast;
 	m_NumVoteOptions = NumVoteOptions;
 	m_Tuning = Tuning;
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		m_aBroadcast[i].m_aBroadcast.clear();
+	}
 }
 
 
@@ -360,11 +366,32 @@ void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
 }
 
 
-void CGameContext::SendBroadcast(const char *pText, int ClientID)
+void CGameContext::SendBroadcast(int ClientID, const char *pText, float Time)
 {
-	CNetMsg_Sv_Broadcast Msg;
-	Msg.m_pMessage = pText;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	int Start = (ClientID < 0 ? 0 : ClientID);
+	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
+
+	// only for server demo record
+	if(ClientID < 0)
+	{
+		CNetMsg_Sv_Broadcast Msg;
+		Msg.m_pMessage = pText;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NOSEND, -1);
+	}
+
+	for(int i = Start; i < End;i ++)
+	{
+		if(m_apPlayers[i])
+		{
+			CBroadcast Broadcast;
+
+			Broadcast.m_Broadcast = pText;
+			Broadcast.m_BroadcastTime = Time;
+			Broadcast.m_StartTick = Server()->Tick();
+
+			AddBroadCast(i, Broadcast);
+		}
+	}
 }
 
 void CGameContext::SendClanChange(int ClientID, int TargetID, const char *pClan)
@@ -432,9 +459,25 @@ void CGameContext::SendSkinChange(int ClientID, int TargetID)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
 }
 
-void CGameContext::SendBroadcast_VL(const char *pText, int ClientID, ...)
+void CGameContext::AddBroadCast(int ClientID, CBroadcast Broadcast)
 {
-	CNetMsg_Sv_Broadcast Msg;
+	if(!m_apPlayers[ClientID])
+		return;
+	
+	for(int i = 0; i < m_aBroadcast[ClientID].m_aBroadcast.size();i ++)
+	{
+		if(str_comp(m_aBroadcast[ClientID].m_aBroadcast[i].m_Broadcast.c_str(), Broadcast.m_Broadcast.c_str()) == 0)
+		{
+			m_aBroadcast[ClientID].m_aBroadcast[i] = Broadcast;
+			return;
+		}
+	}
+			
+	m_aBroadcast[ClientID].m_aBroadcast.add(Broadcast);
+}
+
+void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, float Time, ...)
+{
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
 	
@@ -446,6 +489,7 @@ void CGameContext::SendBroadcast_VL(const char *pText, int ClientID, ...)
 	// only for server demo record
 	if(ClientID < 0)
 	{
+		CNetMsg_Sv_Broadcast Msg;
 		Server()->Localization()->Format_VL(Buffer, "en", _(pText), VarArgs);
 		Msg.m_pMessage = Buffer.buffer();
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
@@ -458,9 +502,13 @@ void CGameContext::SendBroadcast_VL(const char *pText, int ClientID, ...)
 			Buffer.clear();
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), _(pText), VarArgs);
 			
-			Msg.m_pMessage = Buffer.buffer();
-			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
-			
+			CBroadcast Broadcast;
+
+			Broadcast.m_Broadcast = Buffer.buffer();
+			Broadcast.m_BroadcastTime = Time;
+			Broadcast.m_StartTick = Server()->Tick();
+
+			AddBroadCast(i, Broadcast);
 		}
 	}
 	
@@ -622,6 +670,54 @@ void CGameContext::OnTick()
 		{
 			m_apPlayers[i]->Tick();
 			m_apPlayers[i]->PostTick();
+		}
+	}
+
+
+	if(!(Server()->Tick() % 10))
+	{
+		std::string Buffer;
+
+		for(int i = 0; i < MAX_CLIENTS;i ++)
+		{
+			if(!m_apPlayers[i] && m_aBroadcast[i].m_aBroadcast.size())
+			{
+				m_aBroadcast[i].m_aBroadcast.clear();
+				continue;
+			}
+
+			Buffer.clear();
+
+			bool Clear = false;
+
+			for(int j = 0; j < m_aBroadcast[i].m_aBroadcast.size(); j ++)
+			{
+				if(m_aBroadcast[i].m_aBroadcast[j].m_StartTick + 
+					m_aBroadcast[i].m_aBroadcast[j].m_BroadcastTime * Server()->TickSpeed()
+						>= Server()->Tick())
+				{
+					Buffer.append(m_aBroadcast[i].m_aBroadcast[j].m_Broadcast);
+					Buffer.append("\n");
+				}else
+				{
+					m_aBroadcast[i].m_aBroadcast.remove_index(j);
+					Clear = true;
+				}
+			}
+
+			if(!Buffer.length())
+			{
+				if(Clear)
+				{
+					CNetMsg_Sv_Broadcast Msg;
+					Msg.m_pMessage = "";
+					Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
+				}
+				continue;
+			}
+			CNetMsg_Sv_Broadcast Msg;
+			Msg.m_pMessage = Buffer.c_str();
+			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
 		}
 	}
 
@@ -1362,7 +1458,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			{
 				pPlayer->m_LastSetTeam = Server()->Tick();
 				int TimeLeft = (pPlayer->m_TeamChangeTick - Server()->Tick()) / Server()->TickSpeed();
-				SendBroadcast_VL(_("Time to wait before changing team: %02d:%02d"), ClientID, TimeLeft/60, TimeLeft%60);
+				SendBroadcast_Localization(ClientID, _("Time to wait before changing team: %02d:%02d"), 3, TimeLeft/60, TimeLeft%60);
 				return;
 			}
 			// Switch team on given client and kill/respawn him
@@ -1376,11 +1472,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					pPlayer->SetTeam(pMsg->m_Team);
 				}
 				else
-					SendBroadcast_VL(_("Teams must be balanced, please join other team"), ClientID);
+					SendBroadcast_Localization(ClientID, _("Teams must be balanced, please join other team"), 3);
 			}
 			else
 			{
-				SendBroadcast_VL(_("Only %d active players are allowed"), ClientID, Server()->MaxClients() - g_Config.m_SvSpectatorSlots);
+				SendBroadcast_Localization(ClientID, _("Only %d active players are allowed"), 3, Server()->MaxClients() - g_Config.m_SvSpectatorSlots);
 			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE && !m_World.m_Paused)
@@ -1673,7 +1769,7 @@ void CGameContext::ConRestart(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConBroadcast(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
-	pSelf->SendBroadcast(pResult->GetString(0), -1);
+	pSelf->SendBroadcast(-1, pResult->GetString(0));
 }
 
 void CGameContext::ConSay(IConsole::IResult *pResult, void *pUserData)

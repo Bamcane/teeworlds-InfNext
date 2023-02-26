@@ -87,6 +87,7 @@ public:
 	class IGameServer *GameServer() { return m_pGameServer; }
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
+	class CClasses *Classes() { return m_pClasses; }
 
 	enum
 	{
@@ -314,12 +315,16 @@ class CCache
 	void SnapSetStaticsize(int ItemType, int Size);
 	
 	void ReloadMap() override;
+	void InitClasses();
+
+	int m_TimeShiftUnit;
 
 public:
 	const char* GetClientLanguage(int ClientID) override;
 	void SetClientLanguage(int ClientID, const char* pLanguage) override;
 	int* GetIdMap(int ClientID) override;
 	void SetCustClt(int ClientID) override;
+	int GetTimeShiftUnit() const override { return m_TimeShiftUnit; } //In ms
 
 	bool IsSixup(int ClientID) const override { return ClientID != -1 && m_aClients[ClientID].m_Sixup; }
 };

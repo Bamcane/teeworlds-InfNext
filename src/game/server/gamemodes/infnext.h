@@ -4,7 +4,6 @@
 
 #include <base/tl/array.h>
 
-#include <game/server/class.h>
 #include <game/server/gamecontroller.h>
 
 class CGameControllerNext : public IGameController
@@ -14,32 +13,22 @@ public:
 	CGameControllerNext(class CGameContext *pGameServer);
 	~CGameControllerNext();
 
+	class CClasses *Classes();
+
 	void Tick() override;
+	void Snap(int SnappingClient) override;
 	
 	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon) override;
 
 	bool PreSpawn(CPlayer* pPlayer, vec2 *pPos) override;
 	bool IsSpawnable(vec2 Pos) override;
 
+	void OnPlayerSelectClass(CPlayer* pPlayer) override;
+
 	int RoundTick() const;
 	int RoundSecond() const;
 
-	class CClassStatus
-	{
-	public:
-		CClassStatus() {};
-		CClass *m_pClass;
-		int m_Value;
-	};
-
-	array<CClassStatus> m_HumanClasses;
-	array<CClassStatus> m_InfectClasses;
-	
 	array<int> m_LastInfect;
-
-	void InitClasses();
-	void InitHumanClass(CClass *pClass, bool Enable);
-	void InitInfectClass(CClass *pClass, int Proba);
 
 	void SendClassChooser();
 	void CheckNoClass();

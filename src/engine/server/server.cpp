@@ -27,10 +27,14 @@
 #include <engine/shared/protocol_ex.h>
 #include <engine/shared/snapshot.h>
 
+#include <infnext/classes.h>
+
 #include <mastersrv/mastersrv.h>
 
 #include "register.h"
 #include "server.h"
+
+#include "mapconverter.h"
 
 #include <teeuniverses/components/localization.h>
 #include <fstream>
@@ -295,6 +299,7 @@ CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
 	m_TickSpeed = SERVER_TICK_SPEED;
 
 	m_pGameServer = 0;
+	m_pClasses = 0;
 
 	m_CurrentGameTick = 0;
 	m_RunServer = 1;
@@ -2001,33 +2006,73 @@ int CServer::LoadMap(const char *pMapName)
 	// reinit snapshot ids
 	m_IDPool.TimeoutIDs();
 
-	m_aCurrentMapSha256[MAP_TYPE_SIX] = m_pMap->Sha256();
-	char aSha256[SHA256_MAXSTRSIZE];
-	char aBufMsg[256];
-	sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIX], aSha256, sizeof(aSha256));
-	str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
-	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
-	
-	// get the crc of the map
-	m_aCurrentMapCrc[MAP_TYPE_SIX] = m_pMap->Crc();
-	str_format(aBufMsg, sizeof(aBufMsg), "%s crc is %08x", aBuf, m_aCurrentMapCrc[MAP_TYPE_SIX]);
-	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
-
-	str_copy(m_aCurrentMap, pMapName);
-	//map_set(df);
-
-	// load complete map into memory for download
 	{
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+		CDataFileReader dfServerMap;
+		dfServerMap.Open(Storage(), aBuf, IStorage::TYPE_ALL);
+		unsigned ServerMapCrc = dfServerMap.Crc();
+		SHA256_DIGEST ServerMapSha256 = dfServerMap.Sha256();
+		char aServerSha256[SHA256_MAXSTRSIZE];
+		sha256_str(ServerMapSha256, aServerSha256, sizeof(aServerSha256));
+		dfServerMap.Close();
+		
+		char aClientMapName[256];
+		str_format(aClientMapName, sizeof(aClientMapName), "clientmaps/next/%s.map", pMapName);
+		
+		CMapConverter6 MapConverter(Storage(), m_pMap, Console(), Classes());
+		if(!MapConverter.Load())
+			return 0;
+			
+		m_TimeShiftUnit = MapConverter.GetTimeShiftUnit();
+		
+		CDataFileReader dfClientMap;
+		//The map must be converted
+		
+		char aClientMapDir[256];
+		str_format(aClientMapDir, sizeof(aClientMapDir), "clientmaps");
+		
+		if(!Storage()->CreateFolder(aClientMapDir, IStorage::TYPE_SAVE))
+		{
+			dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
+		}
+		
+		str_format(aClientMapDir, sizeof(aClientMapDir), "clientmaps/next");
+		
+		if(!Storage()->CreateFolder(aClientMapDir, IStorage::TYPE_SAVE))
+		{
+			dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
+		}
+				
+		if(!MapConverter.CreateMap(aClientMapName))
+			return 0;
+			
+		CDataFileReader dfGeneratedMap;
+		dfGeneratedMap.Open(Storage(), aClientMapName, IStorage::TYPE_ALL);
+		m_aCurrentMapCrc[MAP_TYPE_SIX] = dfGeneratedMap.Crc();
+
+		m_aCurrentMapSha256[MAP_TYPE_SIX] = dfGeneratedMap.Sha256();
+		dfGeneratedMap.Close();
+		char aSha256[SHA256_MAXSTRSIZE];
+		sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIX], aSha256, sizeof(aSha256));
+	
+		char aBufMsg[128];
+		str_format(aBufMsg, sizeof(aBufMsg), "map crc is %08x, generated map crc is %08x", ServerMapCrc, m_aCurrentMapCrc[MAP_TYPE_SIX]);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
+		str_format(aBufMsg, sizeof(aBufMsg), "map sha256 is %s, generated map sha256 is %s", aServerSha256, aSha256);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
+		
+		//Download the generated map in memory to send it to clients
+		IOHANDLE File = Storage()->OpenFile(aClientMapName, IOFLAG_READ, IStorage::TYPE_ALL);
 		m_aCurrentMapSize[MAP_TYPE_SIX] = (int)io_length(File);
 		if(m_apCurrentMapData[MAP_TYPE_SIX])
 			mem_free(m_apCurrentMapData[MAP_TYPE_SIX]);
 		m_apCurrentMapData[MAP_TYPE_SIX] = (unsigned char *)mem_alloc(m_aCurrentMapSize[MAP_TYPE_SIX], 1);
 		io_read(File, m_apCurrentMapData[MAP_TYPE_SIX], m_aCurrentMapSize[MAP_TYPE_SIX]);
 		io_close(File);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", "map 06 version loaded in memory");
 	}
 	// load complete map07 into memory for download
 	{
+		char aBufMsg[128];
 		str_format(aBuf, sizeof(aBuf), "maps7/%s.map", pMapName);
 		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 		m_aCurrentMapSize[MAP_TYPE_SIXUP] = (int)io_length(File);
@@ -2039,6 +2084,8 @@ int CServer::LoadMap(const char *pMapName)
 		
 		m_aCurrentMapSha256[MAP_TYPE_SIXUP] = sha256(m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
 		m_aCurrentMapCrc[MAP_TYPE_SIXUP] = crc32(0, m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
+		
+		char aSha256[SHA256_MAXSTRSIZE];
 		sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIXUP], aSha256, sizeof(aSha256));
 		str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
@@ -2051,6 +2098,7 @@ int CServer::Run()
 	//
 	m_PrintCBIndex = Console()->RegisterPrintCallback(g_Config.m_ConsoleOutputLevel, SendRconLineAuthed, this);
 
+	InitClasses();
 	// load map
 	if(!LoadMap(g_Config.m_SvMap))
 	{
@@ -2588,6 +2636,7 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// free
 	delete pServer->m_pLocalization;
+	delete pServer->m_pClasses;
 	
 	delete pServer;
 	delete pKernel;
@@ -2614,4 +2663,10 @@ void CServer::InitClientBot(int ClientID)
 void CServer::ReloadMap()
 {
 	m_MapReload = 1;
+}
+
+void CServer::InitClasses()
+{
+	m_pClasses = new CClasses(GameServer()->GameContext());
+	m_pClasses->InitClasses();
 }

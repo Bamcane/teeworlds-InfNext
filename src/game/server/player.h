@@ -4,10 +4,11 @@
 #define GAME_SERVER_PLAYER_H
 
 // this include should perhaps be removed
+#include <infnext/class.h>
+
 #include "entities/character.h"
 #include "gamecontext.h"
 #include "teeinfo.h"
-#include "class.h"
 #include "infdefine.h"
 
 // player object
@@ -124,7 +125,7 @@ public:
 	CTuningParams* GetNextTuningParams() { return &m_NextTuningParams; };
 
 	CClass *GetClass() const { return m_pClass; }
-	int m_ClassChooserLine;
+	int m_MapMenuItem;
 
 
 	bool IsHuman() const;
