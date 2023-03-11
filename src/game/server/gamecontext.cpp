@@ -470,6 +470,11 @@ void CGameContext::AddBroadCast(int ClientID, CBroadcast Broadcast)
 		if(	m_aBroadcast[ClientID].m_aBroadcast[i].m_Type == Broadcast.m_Type)
 		{
 			m_aBroadcast[ClientID].m_aBroadcast.remove_index(i);
+			if(str_comp(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text.c_str(), Broadcast.m_Text.c_str()) == 0)
+			{
+				Broadcast.m_StartTick = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick;
+				Broadcast.m_Time += m_aBroadcast[ClientID].m_aBroadcast[i].m_Time;
+			}
 		}
 	}
 			

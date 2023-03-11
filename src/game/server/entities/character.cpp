@@ -444,6 +444,12 @@ void CCharacter::HandleEvents()
 		{
 			m_pPlayer->Infect();
 		}
+		
+		// handle water tiles
+		if(IsCollisionTile(CCollision::COLFLAG_WATER))
+		{
+			m_Core.m_Vel += vec2(0.f, -(m_pPlayer->GetNextTuningParams()->m_Gravity+0.1f));
+		}
 
 		// handle dead tiles
 		if(IsCollisionTile(CCollision::COLFLAG_DEATH) || GameLayerClipped(m_Pos))
@@ -525,7 +531,7 @@ void CCharacter::HandleBuff()
 		if(m_DehydrationTick%50 == 0)
 		{
 			TakeDamage(vec2(0.f, 0.f), 2, m_DehydrationFrom, WEAPON_HAMMER);
-			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: %t"), 1.2f, BROADCAST_DEHYDRATED, m_DehydrationTick/50);
+			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: %t"), 1.0f, BROADCAST_DEHYDRATED, m_DehydrationTick/50);
 		}
 		
 		m_DehydrationTick--;

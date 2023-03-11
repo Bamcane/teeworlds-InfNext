@@ -43,7 +43,7 @@ void CGameControllerNext::Tick()
 
 	if(m_LastPlayersNum < 2) 
 	{
-		GameServer()->SendBroadcast_Localization(-1, _("Wait game start!"), 0.5f, BROADCAST_INFO);
+		GameServer()->SendBroadcast_Localization(-1, _("Wait game start!"), 0.1f, BROADCAST_INFO);
 	}
 
 	if(!IsInfectionStarted() && (Infects + Humans) >= 2) // send class chooser
