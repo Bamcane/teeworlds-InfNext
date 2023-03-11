@@ -91,9 +91,18 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	{
 		m_Core.m_Infect = pPlayer->GetClass()->m_Infect;
 	}
+
+	InitState();
+
 	GameServer()->m_pController->OnCharacterSpawn(this);
 
 	return true;
+}
+
+void CCharacter::InitState()
+{
+	m_DehydrationTick = 0;
+	m_DehydrationFrom = -1;
 }
 
 void CCharacter::Destroy()
@@ -324,7 +333,7 @@ void CCharacter::HandleWeapons()
 	if(!m_pPlayer->GetClass())
 		return;
 
-	// ammoregen
+	// ammo regen
 	for(int i=WEAPON_GUN; i<=WEAPON_RIFLE; i++)
 	{
 		if(!m_aWeapons[i].m_Got)
@@ -437,7 +446,7 @@ void CCharacter::HandleEvents()
 		}
 
 		// handle dead tiles
-		if(IsCollisionTile(CCollision::COLFLAG_DEATH))
+		if(IsCollisionTile(CCollision::COLFLAG_DEATH) || GameLayerClipped(m_Pos))
 		{
 			Die(GetCID(), WEAPON_SELF);
 		}
@@ -457,6 +466,8 @@ void CCharacter::HandleEvents()
 		m_EmoteType = EMOTE_NORMAL;
 		m_EmoteStop = -1;
 	}
+
+	HandleBuff();
 
 	UpdateTuning();
 }
@@ -505,6 +516,20 @@ void CCharacter::HandleMenu()
 		GameServer()->m_pController->OnPlayerSelectClass(m_pPlayer);
 	}
 
+}
+
+void CCharacter::HandleBuff()
+{
+	if(m_DehydrationTick)
+	{
+		if(m_DehydrationTick%50 == 0)
+		{
+			TakeDamage(vec2(0.f, 0.f), 2, m_DehydrationFrom, WEAPON_HAMMER);
+			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: %t"), 1.2f, BROADCAST_DEHYDRATED, m_DehydrationTick/50);
+		}
+		
+		m_DehydrationTick--;
+	}
 }
 
 void CCharacter::Tick()
@@ -719,7 +744,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 	m_Core.m_Vel += Force;
 
-	if(Mode == DAMAGEMODE_INFECTION && From != m_pPlayer->GetCID())
+	if(Mode == DAMAGEMODE_INFECTION && From >= 0 && From != m_pPlayer->GetCID())
 	{
 		m_pPlayer->Infect();
 		GameServer()->m_apPlayers[From]->m_Score += 3;
@@ -868,6 +893,8 @@ void CCharacter::Snap(int SnappingClient)
 
 	if(m_pPlayer->IsInfect())
 		Emote = EMOTE_ANGRY;
+	if(m_DehydrationTick)
+		Emote = EMOTE_PAIN;
 
 	if(m_aWeapons[WEAPON_HAMMER].m_Got)
 		pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_HAMMER;
@@ -902,6 +929,9 @@ void CCharacter::Snap(int SnappingClient)
 
 	pDDNetCharacter->m_TargetX = m_Core.m_Input.m_TargetX;
 	pDDNetCharacter->m_TargetY = m_Core.m_Input.m_TargetY;
+		
+	if(GetClass())
+		GetClass()->OnDDNetCharacterSnap(pDDNetCharacter);
 
 	if(!Server()->IsSixup(SnappingClient))
 	{
@@ -927,6 +957,9 @@ void CCharacter::Snap(int SnappingClient)
 		pCharacter->m_Health = Health;
 		pCharacter->m_Armor = Armor;
 		pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
+
+		if(GetClass())
+			GetClass()->OnCharacterSnap(pCharacter);
 	}
 	else
 	{
@@ -953,12 +986,30 @@ void CCharacter::Snap(int SnappingClient)
 		pCharacter->m_Health = Health;
 		pCharacter->m_Armor = Armor;
 		pCharacter->m_TriggeredEvents = 0;
+
+		if(GetClass())
+			GetClass()->OnCharacterSnap(pCharacter);
 	}
 }
 
 int CCharacter::GetCID() const
 {
 	return m_pPlayer->GetCID();
+}
+
+CClass *CCharacter::GetClass() const
+{
+	return m_pPlayer->GetClass();
+}
+
+bool CCharacter::IsHuman() const
+{
+	return m_pPlayer->IsHuman();
+}
+
+bool CCharacter::IsInfect() const
+{
+	return m_pPlayer->IsInfect();
 }
 
 void CCharacter::Freeze(float Seconds)
@@ -996,6 +1047,14 @@ void CCharacter::UpdateTuning()
 CCollision *CCharacter::Collision()
 {
 	return GameServer()->Collision();
+}
+
+void CCharacter::Dehydration(int From, float Seconds)
+{
+	if(m_DehydrationTick != 0)
+		return;
+	m_DehydrationFrom = From;
+	m_DehydrationTick = (int)(Seconds * Server()->TickSpeed());
 }
 
 void CCharacter::InitClassWeapon()

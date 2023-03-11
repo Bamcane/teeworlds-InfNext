@@ -5,6 +5,8 @@
 #include <engine/server/mapconverter.h>
 #include <game/layers.h>
 
+#include <limits>
+
 CMapConverter6::CMapConverter6(IStorage *pStorage, IEngineMap *pMap, IConsole* pConsole, CClasses* pClasses) :
 	m_pStorage(pStorage),
 	m_pMap(pMap),
@@ -19,6 +21,67 @@ CMapConverter6::~CMapConverter6()
 {
 	if(m_pTiles)
 		delete[] m_pTiles;
+}
+
+
+void CMapConverter6::QuantizeAnimation(int Quant)
+{
+	//Get the animation cycle
+	CEnvPoint* pEnvPoints = NULL;
+	{
+		int Start, Num;
+		Map()->GetType(MAPITEMTYPE_ENVPOINTS, &Start, &Num);
+		pEnvPoints = (CEnvPoint *)Map()->GetItem(Start, 0, 0);
+	}
+
+	if(!pEnvPoints)
+		return;
+
+	int Start, Num;
+	Map()->GetType(MAPITEMTYPE_ENVELOPE, &Start, &Num);
+	for(int i = 0; i < Num; i++)
+	{
+		CMapItemEnvelope *pItem = (CMapItemEnvelope *)Map()->GetItem(Start+i, 0, 0);
+		if(pItem->m_NumPoints > 0)
+		{
+			// Quant the points:
+			for(int p = 0; p < pItem->m_NumPoints; ++p)
+			{
+				int PointOffest = pItem->m_StartPoint + p;
+				int Time = pEnvPoints[PointOffest].m_Time;
+				int S = Time / Quant;
+				if((Time % Quant) >= Quant / 2)
+				{
+					++S;
+				}
+				int QuantedTime = S * Quant;
+				if(Time != QuantedTime)
+				{
+					pEnvPoints[PointOffest].m_Time = QuantedTime;
+				}
+			}
+		}
+	}
+}
+
+// InfectionDust
+
+// Work with 'long long' to properly handle overflows (later)
+static inline long long gcd_long(long long a, long long b)
+{
+	while(b != 0)
+	{
+		long long c = a % b;
+		a = b;
+		b = c;
+	}
+	return a;
+}
+
+// Function to return LCM of two numbers
+static inline long long lcm(long long a, long long b)
+{
+	return (a / gcd_long(a, b)) * b;
 }
 
 bool CMapConverter6::Load()
@@ -94,9 +157,25 @@ bool CMapConverter6::Load()
 		Map()->GetType(MAPITEMTYPE_ENVPOINTS, &Start, &Num);
 		pEnvPoints = (CEnvPoint *)Map()->GetItem(Start, 0, 0);
 	}
-					
+
+
+	// InfectionDust
+	const int TIMESHIFT_MENUCLASS_MASK = Classes()->m_HumanClasses.size()+1;
+	const int MenuItemSyncMagic = TIMESHIFT_MENUCLASS * 1000;
+	long long AnimationCircle = m_AnimationCycle;
+	long long TimeShiftUnit = 0;
+			
+	int MASK_ALL = 0;
+	for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
+	{
+		MASK_ALL |= 1<<i;
+	}
+	
 	if(pEnvPoints)
 	{
+		static const int Quant = 100;
+		QuantizeAnimation(Quant);
+
 		int Start, Num;
 		Map()->GetType(MAPITEMTYPE_ENVELOPE, &Start, &Num);
 		for(int i = 0; i < Num; i++)
@@ -107,18 +186,35 @@ bool CMapConverter6::Load()
 				int Duration = pEnvPoints[pItem->m_StartPoint + pItem->m_NumPoints - 1].m_Time - pEnvPoints[pItem->m_StartPoint].m_Time;
 				if(Duration)
 				{
-					dbg_msg("infNext", "Duration found: %d", m_AnimationCycle);
-					m_AnimationCycle *= Duration;
-					dbg_msg("infNext", "Duration found: %d", m_AnimationCycle);
+					dbg_msg("MapConverter", "Duration found: %d", Duration);
+					AnimationCircle = lcm(AnimationCircle, Duration);
+					dbg_msg("MapConverter", "New AnimationCycle: %lld", AnimationCircle);
 				}
 			}
 		}
-		
-		if(m_AnimationCycle)
-			m_TimeShiftUnit = m_AnimationCycle*((60000 / m_AnimationCycle)+1);
+
+		dbg_msg("MapConverter", "Final AnimationCycle: %lld", AnimationCircle);
+		if(AnimationCircle)
+			TimeShiftUnit = AnimationCircle*((MenuItemSyncMagic / AnimationCircle)+1);
 		else
-			m_TimeShiftUnit = 60000;
+			TimeShiftUnit = MenuItemSyncMagic;
 	}
+
+	int Multiplier = 1 + TIMESHIFT_MENUCLASS + 3 * ((MASK_ALL + 1) * TIMESHIFT_MENUCLASS_MASK);
+	long long MaxUsedAnimationTime = Multiplier * TimeShiftUnit;
+	long long MaxAvailable = std::numeric_limits<int>::max();
+
+	if(MaxUsedAnimationTime > MaxAvailable)
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "WARNING! The animation duration is off the limit: %lld/%lld", MaxUsedAnimationTime, MaxAvailable);
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "MapConverter", aBuf);
+	}
+	else
+	{
+		dbg_msg("MapConverter", "The animation duration is within the limits: %lld/%lld", MaxUsedAnimationTime, MaxAvailable);
+	}
+	m_TimeShiftUnit = TimeShiftUnit;
 	
 	return true;
 }

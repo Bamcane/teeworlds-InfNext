@@ -5,6 +5,10 @@
 #include "weapon.h"
 
 class CGameContext;
+namespace protocol7
+{
+    class CNetObj_Character;
+}
 
 class CClass
 {
@@ -22,6 +26,9 @@ public:
 
     virtual void OnTick(class CCharacter *pOwner) {};
     virtual void OnPlayerDeath(int ClientID, int KillerID, vec2 Pos) {};
+    virtual void OnCharacterSnap(class CNetObj_Character *pCharacter) {};
+    virtual void OnCharacterSnap(class protocol7::CNetObj_Character *pCharacter) {};
+    virtual void OnDDNetCharacterSnap(class CNetObj_DDNetCharacter *pCharacter) {};
 
     char m_ClassName[32];
     int m_MaxJumpNum;

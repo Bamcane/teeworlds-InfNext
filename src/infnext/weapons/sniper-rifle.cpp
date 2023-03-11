@@ -1,5 +1,5 @@
 #include <game/server/gamecontext.h>
-#include <infnext/weapon-entities/laser.h>
+#include <infnext/entities/laser.h>
 #include "sniper-rifle.h"
 
 CWeaponSniperRifle::CWeaponSniperRifle(CGameContext *pGameServer)

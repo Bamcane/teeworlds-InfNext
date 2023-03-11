@@ -54,6 +54,7 @@ protected:
 	void InitQuad(CQuad* pQuad, vec2 Pos, vec2 Size);
 
 	void InitState();
+	void QuantizeAnimation(int Quant);
 	
 	void CopyVersion();
 	void CopyMapInfo();

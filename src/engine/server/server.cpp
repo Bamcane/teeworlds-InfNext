@@ -1799,7 +1799,7 @@ void CServer::UpdateRegisterServerInfo()
 		JsonBool(g_Config.m_Password[0]),
 		EscapeJson(aGameType, sizeof(aGameType), GameServer()->GameType()),
 		EscapeJson(aName, sizeof(aName), g_Config.m_SvName),
-		EscapeJson(aMapName, sizeof(aMapName), m_aCurrentMap),
+		EscapeJson(aMapName, sizeof(aMapName), GetMapName()),
 		aMapSha256,
 		m_aCurrentMapSize[MAP_TYPE_SIX],
 		EscapeJson(aVersion, sizeof(aVersion), GameServer()->Version()));
@@ -2070,6 +2070,7 @@ int CServer::LoadMap(const char *pMapName)
 		io_close(File);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", "map 06 version loaded in memory");
 	}
+	str_copy(m_aCurrentMap, pMapName);
 	// load complete map07 into memory for download
 	{
 		char aBufMsg[128];

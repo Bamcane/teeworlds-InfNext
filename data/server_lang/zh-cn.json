@@ -1,5 +1,9 @@
 {"translation":[
 	{
+		"key": "You are dehydrated: %t",
+		"value": "你正在脱水: %t"
+	},
+	{
 		"key": "You infected '%s'",
 		"value": "你感染了'%s'"
 	},
@@ -192,6 +196,10 @@
 		"value": "爆炸者"
 	},
 	{
+		"key": "Captain",
+		"value": "船长"
+	},
+	{
 		"key": "Hunter",
 		"value": "猎人"
 	},
@@ -210,6 +218,22 @@
 	{
 		"key": "Sniper",
 		"value": "狙击手"
+	},
+	{
+		"key": "d",
+		"value": "天"
+	},
+	{
+		"key": "h",
+		"value": "小时"
+	},
+	{
+		"key": "min",
+		"value": "分钟"
+	},
+	{
+		"key": "sec",
+		"value": "秒"
 	},
 	{
 		"key": "Class Chooser",

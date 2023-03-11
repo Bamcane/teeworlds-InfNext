@@ -1,5 +1,5 @@
 #include <game/server/gamecontext.h>
-#include <infnext/weapon-entities/laser.h>
+#include <infnext/entities/laser.h>
 #include "rifle.h"
 
 CWeaponRifle::CWeaponRifle(CGameContext *pGameServer)
