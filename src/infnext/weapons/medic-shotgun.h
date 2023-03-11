@@ -7,6 +7,7 @@ class CWeaponMedicShotgun : public CWeaponShotgun
 {
 public:
     CWeaponMedicShotgun(CGameContext *pGameServer);
+    void Fire(vec2 Pos, vec2 Dir, int Owner) override; 
 };
 
 #endif

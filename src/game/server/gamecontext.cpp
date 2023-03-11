@@ -366,7 +366,7 @@ void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
 }
 
 
-void CGameContext::SendBroadcast(int ClientID, const char *pText, float Time)
+void CGameContext::SendBroadcast(int ClientID, const char *pText, float Time, int Type)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
@@ -385,8 +385,9 @@ void CGameContext::SendBroadcast(int ClientID, const char *pText, float Time)
 		{
 			CBroadcast Broadcast;
 
-			Broadcast.m_Broadcast = pText;
-			Broadcast.m_BroadcastTime = Time;
+			Broadcast.m_Text = pText;
+			Broadcast.m_Time = Time;
+			Broadcast.m_Type = Type;
 			Broadcast.m_StartTick = Server()->Tick();
 
 			AddBroadCast(i, Broadcast);
@@ -466,17 +467,16 @@ void CGameContext::AddBroadCast(int ClientID, CBroadcast Broadcast)
 	
 	for(int i = 0; i < m_aBroadcast[ClientID].m_aBroadcast.size();i ++)
 	{
-		if(str_comp(m_aBroadcast[ClientID].m_aBroadcast[i].m_Broadcast.c_str(), Broadcast.m_Broadcast.c_str()) == 0)
+		if(	m_aBroadcast[ClientID].m_aBroadcast[i].m_Type == Broadcast.m_Type)
 		{
-			m_aBroadcast[ClientID].m_aBroadcast[i] = Broadcast;
-			return;
+			m_aBroadcast[ClientID].m_aBroadcast.remove_index(i);
 		}
 	}
 			
 	m_aBroadcast[ClientID].m_aBroadcast.add(Broadcast);
 }
 
-void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, float Time, ...)
+void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, float Time, int Type, ...)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
@@ -504,8 +504,9 @@ void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, f
 			
 			CBroadcast Broadcast;
 
-			Broadcast.m_Broadcast = Buffer.buffer();
-			Broadcast.m_BroadcastTime = Time;
+			Broadcast.m_Text = Buffer.buffer();
+			Broadcast.m_Time = Time;
+			Broadcast.m_Type = Type;
 			Broadcast.m_StartTick = Server()->Tick();
 
 			AddBroadCast(i, Broadcast);
@@ -673,10 +674,7 @@ void CGameContext::OnTick()
 		}
 	}
 
-
-	if(!(Server()->Tick() % 10))
 	{
-		std::string Buffer;
 
 		for(int i = 0; i < MAX_CLIENTS;i ++)
 		{
@@ -686,38 +684,26 @@ void CGameContext::OnTick()
 				continue;
 			}
 
-			Buffer.clear();
-
-			bool Clear = false;
+			bool Broadcast = false;
 
 			for(int j = 0; j < m_aBroadcast[i].m_aBroadcast.size(); j ++)
 			{
 				if(m_aBroadcast[i].m_aBroadcast[j].m_StartTick + 
-					m_aBroadcast[i].m_aBroadcast[j].m_BroadcastTime * Server()->TickSpeed()
-						>= Server()->Tick())
-				{
-					Buffer.append(m_aBroadcast[i].m_aBroadcast[j].m_Broadcast);
-					Buffer.append("\n");
-				}else
+					m_aBroadcast[i].m_aBroadcast[j].m_Time * Server()->TickSpeed()
+						< Server()->Tick())
 				{
 					m_aBroadcast[i].m_aBroadcast.remove_index(j);
-					Clear = true;
+					Broadcast = true;
 				}
+
+				if((Server()->Tick()-m_aBroadcast[i].m_aBroadcast[j].m_StartTick)%50 == 0)
+					Broadcast = true;
 			}
 
-			if(!Buffer.length())
+			if(Broadcast)
 			{
-				if(Clear)
-				{
-					CNetMsg_Sv_Broadcast Msg;
-					Msg.m_pMessage = "";
-					Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
-				}
-				continue;
+				UpdateBroadcast(i);
 			}
-			CNetMsg_Sv_Broadcast Msg;
-			Msg.m_pMessage = Buffer.c_str();
-			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
 		}
 	}
 
@@ -1472,7 +1458,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					pPlayer->SetTeam(pMsg->m_Team);
 				}
 				else
-					SendBroadcast_Localization(ClientID, _("Teams must be balanced, please join other team"), 3);
+					SendBroadcast_Localization(ClientID, _("Teams must be balanced, please join other team"), 3, BROADCAST_SYSTEM);
 			}
 			else
 			{
@@ -2468,4 +2454,19 @@ void CGameContext::AddMapVotes()
 	}
 
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "added maps to votes");
+}
+
+void CGameContext::UpdateBroadcast(int ClientID)
+{
+	std::string Buffer;
+	for(int i = 0;i < m_aBroadcast[ClientID].m_aBroadcast.size(); i ++)
+	{
+		Buffer.append(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text);
+		if(i < m_aBroadcast[ClientID].m_aBroadcast.size()-1)
+			Buffer.append("\n");
+	}
+
+	CNetMsg_Sv_Broadcast Msg;
+	Msg.m_pMessage = Buffer.c_str();
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 }

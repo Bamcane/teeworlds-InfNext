@@ -450,7 +450,7 @@ void CPlayer::SetClass(CClass *pClass)
 		}
 	}
 	
-	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '%s'"), 2,
+	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '%s'"), 2, BROADCAST_CLASS,
 		pClass->m_ClassName);
 
 	if(m_pCharacter)

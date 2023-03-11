@@ -98,9 +98,10 @@ private:
 	class CBroadcast
 	{
 	public:
-		std::string m_Broadcast;
+		std::string m_Text;
 		int64_t m_StartTick;
-		float m_BroadcastTime;
+		int m_Type;
+		float m_Time;
 	};
 
 	struct CPlayerBroadcast
@@ -198,11 +199,13 @@ public:
 	void SendChat(int ClientID, int Team, const char *pText);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
-	void SendBroadcast(int ClientID, const char *pText, float Time=3.0f);
+	void SendBroadcast(int ClientID, const char *pText, float Time=3.0f, int Type=0);
 	void SendSkinChange(int ClientID, int TargetID);
 	void SendClanChange(int ClientID, int TargetID, const char *pClan);
-	void SendBroadcast_Localization(int ClientID, const char *pText, float Time, ...);
+	void SendBroadcast_Localization(int ClientID, const char *pText, float Time, int Type, ...);
 	void SetClientLanguage(int ClientID, const char *pLanguage);
+
+	void UpdateBroadcast(int ClientID);
 
 	const char* Localize(const char *pLanguageCode, const char* pText) const;
 	const char* GetPlayerLanguage(int ClientID) const;

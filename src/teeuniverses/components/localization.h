@@ -105,6 +105,7 @@ public:
 
 	//localize
 	const char* Localize(const char* pLanguageCode, const char* pText);
+	void AddTime(dynamic_string& Buffer, const char* pLanguageCode, int& BufferIter, int64_t Time);
 	
 	//format
 	void Format_V(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);

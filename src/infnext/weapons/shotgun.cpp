@@ -1,5 +1,5 @@
 #include <game/server/gamecontext.h>
-#include <infnext/weapon-entities/projectile.h>
+#include <infnext/entities/projectile.h>
 #include "shotgun.h"
 
 CWeaponShotgun::CWeaponShotgun(CGameContext *pGameServer)

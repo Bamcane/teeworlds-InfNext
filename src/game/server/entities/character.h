@@ -45,6 +45,7 @@ public:
 	void HandleInput();
 	void HandleClass();
 	void HandleMenu();
+	void HandleBuff();
 
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);
@@ -55,6 +56,8 @@ public:
 	bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode = 0);
 
 	bool Spawn(class CPlayer *pPlayer, vec2 Pos);
+	void InitState();
+
 	bool Remove();
 
 	bool IncreaseHealth(int Amount);
@@ -141,6 +144,10 @@ private:
 	int m_FreezeStartTick;
 	int m_FreezeEndTick;
 
+	// Dehydration
+	int m_DehydrationTick; 
+	int m_DehydrationFrom;
+
 public:
 	CCollision *Collision();
 	CCharacterCore *GetCore() {return &m_Core;}
@@ -152,6 +159,13 @@ public:
 	int GetHealth() const {return m_Health; }
 	int GetMaxHealth() const {return m_MaxHealth; }
 	int GetCID() const;
+
+	CClass *GetClass() const;
+	bool IsHuman() const;
+	bool IsInfect() const;
+
+	void Dehydration(int From, float Seconds);
+
 /** Weapon Public for weapon system*/
 	NinjaInfo *GetNinjaInfo() {return &m_Ninja;}
 	void SetReloadTimer(int ReloadTimer) { m_ReloadTimer = ReloadTimer;}
@@ -162,7 +176,6 @@ public:
 	bool m_DeepFreeze;
 
 	int m_LastHookDmgTick;
-
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include <game/server/gamecontext.h>
 #include "laser.h"
 
-CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int Damage)
+CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int Damage, bool Explosive)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
 	m_Pos = Pos;
@@ -14,6 +14,7 @@ CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_Damage = Damage;
 	m_Bounces = 0;
 	m_EvalTick = 0;
+	m_Explosive = Explosive;
 	GameWorld()->InsertEntity(this);
 	DoBounce();
 }
@@ -33,6 +34,12 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	m_Pos = At;
 	m_Energy = -1;
 	pHit->TakeDamage(vec2(0.f, 0.f), m_Damage, m_Owner, WEAPON_RIFLE);
+
+	if(m_Explosive)
+	{
+		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
+		GameServer()->CreateExplosion(m_Pos, m_Owner, WEAPON_RIFLE, false);
+	}
 	return true;
 }
 
@@ -69,7 +76,16 @@ void CLaser::DoBounce()
 			if(m_Bounces > GameServer()->Tuning()->m_LaserBounceNum)
 				m_Energy = -1;
 
-			GameServer()->CreateSound(m_Pos, SOUND_RIFLE_BOUNCE);
+			if(m_Explosive)
+			{
+				GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
+
+				GameServer()->CreateExplosion(m_Pos, m_Owner, WEAPON_RIFLE, false);
+			}
+			else
+			{
+				GameServer()->CreateSound(m_Pos, SOUND_RIFLE_BOUNCE);
+			}
 		}
 	}
 	else

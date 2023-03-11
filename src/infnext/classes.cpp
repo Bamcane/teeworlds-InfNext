@@ -22,6 +22,7 @@ void CClasses::InitClasses()
 	InitHumanClass(new CClassLooper(GameServer()), true);
 	InitHumanClass(new CClassSniper(GameServer()), true);
 	InitHumanClass(new CClassMedic(GameServer()), true);
+	InitHumanClass(new CClassCaptain(GameServer()), true);
 
 	InitInfectClass(new CClassHunter(GameServer()), 33);
 	InitInfectClass(new CClassBoomer(GameServer()), 33);

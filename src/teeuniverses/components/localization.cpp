@@ -265,6 +265,42 @@ static char* format_integer_with_commas(char commas, int n)
 	return _formatted_number;
 }
 
+void CLocalization::AddTime(dynamic_string& Buffer, const char* pLanguageCode, int& BufferIter, int64_t Time)
+{
+	int Days, Hours, Minutes, Seconds;
+	Days = Time/86400;
+	Hours = (Time - Days*86400)/3600;
+	Minutes = (Time - Days*86400 - Hours * 3600)/60;
+	Seconds = Time - Days*86400 - Hours * 3600 - Minutes * 60;
+
+	char aBuf[128];
+	if(Days)
+	{
+		str_format(aBuf, sizeof(aBuf), "%d", Days);
+		BufferIter = Buffer.append_at(BufferIter, aBuf);
+		BufferIter = Buffer.append_at(BufferIter, Localize(pLanguageCode, _("d")));
+	}
+	if(Hours)
+	{
+		str_format(aBuf, sizeof(aBuf), "%d", Hours);
+		BufferIter = Buffer.append_at(BufferIter, aBuf);
+		BufferIter = Buffer.append_at(BufferIter, Localize(pLanguageCode, _("h")));
+	}
+	if(Minutes)
+	{
+		str_format(aBuf, sizeof(aBuf), "%d", Minutes);
+		BufferIter = Buffer.append_at(BufferIter, aBuf);
+		BufferIter = Buffer.append_at(BufferIter, Localize(pLanguageCode, _("min")));
+	}
+
+	if((!Days && !Hours && !Minutes) || Seconds)
+	{
+		str_format(aBuf, sizeof(aBuf), "%d", Seconds);
+		BufferIter = Buffer.append_at(BufferIter, aBuf);
+		BufferIter = Buffer.append_at(BufferIter, Localize(pLanguageCode, _("sec")));
+	}
+}
+
 void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs)
 {
 	CLanguage* pLanguage = m_pMainLanguage;	
@@ -312,7 +348,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			{
 				char aBuf[128];
 				const int pVarArgValue = va_arg(VarArgsIter, int);
-				str_format(aBuf, sizeof(aBuf), "%d", pVarArgValue); // %ll
+				str_format(aBuf, sizeof(aBuf), "%d", pVarArgValue); // %d
 				BufferIter = Buffer.append_at(BufferIter, aBuf);
 			}
 			else if(str_comp_num("%f", pText + ParamTypeStart, 2) == 0) // float
@@ -328,6 +364,11 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 				char* aBuffer = format_integer_with_commas(',', pVarArgValue);
 				BufferIter = Buffer.append_at(BufferIter, aBuffer);
 				delete[] aBuffer;
+			}
+			else if(str_comp_num("%t", pText + ParamTypeStart, 2) == 0) // time
+			{
+				const int64_t pVarArgValue = va_arg(VarArgsIter, int64_t);
+				AddTime(Buffer, pLanguageCode, BufferIter, pVarArgValue);
 			}
 
 			//

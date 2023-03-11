@@ -158,8 +158,6 @@ void IGameController::CycleMap()
 	if(m_RoundCount < g_Config.m_SvRoundsPerMap-1)
 		return;
 
-	bool NeedReload = false;
-
 	// handle maprotation
 	const char *pMapRotation = g_Config.m_SvMaprotation;
 	const char *pCurrentMap = g_Config.m_SvMap;
@@ -211,12 +209,9 @@ void IGameController::CycleMap()
 	char aBufMsg[256];
 	str_format(aBufMsg, sizeof(aBufMsg), "rotating map to %s", &aBuf[i]);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	if(str_comp((const char *)aBuf[i], g_Config.m_SvMap))
-		NeedReload = true;
 	str_copy(g_Config.m_SvMap, &aBuf[i], sizeof(g_Config.m_SvMap));
 	
-	if(NeedReload)
-		Server()->ReloadMap();
+	Server()->ReloadMap();
 }
 
 void IGameController::PostReset()
