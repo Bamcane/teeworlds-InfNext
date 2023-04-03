@@ -1,0 +1,222 @@
+{"translation":[
+	{
+		"key": "'{str:OldName}' changed name to '{str:NewName}'",
+		"value": "'{str:OldName}' \u5df2\u6539\u540d\u4e3a'{str:NewName}'"
+	},
+	{
+		"key": "'{str:Option}' isn't an option on this server",
+		"value": "'{str:Option}' \u4e0d\u662f\u6b64\u670d\u52a1\u5668\u4e0a\u7684\u4e00\u4e2a\u9009\u9879"
+	},
+	{
+		"key": "'{str:Player}' called for vote to kick '{str:Player2}' ({str:Reason})",
+		"value": "'{str:Player}'\u63d0\u8bae\u8e22\u51fa'{str:Player2}' ({str:Reason})"
+	},
+	{
+		"key": "'{str:Player}' called for vote to kick you",
+		"value": "'{str:Player}' \u53d1\u8d77\u6295\u7968\u8e22\u4f60"
+	},
+	{
+		"key": "'{str:Player}' called for vote to move '{str:Player2}' to spectators ({str:Reason})",
+		"value": "'{str:Player}'\u63d0\u8bae\u79fb\u52a8'{str:Player2}'\u5230\u65c1\u89c2 ({str:Reason})"
+	},
+	{
+		"key": "'{str:Player}' called vote to change server option '{str:Option}' ({str:Reason})",
+		"value": "'{str:Player}' \u53d1\u8d77\u6295\u7968\u66f4\u6539\u670d\u52a1\u5668\u9009\u9879 '{str:Option}' ({str:Reason})"
+	},
+	{
+		"key": "'{str:Player}' entered and joined the {lstr:Team}",
+		"value": "'{str:Player}' \u8fde\u63a5\u670d\u52a1\u5668\u5e76\u52a0\u5165{lstr:Team}"
+	},
+	{
+		"key": "'{str:Player}' has left the game",
+		"value": "'{str:Player}'\u79bb\u5f00\u4e86\u6e38\u620f"
+	},
+	{
+		"key": "'{str:Player}' has left the game ({str:Reason})",
+		"value": "'{str:Player}'\u79bb\u5f00\u4e86\u6e38\u620f ({str:Reason})"
+	},
+	{
+		"key": "'{str:Player}' joined the {lstr:Team}",
+		"value": "'{str:Player}' \u52a0\u5165\u4e86{lstr:Team}"
+	},
+	{
+		"key": "Available languages: {str:List}",
+		"value": "\u53ef\u7528\u8bed\u8a00\ufe30 {str:List}"
+	},
+	{
+		"key": "Based on the concept of infNext mod by pure_luck",
+		"value": "\u57fa\u4e8e pure_luck \u6240\u505a\u7684\u65b0\u611f\u67d3\u6a21\u5f0f"
+	},
+	{
+		"key": "Boomer",
+		"value": "\u7206\u70b8\u8005"
+	},
+	{
+		"key": "Captain",
+		"value": "\u8239\u957f"
+	},
+	{
+		"key": "HUM| Humans win!",
+		"value": "HUM| \u4eba\u7c7b\u80dc\u5229\uff01"
+	},
+	{
+		"key": "Hunter",
+		"value": "\u730e\u4eba"
+	},
+	{
+		"key": "INF| Infects win!",
+		"value": "INF| \u611f\u67d3\u80dc\u5229\uff01"
+	},
+	{
+		"key": "Invalid client id to kick",
+		"value": "\u65e0\u6548\u7684\u5ba2\u6237\u7aef ID"
+	},
+	{
+		"key": "Invalid client id to move",
+		"value": "\u65e0\u6548\u7684\u5ba2\u6237\u7aef ID"
+	},
+	{
+		"key": "Invalid spectator id used",
+		"value": "\u65e0\u6548\u7684\u65c1\u89c2\u8005ID"
+	},
+	{
+		"key": "Kick voting requires {int:Num} players on the server",
+		"value": "\u53d1\u8d77\u8e22\u4eba\u6295\u7968\u9700\u8981\u6709 {int:Num} \u540d\u73a9\u5bb6"
+	},
+	{
+		"key": "Language successfully switched to English",
+		"value": "\u8bed\u8a00\u5df2\u6210\u529f\u5207\u6362\u5230\u4e2d\u6587"
+	},
+	{
+		"key": "Looper",
+		"value": "\u5faa\u73af\u8005"
+	},
+	{
+		"key": "Medic",
+		"value": "\u533b\u7597\u5175"
+	},
+	{
+		"key": "Only {int:Num} active players are allowed",
+		"value": "\u53ea\u5141\u8bb8 {int:Num} \u540d\u73a9\u5bb6\u6e38\u73a9"
+	},
+	{
+		"key": "Server does not allow voting to kick players",
+		"value": "\u670d\u52a1\u5668\u4e0d\u5141\u8bb8\u6295\u7968\u8e22\u73a9\u5bb6"
+	},
+	{
+		"key": "Server does not allow voting to move players to spectators",
+		"value": "\u670d\u52a1\u5668\u4e0d\u5141\u8bb8\u6295\u7968\u5c06\u73a9\u5bb6\u79fb\u52a8\u5230\u65c1\u89c2\u8005"
+	},
+	{
+		"key": "Smoker",
+		"value": "\u5438\u70df\u8005"
+	},
+	{
+		"key": "Sniper",
+		"value": "\u72d9\u51fb\u624b"
+	},
+	{
+		"key": "Spectators aren't allowed to start a vote.",
+		"value": "\u65c1\u89c2\u8005\u4e0d\u80fd\u53d1\u8d77\u6295\u7968"
+	},
+	{
+		"key": "Teams must be balanced, please join other team",
+		"value": "\u961f\u4f0d\u5fc5\u987b\u5e73\u8861, \u8bf7\u52a0\u5165\u5176\u4ed6\u961f\u4f0d"
+	},
+	{
+		"key": "Thanks {str:List}",
+		"value": "\u611f\u8c22 {str:List}"
+	},
+	{
+		"key": "Time to wait before changing team: {sec:Time}",
+		"value": "\u5fc5\u987b\u7b49\u5f85{sec:Time}\u624d\u80fd\u66f4\u6539\u961f\u4f0d"
+	},
+	{
+		"key": "Unknown language or no input language code",
+		"value": "\u672a\u77e5\u8bed\u8a00\u6216\u6ca1\u6709\u8f93\u5165\u8bed\u8a00\u4ee3\u7801"
+	},
+	{
+		"key": "Vote aborted",
+		"value": "\u6295\u7968\u4e2d\u6b62"
+	},
+	{
+		"key": "Vote failed",
+		"value": "\u6295\u7968\u5931\u8d25"
+	},
+	{
+		"key": "Vote passed",
+		"value": "\u6295\u7968\u901a\u8fc7"
+	},
+	{
+		"key": "Wait for current vote to end before calling a new one.",
+		"value": "\u7b49\u5f85\u5f53\u524d\u6295\u7968\u7ed3\u675f\u540e\u518d\u53d1\u8d77\u4e00\u4e2a\u65b0\u6295\u7968\u3002"
+	},
+	{
+		"key": "Wait game start!",
+		"value": "\u7b49\u5f85\u6e38\u620f\u5f00\u59cb!"
+	},
+	{
+		"key": "You are '{lstr:Class}'",
+		"value": "\u4f60\u662f '{lstr:Class}'"
+	},
+	{
+		"key": "You are dehydrated: {sec:Time}",
+		"value": "\u4f60\u5df2\u8131\u6c34\uff1a {sec:Time}"
+	},
+	{
+		"key": "You can't kick admins",
+		"value": "\u4f60\u4e0d\u80fd\u8e22\u7ba1\u7406\u5458"
+	},
+	{
+		"key": "You can't kick yourself",
+		"value": "\u4f60\u4e0d\u80fd\u8e22\u51fa\u4f60\u81ea\u5df1"
+	},
+	{
+		"key": "You can't move yourself",
+		"value": "\u4f60\u4e0d\u80fd\u79fb\u52a8\u81ea\u5df1"
+	},
+	{
+		"key": "You infected '{str:Player}'",
+		"value": "\u60a8\u611f\u67d3\u4e86'{str:Player}'"
+	},
+	{
+		"key": "You must wait {sec:Time} before making another vote",
+		"value": "\u4f60\u5fc5\u987b\u7b49\u5f85 {sec:Time} \u624d\u80fd\u518d\u8fdb\u884c\u4e00\u6b21\u6295\u7968"
+	},
+	{
+		"key": "You're infected by '{str:Player}'",
+		"value": "\u4f60\u88ab'{str:Player}' \u611f\u67d3\u4e86"
+	},
+	{
+		"key": "admin forced server option '{str:Value}' ({str:Reason})",
+		"value": "\u7ba1\u7406\u901a\u8fc7\u670d\u52a1\u5668\u9009\u9879 '{str:Value}' ({str:Reason})"
+	},
+	{
+		"key": "admin forced vote no",
+		"value": "\u7ba1\u7406\u5458\u5426\u51b3\u6295\u7968"
+	},
+	{
+		"key": "admin forced vote yes",
+		"value": "\u7ba1\u7406\u5458\u901a\u8fc7\u6295\u7968"
+	},
+	{
+		"key": "admin moved '{str:Player}' to spectator ({str:Reason})",
+		"value": "\u7ba1\u7406\u5458\u79fb\u52a8'{str:Player}'\u5230\u65c1\u89c2\u8005({str:Reason})"
+	},
+	{
+		"key": "blue team",
+		"value": "\u84dd\u961f"
+	},
+	{
+		"key": "game",
+		"value": "\u6e38\u620f"
+	},
+	{
+		"key": "red team",
+		"value": "\u7ea2\u961f"
+	},
+	{
+		"key": "spectators",
+		"value": "\u65c1\u89c2\u8005"
+	}
+]}

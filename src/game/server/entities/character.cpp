@@ -531,7 +531,8 @@ void CCharacter::HandleBuff()
 		if(m_DehydrationTick%50 == 0)
 		{
 			TakeDamage(vec2(0.f, 0.f), 2, m_DehydrationFrom, WEAPON_HAMMER);
-			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: %t"), 1.0f, BROADCAST_DEHYDRATED, m_DehydrationTick/50);
+			int Time = m_DehydrationTick/Server()->TickSpeed();
+			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: {sec:Time}"), 1.0f, BROADCAST_DEHYDRATED, Time);
 		}
 		
 		m_DehydrationTick--;
@@ -754,8 +755,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 	{
 		m_pPlayer->Infect();
 		GameServer()->m_apPlayers[From]->m_Score += 3;
-		GameServer()->SendChatTarget_Localization(From, _("You infected '%s'"), Server()->ClientName(GetCID()));
-		GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '%s'"), Server()->ClientName(From));
+		GameServer()->SendChatTarget_Localization(From, _("You infected '{str:Player}'"), "Player", Server()->ClientName(GetCID()), NULL);
+		GameServer()->SendChatTarget_Localization(GetCID(), _("You're infected by '{str:Player}'"), "Player", Server()->ClientName(From), NULL);
 		
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "kill killer='%s' victim='%s' weapon=%d",

@@ -131,6 +131,7 @@ void IGameController::StartRound()
 
 		pPlayer->CureToDefault();
 	}
+	Server()->ExpireServerInfo();
 }
 
 void IGameController::ChangeMap(const char *pToMap)

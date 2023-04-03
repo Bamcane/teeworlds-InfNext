@@ -112,7 +112,7 @@ private:
 
 	CPlayerBroadcast m_aBroadcast[MAX_CLIENTS];
 
-	void AddBroadCast(int ClientID, CBroadcast Broadcast);
+	void AddBroadcast(int ClientID, CBroadcast Broadcast);
 
 public:
 	IServer *Server() const { return m_pServer; }
@@ -195,14 +195,19 @@ public:
 	void SendMotd(int To, const char* pText);
 	void SendSettings(int ClientID);
 	void SendChatTarget(int To, const char *pText);
-	void SendChatTarget_Localization(int To, const char *pText, ...);
 	void SendChat(int ClientID, int Team, const char *pText);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
 	void SendBroadcast(int ClientID, const char *pText, float Time=3.0f, int Type=0);
 	void SendSkinChange(int ClientID, int TargetID);
 	void SendClanChange(int ClientID, int TargetID, const char *pClan);
+
 	void SendBroadcast_Localization(int ClientID, const char *pText, float Time, int Type, ...);
+	void SendBroadcast_Localization_P(int ClientID, const char* pText, float Time, int Type, int Number, ...);
+
+	void SendChatTarget_Localization(int To, const char *pText, ...);
+	void SendChatTarget_Localization_P(int To, const char* pText, int Number, ...);
+	
 	void SetClientLanguage(int ClientID, const char *pLanguage);
 
 	void UpdateBroadcast(int ClientID);

@@ -491,6 +491,8 @@ set(GAME_GENERATED_SHARED
 
 set(DEPS ${DEP_JSON} ${DEP_MD5} ${DEP_PNGLITE} ${ZLIB_DEP})
 
+find_package(ICU REQUIRED COMPONENTS uc i18n)
+
 # Libraries
 set(LIBS
   ${CMAKE_THREAD_LIBS_INIT}
@@ -498,12 +500,19 @@ set(LIBS
   ${CURL_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${PLATFORM_LIBS}
+  ICU::i18n
+  ICU::uc
 )
 
 # Targets
 add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_UUID_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
 list(APPEND TARGETS_OWN engine-shared game-shared)
+
+target_link_libraries(game-shared PUBLIC
+  ICU::i18n
+  ICU::uc
+)
 
 ########################################################################
 # SERVER
@@ -558,51 +567,32 @@ endif()
 ########################################################################
 # VARIOUS TARGETS
 ########################################################################
+# Translation dev targets
+add_custom_target(generate-pot)
 
-set_glob(MASTERSRV_SRC GLOB src/mastersrv/*)
+add_custom_command(
+  TARGET generate-pot
+  COMMAND ${PYTHON_EXECUTABLE} tools/generate-po.py
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
 
-set(TARGET_MASTERSRV mastersrv)
-set(TARGET_VERSIONSRV versionsrv)
+add_custom_target(update-po-files)
 
-add_executable(${TARGET_MASTERSRV} EXCLUDE_FROM_ALL ${MASTERSRV_SRC} $<TARGET_OBJECTS:engine-shared> ${DEPS})
-add_executable(${TARGET_VERSIONSRV} EXCLUDE_FROM_ALL ${VERSIONSRV_SRC} $<TARGET_OBJECTS:engine-shared> ${DEPS})
+set(PO_TEMPlATE "other/translations/infnext.pot")
 
-target_link_libraries(${TARGET_MASTERSRV} ${LIBS})
-target_link_libraries(${TARGET_VERSIONSRV} ${LIBS})
+add_custom_target(update-json-files)
+add_custom_command(
+  TARGET update-json-files
+  COMMAND ${PYTHON_EXECUTABLE} tools/localization.py
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
 
-list(APPEND TARGETS_OWN ${TARGET_MASTERSRV} ${TARGET_VERSIONSRV})
-list(APPEND TARGETS_LINK ${TARGET_MASTERSRV} ${TARGET_VERSIONSRV})
-
-foreach(ABS_T ${TOOLS})
-  file(RELATIVE_PATH T "${PROJECT_SOURCE_DIR}/src/tools/" ${ABS_T})
-  if(T MATCHES "\\.cpp$")
-    string(REGEX REPLACE "\\.cpp$" "" TOOL "${T}")
-    set(TOOL_DEPS ${DEPS})
-    set(TOOL_LIBS ${LIBS})
-    if(TOOL MATCHES "^(tileset_.*|dilate|map_extract|map_replace_image)$")
-      list(APPEND TOOL_DEPS ${PNGLITE_DEP})
-      list(APPEND TOOL_LIBS ${PNGLITE_LIBRARIES})
-      list(APPEND TOOL_INCLUDE_DIRS ${PNGLITE_INCLUDE_DIRS})
-    endif()
-    set(EXCLUDE_FROM_ALL)
-    add_executable(${TOOL} EXCLUDE_FROM_ALL
-      ${TOOL_DEPS}
-      src/tools/${TOOL}.cpp
-      ${EXTRA_TOOL_SRC}
-      $<TARGET_OBJECTS:engine-shared>
-    )
-    target_include_directories(${TOOL} PRIVATE ${TOOL_INCLUDE_DIRS})
-    target_link_libraries(${TOOL} ${TOOL_LIBS})
-    list(APPEND TARGETS_TOOLS ${TOOL})
-  endif()
-endforeach()
-
-list(APPEND TARGETS_OWN ${TARGETS_TOOLS})
-list(APPEND TARGETS_LINK ${TARGETS_TOOLS})
-
-add_custom_target(tools DEPENDS ${TARGETS_TOOLS})
-add_custom_target(everything DEPENDS ${TARGETS_OWN})
-
+add_custom_target(update-map-files)
+add_custom_command(
+  TARGET update-map-files
+  COMMAND ${PYTHON_EXECUTABLE} tools/convert_map.py
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
 ########################################################################
 # INSTALLATION
 ########################################################################

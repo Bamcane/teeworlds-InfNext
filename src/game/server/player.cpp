@@ -279,7 +279,15 @@ void CPlayer::OnDisconnect(const char *pReason)
 
 	if(Server()->ClientIngame(m_ClientID))
 	{
-		GameServer()->SendChatTarget_Localization(-1, _("'%s' has left the game"), Server()->ClientName(m_ClientID));
+		if(pReason && pReason[0])
+			GameServer()->SendChatTarget_Localization(-1, _("'{str:Player}' has left the game ({str:Reason})"), 
+				"Player", Server()->ClientName(m_ClientID),
+				"Reason", pReason,
+				NULL);
+		else
+			GameServer()->SendChatTarget_Localization(-1, _("'{str:Player}' has left the game"), 
+				"Player", Server()->ClientName(m_ClientID),
+				NULL);
 		char aBuf[512];
 		str_format(aBuf, sizeof(aBuf), "leave player='%d:%s'", m_ClientID, Server()->ClientName(m_ClientID));
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "game", aBuf);
@@ -364,7 +372,10 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	char aBuf[512];
 	if(DoChatMsg)
 	{
-		GameServer()->SendChatTarget_Localization(-1, _("'%s' joined the %s"), Server()->ClientName(m_ClientID), GameServer()->m_pController->GetTeamName(Team));	
+		GameServer()->SendChatTarget_Localization(-1, _("'{str:Player}' joined the {lstr:Team}"), 
+			"Player", Server()->ClientName(m_ClientID), 
+			"Team", GameServer()->m_pController->GetTeamName(Team),
+			NULL);	
 	}
 
 	if(Team != m_Team)
@@ -450,8 +461,9 @@ void CPlayer::SetClass(CClass *pClass)
 		}
 	}
 	
-	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '%s'"), 2, BROADCAST_CLASS,
-		pClass->m_ClassName);
+	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '{lstr:Class}'"), 2, BROADCAST_CLASS,
+		"Class", pClass->m_ClassName,
+		NULL);
 
 	if(m_pCharacter)
 	{
@@ -460,6 +472,7 @@ void CPlayer::SetClass(CClass *pClass)
 		m_pCharacter->GetCore()->m_Infect = pClass->m_Infect;
 	}
 
+	Server()->ExpireServerInfo();
 }
 
 void CPlayer::CureToDefault()
