@@ -92,6 +92,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		m_Core.m_Infect = pPlayer->GetClass()->m_Infect;
 	}
 
+	// infNext init
 	InitState();
 
 	GameServer()->m_pController->OnCharacterSpawn(this);
@@ -530,7 +531,7 @@ void CCharacter::HandleBuff()
 	{
 		if(m_DehydrationTick%50 == 0)
 		{
-			TakeDamage(vec2(0.f, 0.f), 2, m_DehydrationFrom, WEAPON_HAMMER);
+			TakeDamage(vec2(0.f, 0.f), 2, m_DehydrationFrom, m_DehydrationWeapon);
 			int Time = m_DehydrationTick/Server()->TickSpeed();
 			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: {sec:Time}"), 1.0f, BROADCAST_DEHYDRATED, Time);
 		}
@@ -1056,12 +1057,13 @@ CCollision *CCharacter::Collision()
 	return GameServer()->Collision();
 }
 
-void CCharacter::Dehydration(int From, float Seconds)
+void CCharacter::Dehydration(int From, int Weapon, float Seconds)
 {
-	if(m_DehydrationTick != 0)
+	if(From == m_DehydrationFrom && m_DehydrationTick != 0)
 		return;
 	m_DehydrationFrom = From;
 	m_DehydrationTick = (int)(Seconds * Server()->TickSpeed());
+	m_DehydrationWeapon = Weapon;
 }
 
 void CCharacter::InitClassWeapon()

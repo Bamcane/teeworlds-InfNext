@@ -2018,7 +2018,7 @@ int CServer::LoadMap(const char *pMapName)
 		char aClientMapName[256];
 		str_format(aClientMapName, sizeof(aClientMapName), "clientmaps/next/%s.map", pMapName);
 		
-		CMapConverter6 MapConverter(Storage(), m_pMap, Console(), Classes());
+		CMapConverter MapConverter(Storage(), m_pMap, Console(), Classes());
 		if(!MapConverter.Load())
 			return 0;
 			
@@ -2042,7 +2042,7 @@ int CServer::LoadMap(const char *pMapName)
 			dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
 		}
 				
-		if(!MapConverter.CreateMap(aClientMapName))
+		if(!MapConverter.CreateMap(aClientMapName, pMapName))
 			return 0;
 			
 		CDataFileReader dfGeneratedMap;
@@ -2074,7 +2074,7 @@ int CServer::LoadMap(const char *pMapName)
 	// load complete map07 into memory for download
 	{
 		char aBufMsg[128];
-		str_format(aBuf, sizeof(aBuf), "maps7/%s.map", pMapName);
+		str_format(aBuf, sizeof(aBuf), "clientmaps/next/%s7.map", pMapName);
 		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 		m_aCurrentMapSize[MAP_TYPE_SIXUP] = (int)io_length(File);
 		if(m_apCurrentMapData[MAP_TYPE_SIXUP])
@@ -2088,6 +2088,7 @@ int CServer::LoadMap(const char *pMapName)
 		
 		char aSha256[SHA256_MAXSTRSIZE];
 		sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIXUP], aSha256, sizeof(aSha256));
+		
 		str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
 	}

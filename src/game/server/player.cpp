@@ -177,7 +177,7 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
-	StrToInts(&pClientInfo->m_Clan0, 3, !m_pClass ? "????" : GameServer()->Localize(GameServer()->GetPlayerLanguage(SnappingClient), m_pClass->m_ClassName));
+	StrToInts(&pClientInfo->m_Clan0, 3, !m_pClass ? "????" : m_pClass->m_ClassName);
 	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_TeeInfos.m_aSkinName);
 	pClientInfo->m_UseCustomColor = GetClass() ? GetClass()->m_Skin.m_UseCustomColor : m_TeeInfos.m_UseCustomColor;
@@ -456,12 +456,11 @@ void CPlayer::SetClass(CClass *pClass)
 		if (each) 
 		{
 			m_pGameServer->SendSkinChange(GetCID(), each->GetCID());
-			m_pGameServer->SendClanChange(GetCID(), each->GetCID(), 
-				GameServer()->Localize(each->GetLanguage(), m_pClass->m_ClassName));
+			m_pGameServer->SendClanChange(GetCID(), each->GetCID(), m_pClass->m_ClassName);
 		}
 	}
 	
-	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '{lstr:Class}'"), 2, BROADCAST_CLASS,
+	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '{lstr:Class}' "), 150, BROADCAST_CLASS,
 		"Class", pClass->m_ClassName,
 		NULL);
 
@@ -473,6 +472,16 @@ void CPlayer::SetClass(CClass *pClass)
 	}
 
 	Server()->ExpireServerInfo();
+			
+	protocol7::CNetMsg_Sv_GameInfo GameInfoMsg;
+	GameInfoMsg.m_GameFlags = 0;
+	GameInfoMsg.m_ScoreLimit = g_Config.m_SvScorelimit;
+	GameInfoMsg.m_TimeLimit = g_Config.m_SvTimelimit;
+	GameInfoMsg.m_MatchNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
+	GameInfoMsg.m_MatchCurrent = GameServer()->m_pController->m_RoundCount+1;
+
+	protocol7::CNetMsg_Sv_GameInfo *pInfoMsg = &GameInfoMsg;
+	Server()->SendPackMsg(pInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, m_ClientID);
 }
 
 void CPlayer::CureToDefault()

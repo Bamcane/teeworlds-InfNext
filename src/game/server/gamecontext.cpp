@@ -288,7 +288,7 @@ void CGameContext::SendChatTarget_Localization(int To, const char *pText, ...)
 	int Start = (To < 0 ? 0 : To);
 	int End = (To < 0 ? MAX_CLIENTS : To+1);
 	
-	std::string Buffer;
+	dynamic_string Buffer;
 	
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -300,7 +300,7 @@ void CGameContext::SendChatTarget_Localization(int To, const char *pText, ...)
 			Buffer.clear();
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
 			
-			SendChatTarget(i, Buffer.c_str());
+			SendChatTarget(i, Buffer.buffer());
 		}
 	}
 	
@@ -312,11 +312,7 @@ void CGameContext::SendChatTarget_Localization_P(int To, const char* pText, int 
 	int Start = (To < 0 ? 0 : To);
 	int End = (To < 0 ? MAX_CLIENTS : To+1);
 	
-	CNetMsg_Sv_Chat Msg;
-	Msg.m_Team = 0;
-	Msg.m_ClientID = -1;
-	
-	std::string Buffer;
+	dynamic_string Buffer;
 	
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -328,7 +324,7 @@ void CGameContext::SendChatTarget_Localization_P(int To, const char* pText, int 
 			Buffer.clear();
 			Server()->Localization()->Format_VLP(Buffer, m_apPlayers[i]->GetLanguage(), Number, pText, VarArgs);
 			
-			SendChatTarget(To, Buffer.c_str());
+			SendChatTarget(To, Buffer.buffer());
 		}
 	}
 	
@@ -393,8 +389,7 @@ void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-
-void CGameContext::SendBroadcast(int ClientID, const char *pText, float Time, int Type)
+void CGameContext::SendBroadcast(int ClientID, const char *pText, int Time, int Type)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
@@ -475,10 +470,7 @@ void CGameContext::SendSkinChange(int ClientID, int TargetID)
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
 		if (p == (NUM_SKINPARTS - 1)) {
-			if (Server()->IsSixup(ClientID))
-				Msg.m_apSkinPartNames[p] = FCLIENT_STRING;
-			else
-				Msg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->m_TeeInfos.m_apSkinPartNames[p];
+			Msg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->m_TeeInfos.m_apSkinPartNames[p];
 		} else {
 			Msg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->m_TeeInfos.m_apSkinPartNames[p];
 		}
@@ -493,40 +485,40 @@ void CGameContext::AddBroadcast(int ClientID, CBroadcast Broadcast)
 	if(!m_apPlayers[ClientID])
 		return;
 	
+	// only for server demo record
+	if(ClientID < 0)
+	{
+		CNetMsg_Sv_Broadcast Msg;
+		Msg.m_pMessage = Broadcast.m_Text.c_str();
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
+	}
+	
 	for(int i = 0; i < m_aBroadcast[ClientID].m_aBroadcast.size();i ++)
 	{
 		if(	m_aBroadcast[ClientID].m_aBroadcast[i].m_Type == Broadcast.m_Type)
 		{
-			m_aBroadcast[ClientID].m_aBroadcast.remove_index(i);
-			if(str_comp(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text.c_str(), Broadcast.m_Text.c_str()) == 0)
+			if(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text == Broadcast.m_Text)
 			{
 				Broadcast.m_StartTick = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick;
-				Broadcast.m_Time += m_aBroadcast[ClientID].m_aBroadcast[i].m_Time;
+				int LeftTime = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick + m_aBroadcast[ClientID].m_aBroadcast[i].m_Time - Server()->Tick();
+				Broadcast.m_Time += Server()->Tick() - LeftTime;
 			}
+			m_aBroadcast[ClientID].m_aBroadcast.remove_index(i);
 		}
 	}
 			
 	m_aBroadcast[ClientID].m_aBroadcast.add(Broadcast);
 }
 
-void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, float Time, int Type, ...)
+void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, int Time, int Type, ...)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
 	
-	std::string Buffer;
+	dynamic_string Buffer;
 	
 	va_list VarArgs;
 	va_start(VarArgs, pText);
-	
-	// only for server demo record
-	if(ClientID < 0)
-	{
-		CNetMsg_Sv_Broadcast Msg;
-		Server()->Localization()->Format_VL(Buffer, "en", _(pText), VarArgs);
-		Msg.m_pMessage = Buffer.c_str();
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
-	}
 
 	for(int i = Start; i < End; i++)
 	{
@@ -537,7 +529,7 @@ void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, f
 			
 			CBroadcast Broadcast;
 
-			Broadcast.m_Text = Buffer.c_str();
+			Broadcast.m_Text = Buffer.buffer();
 			Broadcast.m_Time = Time;
 			Broadcast.m_Type = Type;
 			Broadcast.m_StartTick = Server()->Tick();
@@ -549,12 +541,12 @@ void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, f
 	va_end(VarArgs);
 }
 
-void CGameContext::SendBroadcast_Localization_P(int ClientID, const char* pText, float Time, int Type, int Number, ...)
+void CGameContext::SendBroadcast_Localization_P(int ClientID, const char* pText, int Time, int Type, int Number, ...)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
 	
-	std::string Buffer;
+	dynamic_string Buffer;
 	
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -568,7 +560,7 @@ void CGameContext::SendBroadcast_Localization_P(int ClientID, const char* pText,
 			
 			CBroadcast Broadcast;
 
-			Broadcast.m_Text = Buffer.c_str();
+			Broadcast.m_Text = Buffer.buffer();
 			Broadcast.m_Time = Time;
 			Broadcast.m_Type = Type;
 			Broadcast.m_StartTick = Server()->Tick();
@@ -738,7 +730,6 @@ void CGameContext::OnTick()
 	}
 
 	{
-
 		for(int i = 0; i < MAX_CLIENTS;i ++)
 		{
 			if(!m_apPlayers[i] && m_aBroadcast[i].m_aBroadcast.size())
@@ -752,7 +743,7 @@ void CGameContext::OnTick()
 			for(int j = 0; j < m_aBroadcast[i].m_aBroadcast.size(); j ++)
 			{
 				if(m_aBroadcast[i].m_aBroadcast[j].m_StartTick + 
-					m_aBroadcast[i].m_aBroadcast[j].m_Time * Server()->TickSpeed()
+					m_aBroadcast[i].m_aBroadcast[j].m_Time
 						< Server()->Tick())
 				{
 					m_aBroadcast[i].m_aBroadcast.remove_index(j);
@@ -760,7 +751,9 @@ void CGameContext::OnTick()
 				}
 
 				if((Server()->Tick()-m_aBroadcast[i].m_aBroadcast[j].m_StartTick)%50 == 0)
+				{
 					Broadcast = true;
+				}
 			}
 
 			if(Broadcast)
@@ -1351,7 +1344,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(pPlayer->m_LastVoteCall && Timeleft > 0)
 			{
 				int Seconds = (Timeleft/Server()->TickSpeed())+1;
-				SendChatTarget_Localization(ClientID, _("You must wait {sec:Time} before making another vote"), &Seconds, NULL);
+				SendChatTarget_Localization(ClientID, _("You must wait {sec:Time} before making another vote"), "Time", &Seconds, NULL);
 				return;
 			}
 
@@ -1517,7 +1510,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			{
 				pPlayer->m_LastSetTeam = Server()->Tick();
 				int TimeLeft = (pPlayer->m_TeamChangeTick - Server()->Tick()) / Server()->TickSpeed();
-				SendBroadcast_Localization(ClientID, _("Time to wait before changing team: {sec:Time}"), 3, BROADCAST_SYSTEM, 
+				SendBroadcast_Localization(ClientID, _("Time to wait before changing team: {sec:Time}"), 150, BROADCAST_SYSTEM, 
 					"Time", &TimeLeft,
 					NULL);
 				return;
@@ -1533,12 +1526,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					pPlayer->SetTeam(pMsg->m_Team);
 				}
 				else
-					SendBroadcast_Localization(ClientID, _("Teams must be balanced, please join other team"), 3, BROADCAST_SYSTEM, NULL);
+					SendBroadcast_Localization(ClientID, _("Teams must be balanced, please join other team"), 150, BROADCAST_SYSTEM, NULL);
 			}
 			else
 			{
 				int Num = Server()->MaxClients() - g_Config.m_SvSpectatorSlots;
-				SendBroadcast_Localization(ClientID, _("Only {int:Num} active players are allowed"), 3, BROADCAST_SYSTEM, 
+				SendBroadcast_Localization(ClientID, _("Only {int:Num} active players are allowed"), 150, BROADCAST_SYSTEM, 
 					"Num", &Num,
 					NULL);
 			}
@@ -2197,10 +2190,10 @@ void CGameContext::ConLanguage(IConsole::IResult *pResult, void *pUserData)
 			BufferList.append(")");
 		}
 		
-		std::string Buffer;
+		dynamic_string Buffer;
 		pSelf->Server()->Localization()->Format_L(Buffer, pLanguage, _("Available languages: {str:List}"), "List", BufferList.c_str(), NULL);
 		
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_CHAT, "language", Buffer.c_str());
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_CHAT, "language", Buffer.buffer());
 	}
 	
 	return;

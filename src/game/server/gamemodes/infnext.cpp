@@ -43,16 +43,35 @@ void CGameControllerNext::Tick()
 
 	if(m_LastPlayersNum < 2) 
 	{
-		GameServer()->SendBroadcast_Localization(-1, _("Wait game start!"), 0.1f, BROADCAST_INFO);
+		GameServer()->SendBroadcast_Localization(-1, _("Wait game start!"), 2, BROADCAST_INFO);
+		m_RoundStartTick++;
+	}
+	else if(!IsInfectionStarted())
+	{
+		// send broadcast
+		int Seconds = (m_RoundStartTick + 10 * Server()->TickSpeed() - Server()->Tick()) / Server()->TickSpeed() + 1;
+		GameServer()->SendBroadcast_Localization(-1, _("Infection is coming in {sec:Time}!"), 25, BROADCAST_INFO, 
+			"Time", &Seconds, NULL);
+
+		// create sound
+		if((Server()->Tick()-m_RoundStartTick)%Server()->TickSpeed() == 0)
+			GameServer()->CreateSoundGlobal(SOUND_HOOK_NOATTACH);
 	}
 
-	if(!IsInfectionStarted() && (Infects + Humans) >= 2) // send class chooser
+	if(m_LastPlayersNum < 2 && Infects + Humans >= 2)
 	{
-		SendClassChooser();
+		StartRound();
+	}
+
+	// cancel the game
+	if(IsInfectionStarted() && m_LastPlayersNum < 2)
+	{
+		StartRound();
+		GameServer()->SendChatTarget_Localization(-1, _("The game has been canceled"), NULL);
 	}
 
 	// start infection
-	if((Server()->Tick()-m_RoundStartTick) == 500 && (Infects + Humans) >= 2)
+	if((Server()->Tick()-m_RoundStartTick) >= 500 && !Infects && Infects + Humans >= 2)
 	{
 		CreateInfects();
 		CheckNoClass();
@@ -131,11 +150,6 @@ CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 
 	return Classes()->m_InfectClasses[ClassID].m_pClass;
 }
-
-void CGameControllerNext::SendClassChooser()
-{
-}
-
 // from infclass
 void CGameControllerNext::Snap(int SnappingClient)
 {
@@ -159,12 +173,15 @@ void CGameControllerNext::Snap(int SnappingClient)
 
 	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
 	pGameInfoObj->m_RoundCurrent = m_RoundCount+1;
-	
+
+	const int TIMESHIFT_MENUCLASS_MASK = Classes()->m_HumanClasses.size()+1;
 	int ClassMask = 0;
+	int MASK_ALL = 0;
 	for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
 	{
 		if(Classes()->m_HumanClasses[i].m_Value)
 			ClassMask |= 1<<i;
+		MASK_ALL |= 1<<i;
 	}
 
 	if(SnappingClient != -1)
@@ -215,14 +232,6 @@ void CGameControllerNext::Snap(int SnappingClient)
 			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_PAUSED;
 
 		pGameData->m_GameStateEndTick = 0;
-
-		if(GameServer()->m_apPlayers[SnappingClient])
-		{
-			if(!GameServer()->m_apPlayers[SnappingClient]->GetClass())
-			{
-				pGameData->m_GameStartTick = Server()->Tick();
-			}
-		}
 	}
 }
 
@@ -244,23 +253,21 @@ void CGameControllerNext::CheckNoClass()
 		int Class = 0;
 		do
 		{
+			// random a enable class
 			Class = random_int(0, Classes()->m_HumanClasses.size()-1);
 		}while(!Classes()->m_HumanClasses[Class].m_Value);
 
+		// set class
 		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass);
-		
-		GameServer()->SendMotd(i, "");
 	}
 }
 
 void CGameControllerNext::CreateInfects()
 {
 	int InfectNum;
-	if(InfectNum > 24)
-		InfectNum = 4;
-	else if(InfectNum > 8)
+	if(m_LastPlayersNum > 8)
 		InfectNum = 3;
-	else if(InfectNum > 4)
+	else if(m_LastPlayersNum > 4)
 		InfectNum = 2;
 	else InfectNum = 1;
 
@@ -277,18 +284,26 @@ void CGameControllerNext::CreateInfects()
 			if(!GameServer()->m_apPlayers[j])
 				continue;
 
+			bool Next = false;
 			for(int k = 0;k < tmpList.size();k ++)
 			{
 				if(tmpList[k] == j)
-					continue;
+				{
+					Next = true;
+					break;
+				}
 			}
+
+			if(Next)
+				continue;
 
 			float Scoremod = 1.0f;
 			int Score = 10;
 			
+			// if this player has infected last round and his game technology is good, his scoremod will lower 
 			if(PlayerInfected(j))
 			{
-				Scoremod = 0.4f;
+				Scoremod = 0.6f;
 				if(GameServer()->m_apPlayers[j]->m_LastScore)
 					Scoremod -= max(0.f, GameServer()->m_apPlayers[j]->m_LastScore/120.0f);
 			}
@@ -301,8 +316,20 @@ void CGameControllerNext::CreateInfects()
 			}
 		};
 		GameServer()->m_apPlayers[InfectID]->Infect();
+
+		GameServer()->SendChatTarget_Localization(-1, _("'{str:PlayerName}' has been infected"), 
+			"PlayerName", Server()->ClientName(InfectID), NULL);
+		
 		tmpList.add(InfectID);
+
+		// send debug info
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "Infected player='%s' infect num=%d/%d", 
+			Server()->ClientName(InfectID), i, InfectNum);
+		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "infNext", aBuf);
 	}
+
+	// clear infects
 	m_LastInfect.clear();
 	m_LastInfect = tmpList;
 }
@@ -396,6 +423,6 @@ void CGameControllerNext::OnPlayerSelectClass(CPlayer* pPlayer)
 	}
 	else 
 	{
-		GameServer()->SendBroadcast_Localization(ClientID, Classes()->m_HumanClasses[Class].m_pClass->m_ClassName, 0.5f, BROADCAST_CLASS);
+		GameServer()->SendBroadcast_Localization(ClientID, Classes()->m_HumanClasses[Class].m_pClass->m_ClassName, 2, BROADCAST_CLASS);
 	}
 }

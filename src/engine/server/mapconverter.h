@@ -18,7 +18,7 @@ enum
 	MENU_ANGLE_START = -90
 };
 
-class CMapConverter6
+class CMapConverter
 {
 protected:
 	IStorage *m_pStorage;
@@ -71,13 +71,18 @@ protected:
 	void Finalize();
 	void CreateCircle(array<CQuad>* pQuads, vec2 Pos, float Size, vec4 Color, int Env=-1, int EnvTO=0);
 	
+	// 0.7
+	bool CheckImageDimensions(void *pLayerItem, int LayerType, const char *pFilename);
+	void *ReplaceImageItem(void *pItem, int Type, CMapItemImage *pNewImgItem);
+	int LoadPNG(class CImageInfo *pImg, const char *pFilename);
+	int ConvertMapTo7(const char* pFilename);
 
 public:
-	CMapConverter6(IStorage *pStorage, IEngineMap *pMap, IConsole* pConsole, CClasses *pClasses);
-	~CMapConverter6();
+	CMapConverter(IStorage *pStorage, IEngineMap *pMap, IConsole* pConsole, CClasses *pClasses);
+	~CMapConverter();
 	
 	bool Load();
-	bool CreateMap(const char* pFilename);
+	bool CreateMap(const char* pFilename, const char *pMapName);
 	
 	inline int GetTimeShiftUnit() const { return m_TimeShiftUnit; }
 };

@@ -33,7 +33,6 @@ vec2 CSeaWater::GetPos(float Time)
 	return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
 }
 
-
 void CSeaWater::Tick()
 {
 	float Pt = (Server()->Tick()-m_StartTick-1)/(float)Server()->TickSpeed();
@@ -59,7 +58,7 @@ void CSeaWater::Tick()
         if(distance(pChr->m_Pos, CurPos) < 96.0f)
 		{
             pChr->GetCore()->m_Vel += normalize(CurPos - PrevPos);
-			pChr->Dehydration(m_Owner, 3.0f);
+			pChr->Dehydration(m_Owner, m_Weapon, 3.0f);
 		}
 	}
 

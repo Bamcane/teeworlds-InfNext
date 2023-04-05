@@ -147,6 +147,7 @@ private:
 	// Dehydration
 	int m_DehydrationTick; 
 	int m_DehydrationFrom;
+	int m_DehydrationWeapon;
 
 public:
 	CCollision *Collision();
@@ -164,7 +165,7 @@ public:
 	bool IsHuman() const;
 	bool IsInfect() const;
 
-	void Dehydration(int From, float Seconds);
+	void Dehydration(int From, int Weapon, float Seconds);
 
 /** Weapon Public for weapon system*/
 	NinjaInfo *GetNinjaInfo() {return &m_Ninja;}

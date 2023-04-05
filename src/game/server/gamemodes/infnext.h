@@ -30,7 +30,6 @@ public:
 
 	array<int> m_LastInfect;
 
-	void SendClassChooser();
 	void CheckNoClass();
 	void CreateInfects();
 

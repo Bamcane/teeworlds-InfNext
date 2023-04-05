@@ -37,13 +37,14 @@ protected:
 
 	int m_Warmup;
 	int m_UnpauseTimer;
-	int m_RoundCount;
 
 	int m_GameFlags;
 	int m_UnbalancedTick;
 	bool m_ForceBalanced;
 
 public:
+	int m_RoundCount;
+	
 	const char *m_pGameType;
 
 	bool IsTeamplay() const;

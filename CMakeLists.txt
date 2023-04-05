@@ -568,31 +568,21 @@ endif()
 # VARIOUS TARGETS
 ########################################################################
 # Translation dev targets
-add_custom_target(generate-pot)
+add_custom_target(generate_pot)
 
 add_custom_command(
-  TARGET generate-pot
+  TARGET generate_pot
   COMMAND ${PYTHON_EXECUTABLE} tools/generate-po.py
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-add_custom_target(update-po-files)
-
-set(PO_TEMPlATE "other/translations/infnext.pot")
-
-add_custom_target(update-json-files)
+add_custom_target(update_json_files)
 add_custom_command(
-  TARGET update-json-files
+  TARGET update_json_files
   COMMAND ${PYTHON_EXECUTABLE} tools/localization.py
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-add_custom_target(update-map-files)
-add_custom_command(
-  TARGET update-map-files
-  COMMAND ${PYTHON_EXECUTABLE} tools/convert_map.py
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
 ########################################################################
 # INSTALLATION
 ########################################################################

@@ -622,5 +622,5 @@ int IGameController::ClampTeam(int Team)
 
 bool IGameController::IsInfectionStarted()
 {
-	return (m_RoundStartTick + Server()->TickSpeed()*10 <= Server()->Tick());
+	return Server()->Tick() > (m_RoundStartTick + Server()->TickSpeed()*10);
 }
