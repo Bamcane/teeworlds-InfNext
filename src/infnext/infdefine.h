@@ -1,5 +1,5 @@
-#ifndef GAME_SERVER_INFDEFINE_H
-#define GAME_SERVER_INFDEFINE_H
+#ifndef INFNEXT_INFDEFINE_H
+#define INFNEXT_INFDEFINE_H
 
 enum DamageMode
 {
@@ -7,6 +7,12 @@ enum DamageMode
     DAMAGEMODE_DMGSELF,
     DAMAGEMODE_DMGALL,
     DAMAGEMODE_INFECTION,
+};
+
+enum EffectType
+{
+    EFFECTTYPE_DEHYDRATION=0,
+    EFFECTTYPE_FREEZE,
 };
 
 enum BroadcastType

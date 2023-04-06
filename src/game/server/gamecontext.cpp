@@ -501,7 +501,8 @@ void CGameContext::AddBroadcast(int ClientID, CBroadcast Broadcast)
 			{
 				Broadcast.m_StartTick = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick;
 				int LeftTime = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick + m_aBroadcast[ClientID].m_aBroadcast[i].m_Time - Server()->Tick();
-				Broadcast.m_Time += Server()->Tick() - LeftTime;
+				int UsedTime = m_aBroadcast[ClientID].m_aBroadcast[i].m_Time - LeftTime;
+				Broadcast.m_Time += UsedTime;
 			}
 			m_aBroadcast[ClientID].m_aBroadcast.remove_index(i);
 		}

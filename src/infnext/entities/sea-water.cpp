@@ -1,5 +1,7 @@
 #include <game/generated/protocol.h>
 #include <game/server/gamecontext.h>
+
+#include <infnext/effects/dehydration.h>
 #include "sea-water.h"
 
 CSeaWater::CSeaWater(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Dir, int Span, int Weapon)
@@ -58,7 +60,7 @@ void CSeaWater::Tick()
         if(distance(pChr->m_Pos, CurPos) < 96.0f)
 		{
             pChr->GetCore()->m_Vel += normalize(CurPos - PrevPos);
-			pChr->Dehydration(m_Owner, m_Weapon, 3.0f);
+			pChr->AddEffect(new CDehydration(pChr, Server()->Tick(), 200, 10, m_Owner, m_Weapon));
 		}
 	}
 

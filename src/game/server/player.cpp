@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
 #include <engine/shared/config.h>
+#include <infnext/infdefine.h>
 #include "player.h"
-#include "infdefine.h"
 
 struct Skin
 {

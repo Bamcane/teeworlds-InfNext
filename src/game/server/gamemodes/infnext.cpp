@@ -177,9 +177,33 @@ void CGameControllerNext::Snap(int SnappingClient)
 	const int TIMESHIFT_MENUCLASS_MASK = Classes()->m_HumanClasses.size()+1;
 	int ClassMask = 0;
 	int MASK_ALL = 0;
-	for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
+	int ClassesNum[Classes()->m_HumanClasses.size()];
+	for(int i = 0; i < Classes()->m_HumanClasses.size(); i ++)
 	{
-		if(Classes()->m_HumanClasses[i].m_Value)
+		ClassesNum[i] = 0;
+	}
+
+	for(int i = 0;i < MAX_CLIENTS;i ++)
+	{
+		if(!GameServer()->m_apPlayers[i])
+			continue;
+		if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+			continue;
+		if(!GameServer()->m_apPlayers[i]->GetClass())
+			continue;
+		for(int j = 0; j < Classes()->m_HumanClasses.size(); j ++)
+		{
+			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_HumanClasses[j].m_pClass)
+			{
+				ClassesNum[j]++;
+				break;
+			}
+		}
+	}
+
+	for(int i = 0; i < Classes()->m_HumanClasses.size(); i++) 
+	{
+		if(Classes()->m_HumanClasses[i].m_Value && ClassesNum[i] <= Classes()->m_HumanClasses[i].m_Limit)
 			ClassMask |= 1<<i;
 		MASK_ALL |= 1<<i;
 	}
@@ -325,7 +349,7 @@ void CGameControllerNext::CreateInfects()
 		// send debug info
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "Infected player='%s' infect num=%d/%d", 
-			Server()->ClientName(InfectID), i, InfectNum);
+			Server()->ClientName(InfectID), i+1, InfectNum);
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "infNext", aBuf);
 	}
 
