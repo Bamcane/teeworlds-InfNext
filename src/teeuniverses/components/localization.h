@@ -135,7 +135,7 @@ public:
 	
 	//format
 	void Format_V(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);
-	void Format(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, ...);
+	void Format(dynamic_string& Buffer, const char* pText, ...);
 	//localize, format
 	void Format_VL(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);
 	void Format_L(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, ...);

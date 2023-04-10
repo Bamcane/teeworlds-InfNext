@@ -1,3 +1,5 @@
+
+
 #include "localization.h"
 
 #include <base/math.h>
@@ -688,12 +690,13 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 		ArabicShaping(Buffer, BufferStart);
 }
 
-void CLocalization::Format(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, ...)
+void CLocalization::Format(dynamic_string& Buffer, const char* pText, ...)
 {
 	va_list VarArgs;
 	va_start(VarArgs, pText);
 	
-	Format_V(Buffer, pLanguageCode, pText, VarArgs);
+	// There should be "en" (no localize)
+	Format_V(Buffer, "en", pText, VarArgs);
 	
 	va_end(VarArgs);
 }
