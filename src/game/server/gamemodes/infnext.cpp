@@ -203,7 +203,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 
 	for(int i = 0; i < Classes()->m_HumanClasses.size(); i++) 
 	{
-		if(Classes()->m_HumanClasses[i].m_Value && ClassesNum[i] <= Classes()->m_HumanClasses[i].m_Limit)
+		if(Classes()->m_HumanClasses[i].m_Value && ClassesNum[i] < Classes()->m_HumanClasses[i].m_Limit)
 			ClassMask |= 1<<i;
 		MASK_ALL |= 1<<i;
 	}
@@ -261,6 +261,12 @@ void CGameControllerNext::Snap(int SnappingClient)
 
 void CGameControllerNext::CheckNoClass()
 {
+	int ClassesNum[Classes()->m_HumanClasses.size()];
+	for(int i = 0; i < Classes()->m_HumanClasses.size(); i ++)
+	{
+		ClassesNum[i] = 0;
+	}
+
 	for(int i = 0;i < MAX_CLIENTS; i ++)
 	{
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
@@ -279,7 +285,7 @@ void CGameControllerNext::CheckNoClass()
 		{
 			// random a enable class
 			Class = random_int(0, Classes()->m_HumanClasses.size()-1);
-		}while(!Classes()->m_HumanClasses[Class].m_Value);
+		}while(!Classes()->m_HumanClasses[Class].m_Value || ClassesNum[i] >= Classes()->m_HumanClasses[i].m_Limit);
 
 		// set class
 		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass);
@@ -295,7 +301,7 @@ void CGameControllerNext::CreateInfects()
 		InfectNum = 2;
 	else InfectNum = 1;
 
-	array<int> tmpList;
+	std::vector<int> tmpList;
 
 	for(int i = 0;i < InfectNum;i ++)
 	{
@@ -344,7 +350,7 @@ void CGameControllerNext::CreateInfects()
 		GameServer()->SendChatTarget_Localization(-1, _("'{str:PlayerName}' has been infected"), 
 			"PlayerName", Server()->ClientName(InfectID), NULL);
 		
-		tmpList.add(InfectID);
+		tmpList.push_back(InfectID);
 
 		// send debug info
 		char aBuf[256];

@@ -14,6 +14,8 @@ CClasses::~CClasses()
 		delete m_HumanClasses[i].m_pClass;
 	for(int i = 0;i < m_InfectClasses.size(); i++)
 		delete m_InfectClasses[i].m_pClass;
+	m_HumanClasses.clear();
+	m_InfectClasses.clear();
 }
 
 // Init Class
@@ -36,7 +38,7 @@ void CClasses::InitHumanClass(CClass *pClass, bool Enable, int Limit)
 	NewStatus.m_pClass = pClass;
 	NewStatus.m_Value = Enable;
 	NewStatus.m_Limit = Limit;
-	m_HumanClasses.add(NewStatus);
+	m_HumanClasses.push_back(NewStatus);
 }
 
 // Infects
@@ -46,5 +48,5 @@ void CClasses::InitInfectClass(CClass *pClass, int Proba, int Limit)
 	NewStatus.m_pClass = pClass;
 	NewStatus.m_Value = Proba;
 	NewStatus.m_Limit = Limit;
-	m_InfectClasses.add(NewStatus);
+	m_InfectClasses.push_back(NewStatus);
 }

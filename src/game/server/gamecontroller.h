@@ -4,7 +4,8 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
-#include <base/tl/array.h>
+
+#include <vector>
 
 /*
 	Class: Game Controller
@@ -17,7 +18,7 @@ class IGameController
 	class IServer *m_pServer;
 
 protected:
-	array<vec2> m_aaSpawnPoints[2];
+	std::vector<vec2> m_aaSpawnPoints[2];
 
 	CGameContext *GameServer() const { return m_pGameServer; }
 	IServer *Server() const { return m_pServer; }

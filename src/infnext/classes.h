@@ -3,7 +3,7 @@
 
 #include "class.h"
 
-#include <base/tl/array.h>
+#include <vector>
 
 class CGameContext;
 
@@ -27,8 +27,8 @@ public:
 		int m_Limit;
 	};
 
-	array<CClassStatus> m_HumanClasses;
-	array<CClassStatus> m_InfectClasses;
+	std::vector<CClassStatus> m_HumanClasses;
+	std::vector<CClassStatus> m_InfectClasses;
 
 	void InitClasses();
 	void InitHumanClass(CClass *pClass, bool Enable, int Limit);

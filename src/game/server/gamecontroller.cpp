@@ -5,8 +5,6 @@
 
 #include <game/generated/protocol.h>
 
-#include <base/tl/array.h>
-
 #include "gamecontroller.h"
 #include "gamecontext.h"
 
@@ -67,9 +65,9 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	int SubType = 0;
 
 	if(Index == ENTITY_SPAWN_RED)
-		m_aaSpawnPoints[0].add(Pos);
+		m_aaSpawnPoints[0].push_back(Pos);
 	else if(Index == ENTITY_SPAWN_BLUE)
-		m_aaSpawnPoints[1].add(Pos);
+		m_aaSpawnPoints[1].push_back(Pos);
 
 	return false;
 }
