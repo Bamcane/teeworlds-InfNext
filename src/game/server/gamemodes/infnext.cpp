@@ -87,7 +87,7 @@ void CGameControllerNext::Tick()
 			EndRound();
 		}else if((Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60)
 		{
-			GameServer()->SendChatTarget_Localization(-1, _("HUM| Humans win!"));
+			GameServer()->SendChatTarget_Localization(-1, _("INF| Humans win!"));
 			GameServer()->CreateSoundGlobal(SOUND_CTF_DROP, -1);
 			EndRound();
 		}
@@ -133,9 +133,39 @@ CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 	int ClassesNum = Classes()->m_InfectClasses.size();
 	double Probability[ClassesNum];
 
+	int InfClassesNum[ClassesNum];
+	for(int i = 0; i < ClassesNum; i ++)
+	{
+		InfClassesNum[i] = 0;
+	}
+
+	for(int i = 0;i < MAX_CLIENTS;i ++)
+	{
+		if(!GameServer()->m_apPlayers[i])
+			continue;
+		if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+			continue;
+		if(!GameServer()->m_apPlayers[i]->GetClass())
+			continue;
+		for(int j = 0; j < ClassesNum; j ++)
+		{
+			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_InfectClasses[j].m_pClass)
+			{
+				InfClassesNum[j]++;
+				break;
+			}
+		}
+	}
+
 	for(int i = 0;i < ClassesNum; i ++)
 	{
-		Probability[i] = (double)Classes()->m_InfectClasses[i].m_Value;
+		if(InfClassesNum[i] < Classes()->m_InfectClasses[i].m_Limit)
+		{
+			Probability[i] = (double)Classes()->m_InfectClasses[i].m_Value;
+		}else
+		{
+			Probability[i] = (double)(0.f);
+		}
 	}
 
 	int Seconds = (Server()->Tick()-m_RoundStartTick)/((float)Server()->TickSpeed());
@@ -265,6 +295,24 @@ void CGameControllerNext::CheckNoClass()
 	for(int i = 0; i < Classes()->m_HumanClasses.size(); i ++)
 	{
 		ClassesNum[i] = 0;
+	}
+
+	for(int i = 0;i < MAX_CLIENTS;i ++)
+	{
+		if(!GameServer()->m_apPlayers[i])
+			continue;
+		if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+			continue;
+		if(!GameServer()->m_apPlayers[i]->GetClass())
+			continue;
+		for(int j = 0; j < Classes()->m_HumanClasses.size(); j ++)
+		{
+			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_HumanClasses[j].m_pClass)
+			{
+				ClassesNum[j]++;
+				break;
+			}
+		}
 	}
 
 	for(int i = 0;i < MAX_CLIENTS; i ++)
