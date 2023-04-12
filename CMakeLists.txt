@@ -275,7 +275,7 @@ if(UNIX)
 endif()
 find_package(Threads)
 
-message(STATUS "******** LastDay ********")
+message(STATUS "******** InfNext ********")
 message(STATUS "Target OS: ${TARGET_OS} ${TARGET_BITS}bit")
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")

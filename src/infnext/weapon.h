@@ -20,7 +20,8 @@ protected:
 	bool m_FullAuto;
 public:
 	CWeapon(class CGameContext *pGameServer);
-    
+	virtual ~CWeapon() {};
+
 	class IServer *Server();
 	class CGameContext *GameServer() { return m_pGameServer; }
 	class CGameWorld *GameWorld();

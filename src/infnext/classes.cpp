@@ -10,9 +10,9 @@ CClasses::CClasses(CGameContext *pGameServer)
 
 CClasses::~CClasses()
 {
-	for(int i = 0;i < m_HumanClasses.size(); i++)
+	for(int i = 0;i < (int) m_HumanClasses.size(); i++)
 		delete m_HumanClasses[i].m_pClass;
-	for(int i = 0;i < m_InfectClasses.size(); i++)
+	for(int i = 0;i < (int) m_InfectClasses.size(); i++)
 		delete m_InfectClasses[i].m_pClass;
 	m_HumanClasses.clear();
 	m_InfectClasses.clear();

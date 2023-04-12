@@ -165,7 +165,7 @@ bool CMapConverter::Load()
 	long long TimeShiftUnit = 0;
 			
 	int MASK_ALL = 0;
-	for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
+	for(int i = 0; i < (int)Classes()->m_HumanClasses.size(); i++) 
 	{
 		MASK_ALL |= 1<<i;
 	}
@@ -640,7 +640,7 @@ void CMapConverter::Finalize()
 		Item.m_OffsetX = 0;
 		Item.m_OffsetY = 0;
 		Item.m_StartLayer = m_NumLayers;
-		Item.m_NumLayers = Classes()->m_HumanClasses.size()+1;
+		Item.m_NumLayers = (int)Classes()->m_HumanClasses.size()+1;
 		Item.m_UseClipping = 0;
 		Item.m_ClipX = 0;
 		Item.m_ClipY = 0;
@@ -653,8 +653,6 @@ void CMapConverter::Finalize()
 
 	//Menu
 	{
-		char aSkinPath[IO_MAX_PATH_LENGTH];
-
 		array<CQuad> aQuads;
 		
 		int HiddenValues[4];
@@ -669,7 +667,7 @@ void CMapConverter::Finalize()
 		const float MenuRadius = MENU_RADIUS;
 		const float MenuAngleStart = MENU_ANGLE_START;
 		
-		const float MenuAngleStep = 360.0f/static_cast<float>(Classes()->m_HumanClasses.size());
+		const float MenuAngleStep = 360.0f/static_cast<float>((int)Classes()->m_HumanClasses.size());
 
 		for(int pass = 0; pass < 2; pass++)
 		{	
@@ -698,15 +696,15 @@ void CMapConverter::Finalize()
 				HighlightValues[3] = 1000;
 			}
 		
-			const int TIMESHIFT_MENUCLASS_MASK = Classes()->m_HumanClasses.size()+1;
+			const int TIMESHIFT_MENUCLASS_MASK = (int)Classes()->m_HumanClasses.size()+1;
 			
 			int MASK_ALL = 0;
-			for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
+			for(int i = 0; i < (int) Classes()->m_HumanClasses.size(); i++) 
 			{
 				MASK_ALL |= 1<<i;
 			}
 
-			for(int i=0; i<Classes()->m_HumanClasses.size(); i++) 
+			for(int i = 0; i < (int) Classes()->m_HumanClasses.size(); i++) 
 			{
 				int ClassMask = 1<<i;
 				
@@ -839,6 +837,10 @@ void CMapConverter::Finalize()
 					char aSkinPath[IO_MAX_PATH_LENGTH];
 
 					str_format(aSkinPath, sizeof(aSkinPath), "../skins/%s", SkinName);
+
+					char aBuf[256];
+					str_format(aBuf, sizeof(aBuf), "Use skins file: %s", aSkinPath);
+					Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "MapConverter", aBuf);
 
 					int ImageID = AddExternalImage(aSkinPath, 256, 128);
 					

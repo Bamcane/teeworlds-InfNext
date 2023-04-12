@@ -46,7 +46,7 @@ bool IGameController::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 	int Type = (pPlayer->IsInfect() ? TEAM_RED : TEAM_BLUE);
 
 	// get spawn point
-	for(int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
+	for(unsigned int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
 	{
 		if(IsSpawnable(m_aaSpawnPoints[Type][i]))
 		{
@@ -61,9 +61,6 @@ bool IGameController::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 
 bool IGameController::OnEntity(int Index, vec2 Pos)
 {
-	int Type = -1;
-	int SubType = 0;
-
 	if(Index == ENTITY_SPAWN_RED)
 		m_aaSpawnPoints[0].push_back(Pos);
 	else if(Index == ENTITY_SPAWN_BLUE)

@@ -15,7 +15,7 @@ CWeaponGun::CWeaponGun(CGameContext *pGameServer)
 
 void CWeaponGun::Fire(vec2 Pos, vec2 Dir, int Owner)
 {
-    CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_GUN,
+    new CProjectile(GameWorld(), WEAPON_GUN,
     Owner,
     Pos,
     Dir,

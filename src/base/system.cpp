@@ -407,16 +407,56 @@ int io_flush(IOHANDLE io)
 	return 0;
 }
 
-void *thread_init(void (*threadfunc)(void *), void *u)
+struct THREAD_RUN
 {
+	void (*threadfunc)(void *);
+	void *u;
+};
+
 #if defined(CONF_FAMILY_UNIX)
-	pthread_t id;
-	pthread_create(&id, NULL, (void *(*)(void*))threadfunc, u);
-	return (void*)id;
+static void *thread_run(void *user)
 #elif defined(CONF_FAMILY_WINDOWS)
-	return CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)threadfunc, u, 0, NULL);
+static unsigned long __stdcall thread_run(void *user)
 #else
-	#error not implemented
+#error not implemented
+#endif
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	CWindowsComLifecycle WindowsComLifecycle(false);
+#endif
+	struct THREAD_RUN *data = (THREAD_RUN *)user;
+	void (*threadfunc)(void *) = data->threadfunc;
+	void *u = data->u;
+	free(data);
+	threadfunc(u);
+	return 0;
+}
+
+void *thread_init(void (*threadfunc)(void *), void *u, const char *name)
+{
+	struct THREAD_RUN *data = (THREAD_RUN *)malloc(sizeof(*data));
+	data->threadfunc = threadfunc;
+	data->u = u;
+#if defined(CONF_FAMILY_UNIX)
+	{
+		pthread_t id;
+		pthread_attr_t attr;
+		pthread_attr_init(&attr);
+#if defined(CONF_PLATFORM_MACOS) && defined(__MAC_10_10) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_10
+		pthread_attr_set_qos_class_np(&attr, QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
+		int result = pthread_create(&id, &attr, thread_run, data);
+		if(result != 0)
+		{
+			dbg_msg("thread", "creating %s thread failed: %d", name, result);
+			return 0;
+		}
+		return (void *)id;
+	}
+#elif defined(CONF_FAMILY_WINDOWS)
+	return CreateThread(NULL, 0, thread_run, data, 0, NULL);
+#else
+#error not implemented
 #endif
 }
 

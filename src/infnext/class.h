@@ -22,7 +22,7 @@ protected:
 public:
     CClass(CGameContext *pGameServer);
     CClass() {};
-    ~CClass();
+    virtual ~CClass();
 
     virtual void OnTick(class CCharacter *pOwner) {};
     virtual void OnPlayerDeath(int ClientID, int KillerID, vec2 Pos) {};

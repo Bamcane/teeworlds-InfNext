@@ -23,7 +23,7 @@ void CWeaponShotgun::Fire(vec2 Pos, vec2 Dir, int Owner)
         a += Spreading[i+2];
         float v = 1-(absolute(i)/(float)ShotSpread);
         float Speed = mix((float)GameServer()->Tuning()->m_ShotgunSpeeddiff, 1.0f, v);
-        CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_SHOTGUN,
+        new CProjectile(GameWorld(), WEAPON_SHOTGUN,
             Owner,
             Pos,
             vec2(cosf(a), sinf(a))*Speed,

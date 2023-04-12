@@ -11,7 +11,7 @@ CWeaponLooperRifle::CWeaponLooperRifle(CGameContext *pGameServer)
 
 void CWeaponLooperRifle::Fire(vec2 Pos, vec2 Dir, int Owner)
 {
-    CLaser *pLaser = new CLaser(GameWorld(),
+    new CLaser(GameWorld(),
         Pos,
         Dir,
         GameServer()->Tuning()->m_LaserReach*0.7f,

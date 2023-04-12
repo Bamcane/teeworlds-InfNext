@@ -180,6 +180,8 @@ const char *CRegister::ProtocolToScheme(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
+
+	return "invalid protocol";
 }
 
 const char *CRegister::ProtocolToString(int Protocol)
@@ -193,6 +195,8 @@ const char *CRegister::ProtocolToString(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
+
+	return "invalid protocol";
 }
 
 bool CRegister::ProtocolFromString(int *pResult, const char *pString)
@@ -232,6 +236,8 @@ const char *CRegister::ProtocolToSystem(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
+
+	return "invalid protocol";
 }
 
 IPRESOLVE CRegister::ProtocolToIpresolve(int Protocol)
@@ -245,6 +251,8 @@ IPRESOLVE CRegister::ProtocolToIpresolve(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
+
+	return IPRESOLVE::ERROR;
 }
 
 void CRegister::ConchainOnConfigChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)

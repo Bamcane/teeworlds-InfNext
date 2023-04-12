@@ -103,19 +103,21 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 
-	if(pVictim->GetPlayer() != pKiller)
+	if(pVictim->GetPlayer() == pKiller)
+		return 0;
+	
+	if(pKiller->IsInfect())
 	{
-		if(pKiller->IsInfect())
-		{
-			GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '{str:Player}'"), "Player", Server()->ClientName(pVictim->GetCID()), NULL);
-			GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You're infected by '{str:Player}'"), "Player", Server()->ClientName(pKiller->GetCID()), NULL);
-			pKiller->m_Score += 3;
-		}else
-		{
-			pKiller->m_Score += 1;
-		}
-		GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(pKiller->GetCID()));
+		GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '{str:Player}'"), "Player", Server()->ClientName(pVictim->GetCID()), NULL);
+		GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You're infected by '{str:Player}'"), "Player", Server()->ClientName(pKiller->GetCID()), NULL);
+		pKiller->m_Score += 3;
+	}else
+	{
+		pKiller->m_Score += 1;
 	}
+	GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(pKiller->GetCID()));
+
+	return 1;
 }
 
 int CGameControllerNext::RoundTick() const
@@ -208,12 +210,12 @@ void CGameControllerNext::Snap(int SnappingClient)
 	int ClassMask = 0;
 	int MASK_ALL = 0;
 	int ClassesNum[Classes()->m_HumanClasses.size()];
-	for(int i = 0; i < Classes()->m_HumanClasses.size(); i ++)
+	for(unsigned int i = 0; i < (unsigned int) Classes()->m_HumanClasses.size(); i ++)
 	{
 		ClassesNum[i] = 0;
 	}
 
-	for(int i = 0;i < MAX_CLIENTS;i ++)
+	for(unsigned int i = 0;i < MAX_CLIENTS;i ++)
 	{
 		if(!GameServer()->m_apPlayers[i])
 			continue;
@@ -221,7 +223,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 			continue;
 		if(!GameServer()->m_apPlayers[i]->GetClass())
 			continue;
-		for(int j = 0; j < Classes()->m_HumanClasses.size(); j ++)
+		for(unsigned int j = 0; j < (unsigned int) Classes()->m_HumanClasses.size(); j ++)
 		{
 			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_HumanClasses[j].m_pClass)
 			{
@@ -231,7 +233,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 		}
 	}
 
-	for(int i = 0; i < Classes()->m_HumanClasses.size(); i++) 
+	for(unsigned int i = 0; i < Classes()->m_HumanClasses.size(); i++) 
 	{
 		if(Classes()->m_HumanClasses[i].m_Value && ClassesNum[i] < Classes()->m_HumanClasses[i].m_Limit)
 			ClassMask |= 1<<i;
@@ -247,7 +249,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 			if(!GameServer()->m_apPlayers[SnappingClient]->GetClass())
 			{
 				int Item = GameServer()->m_apPlayers[SnappingClient]->m_MapMenuItem;
-				Page = TIMESHIFT_MENUCLASS + 3*((Item+1) + ClassMask*(Classes()->m_HumanClasses.size()+1)) + 1;
+				Page = TIMESHIFT_MENUCLASS + 3*((Item+1) + ClassMask*TIMESHIFT_MENUCLASS_MASK) + 1;
 			}
 			
 			if(Page >= 0)
@@ -291,8 +293,9 @@ void CGameControllerNext::Snap(int SnappingClient)
 
 void CGameControllerNext::CheckNoClass()
 {
-	int ClassesNum[Classes()->m_HumanClasses.size()];
-	for(int i = 0; i < Classes()->m_HumanClasses.size(); i ++)
+	unsigned int Size = (unsigned int)Classes()->m_HumanClasses.size();
+	int ClassesNum[Size];
+	for(unsigned int i = 0; i < Size; i ++)
 	{
 		ClassesNum[i] = 0;
 	}
@@ -305,7 +308,7 @@ void CGameControllerNext::CheckNoClass()
 			continue;
 		if(!GameServer()->m_apPlayers[i]->GetClass())
 			continue;
-		for(int j = 0; j < Classes()->m_HumanClasses.size(); j ++)
+		for(unsigned int j = 0; j < Size; j ++)
 		{
 			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_HumanClasses[j].m_pClass)
 			{
@@ -363,7 +366,7 @@ void CGameControllerNext::CreateInfects()
 				continue;
 
 			bool Next = false;
-			for(int k = 0;k < tmpList.size();k ++)
+			for(unsigned int k = 0;k < (unsigned int) tmpList.size();k ++)
 			{
 				if(tmpList[k] == j)
 				{
@@ -420,7 +423,7 @@ bool CGameControllerNext::PlayerInfected(int ClientID)
 	if(!GameServer()->m_apPlayers[ClientID])
 		return true;
 
-	for(int i = 0;i < m_LastInfect.size();i ++)
+	for(unsigned int i = 0;i < m_LastInfect.size();i ++)
 	{
 		if(m_LastInfect[i] == ClientID)
 			return true;
@@ -470,7 +473,7 @@ bool CGameControllerNext::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 
 	// get spawn point
 	int RandomShift = random_int(0, m_aaSpawnPoints[Type].size()-1);
-	for(int i = 0; i < m_aaSpawnPoints[Type].size(); i++)
+	for(int i = 0; i < (int)m_aaSpawnPoints[Type].size(); i++)
 	{
 		int I = (i + RandomShift)%m_aaSpawnPoints[Type].size();
 		if(IsSpawnable(m_aaSpawnPoints[Type][I]))

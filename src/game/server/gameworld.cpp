@@ -208,7 +208,9 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 		if(p == pNotThis)
 			continue;
 
-		vec2 IntersectPos = closest_point_on_line(Pos0, Pos1, p->m_Pos);
+		vec2 IntersectPos;
+		if(!closest_point_on_line(Pos0, Pos1, p->m_Pos, IntersectPos))
+			continue;
 		float Len = distance(p->m_Pos, IntersectPos);
 		if(Len < p->m_ProximityRadius+Radius)
 		{

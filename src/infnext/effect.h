@@ -21,6 +21,7 @@ public:
     int m_Type;
 
     CEffect(class CCharacter *pOwner, int StartTick, int Time, int Type);
+    virtual ~CEffect() {};
 
     virtual void OnPlayerTick();
     virtual void OnCharacterSnap(CNetObj_Character *pCharacter);

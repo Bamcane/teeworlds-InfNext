@@ -315,7 +315,7 @@ void CGameContext::SendChatTarget_Localization_P(int To, const char* pText, int 
 	dynamic_string Buffer;
 	
 	va_list VarArgs;
-	va_start(VarArgs, pText);
+	va_start(VarArgs, Number);
 	
 	for(int i = Start; i < End; i++)
 	{
@@ -519,7 +519,7 @@ void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, i
 	dynamic_string Buffer;
 	
 	va_list VarArgs;
-	va_start(VarArgs, pText);
+	va_start(VarArgs, Type);
 
 	for(int i = Start; i < End; i++)
 	{
@@ -550,7 +550,7 @@ void CGameContext::SendBroadcast_Localization_P(int ClientID, const char* pText,
 	dynamic_string Buffer;
 	
 	va_list VarArgs;
-	va_start(VarArgs, pText);
+	va_start(VarArgs, Number);
 	
 	for(int i = Start; i < End; i++)
 	{
@@ -1376,7 +1376,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 				if(!pOption)
 				{
-					(ClientID, _("'{str:Option}' isn't an option on this server"), "Option", pMsg->m_pValue, NULL);
+					SendChatTarget_Localization(ClientID, _("'{str:Option}' isn't an option on this server"), "Option", pMsg->m_pValue, NULL);
 					return;
 				}
 			}

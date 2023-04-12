@@ -521,8 +521,6 @@ void CCharacter::HandleMenu()
 	if(m_pPlayer->GetClass())
 		return;
 	vec2 CursorPos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
-			
-	bool Broadcast = false;
 
 	m_pPlayer->m_MapMenuItem = -1;
 	
