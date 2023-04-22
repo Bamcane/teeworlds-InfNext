@@ -115,6 +115,8 @@ private:
 	void AddBroadcast(int ClientID, CBroadcast Broadcast);
 
 public:
+	int m_ZoneHandle_Next;
+
 	IServer *Server() const { return m_pServer; }
 	IStorage *Storage() const { return m_pStorage; }
 	class IConsole *Console() { return m_pConsole; }

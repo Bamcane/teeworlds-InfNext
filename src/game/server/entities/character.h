@@ -142,7 +142,7 @@ private:
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
 private:
-	bool IsCollisionTile(int Flags);
+	bool IsCollisionTile(int Zone, int Flags);
 	void UpdateTuning();
 	int m_FreezeStartTick;
 	int m_FreezeEndTick;
@@ -179,6 +179,7 @@ public:
 	bool m_DeepFreeze;
 
 	int m_LastHookDmgTick;
+	int m_TimeShiftTick;
 };
 
 #endif

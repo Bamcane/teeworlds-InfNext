@@ -26,6 +26,13 @@ public:
 	CMapItemLayerTilemap *GameLayer() const { return m_pGameLayer; };
 	CMapItemGroup *GetGroup(int Index) const;
 	CMapItemLayer *GetLayer(int Index) const;
+
+	CMapItemGroup *ZoneGroup() const { return m_pZoneGroup; }
+	CMapItemGroup *EntityGroup() const { return m_pEntityGroup; }
+
+private:
+	CMapItemGroup *m_pZoneGroup;
+	CMapItemGroup *m_pEntityGroup;
 };
 
 #endif

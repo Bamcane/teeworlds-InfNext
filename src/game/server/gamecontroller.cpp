@@ -29,10 +29,15 @@ IGameController::IGameController(class CGameContext *pGameServer)
 
 	m_UnbalancedTick = -1;
 	m_ForceBalanced = false;
+	
+	m_aaSpawnPoints[0].clear();
+	m_aaSpawnPoints[1].clear();
 }
 
 IGameController::~IGameController()
 {
+	m_aaSpawnPoints[0].clear();
+	m_aaSpawnPoints[1].clear();
 }
 
 bool IGameController::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
@@ -59,13 +64,15 @@ bool IGameController::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 }
 
 
-bool IGameController::OnEntity(int Index, vec2 Pos)
+bool IGameController::OnEntity(const char* pName, vec2 Pivot, vec2 P0, vec2 P1, vec2 P2, vec2 P3, int PosEnv)
 {
-	if(Index == ENTITY_SPAWN_RED)
+	vec2 Pos = (P0 + P1 + P2 + P3)/4.0f;
+	
+	if(str_comp(pName, "inInfect") == 0)
 		m_aaSpawnPoints[0].push_back(Pos);
-	else if(Index == ENTITY_SPAWN_BLUE)
+	else if(str_comp(pName, "inHuman") == 0)
 		m_aaSpawnPoints[1].push_back(Pos);
-
+	
 	return false;
 }
 
@@ -421,52 +428,6 @@ bool IGameController::IsTeamplay() const
 
 void IGameController::Snap(int SnappingClient)
 {
-	CNetObj_GameInfo *pGameInfoObj = (CNetObj_GameInfo *)Server()->SnapNewItem(NETOBJTYPE_GAMEINFO, 0, sizeof(CNetObj_GameInfo));
-	if(!pGameInfoObj)
-		return;
-
-	pGameInfoObj->m_GameFlags = m_GameFlags;
-	pGameInfoObj->m_GameStateFlags = 0;
-	if(m_GameOverTick != -1)
-		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_GAMEOVER;
-	if(m_SuddenDeath)
-		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_SUDDENDEATH;
-	if(GameServer()->m_World.m_Paused)
-		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_PAUSED;
-	pGameInfoObj->m_RoundStartTick = m_RoundStartTick;
-	pGameInfoObj->m_WarmupTimer = GameServer()->m_World.m_Paused ? m_UnpauseTimer : m_Warmup;
-
-	pGameInfoObj->m_ScoreLimit = g_Config.m_SvScorelimit;
-	pGameInfoObj->m_TimeLimit = g_Config.m_SvTimelimit;
-
-	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
-	pGameInfoObj->m_RoundCurrent = m_RoundCount+1;
-	
-	CNetObj_GameInfoEx* pGameInfoEx = (CNetObj_GameInfoEx*)Server()->SnapNewItem(NETOBJTYPE_GAMEINFOEX, 0, sizeof(CNetObj_GameInfoEx));
-	if(!pGameInfoEx)
-		return;
-
-	pGameInfoEx->m_Flags = GAMEINFOFLAG_GAMETYPE_PLUS | GAMEINFOFLAG_ALLOW_EYE_WHEEL | GAMEINFOFLAG_ALLOW_HOOK_COLL | GAMEINFOFLAG_ENTITIES_FNG | GAMEINFOFLAG_PREDICT_VANILLA;
-	pGameInfoEx->m_Flags2 = GAMEINFOFLAG2_GAMETYPE_CITY | GAMEINFOFLAG2_ALLOW_X_SKINS | GAMEINFOFLAG2_NO_WEAK_HOOK_AND_BOUNCE | GAMEINFOFLAG2_HUD_DDRACE | GAMEINFOFLAG2_HUD_AMMO | GAMEINFOFLAG2_HUD_HEALTH_ARMOR;
-	pGameInfoEx->m_Version = GAMEINFO_CURVERSION;
-
-	if(Server()->IsSixup(SnappingClient))
-	{
-		protocol7::CNetObj_GameData *pGameData = static_cast<protocol7::CNetObj_GameData *>(Server()->SnapNewItem(-protocol7::NETOBJTYPE_GAMEDATA, 0, sizeof(protocol7::CNetObj_GameData)));
-		if(!pGameData)
-			return;
-
-		pGameData->m_GameStartTick = m_RoundStartTick;
-		pGameData->m_GameStateFlags = 0;
-		if(m_GameOverTick != -1)
-			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_GAMEOVER;
-		if(m_SuddenDeath)
-			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_SUDDENDEATH;
-		if(GameServer()->m_World.m_Paused)
-			pGameData->m_GameStateFlags |= protocol7::GAMESTATEFLAG_PAUSED;
-
-		pGameData->m_GameStateEndTick = 0;
-	}
 }
 
 void IGameController::UpdateGameInfo(int ClientID)
@@ -618,4 +579,9 @@ int IGameController::ClampTeam(int Team)
 bool IGameController::IsInfectionStarted()
 {
 	return Server()->Tick() > (m_RoundStartTick + Server()->TickSpeed()*10);
+}
+
+double IGameController::GetTime()
+{
+	return static_cast<double>(Server()->Tick() - m_RoundStartTick)/Server()->TickSpeed();
 }

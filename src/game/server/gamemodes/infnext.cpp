@@ -254,7 +254,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 			
 			if(Page >= 0)
 			{
-				double PageShift = static_cast<double>(Page * Server()->GetTimeShiftUnit())/1000.0f;
+				double PageShift = static_cast<double>((Page * Server()->GetTimeShiftUnit()))/1000.0f;
 				double CycleShift = fmod(static_cast<double>(Server()->Tick() - pGameInfoObj->m_RoundStartTick)/Server()->TickSpeed(), Server()->GetTimeShiftUnit()/1000.0f);
 				int TimeShift = (PageShift + CycleShift)*Server()->TickSpeed();
 				
@@ -269,7 +269,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 		return;
 
 	pGameInfoEx->m_Flags = GAMEINFOFLAG_ALLOW_EYE_WHEEL | GAMEINFOFLAG_ALLOW_HOOK_COLL | GAMEINFOFLAG_DONT_MASK_ENTITIES | GAMEINFOFLAG_ENTITIES_DDNET | GAMEINFOFLAG_PREDICT_VANILLA;
-	pGameInfoEx->m_Flags2 = GAMEINFOFLAG2_NO_WEAK_HOOK_AND_BOUNCE | GAMEINFOFLAG2_HUD_DDRACE | GAMEINFOFLAG2_HUD_AMMO | GAMEINFOFLAG2_HUD_HEALTH_ARMOR;
+	pGameInfoEx->m_Flags2 = GAMEINFOFLAG2_NO_WEAK_HOOK | GAMEINFOFLAG2_HUD_DDRACE | GAMEINFOFLAG2_HUD_AMMO | GAMEINFOFLAG2_HUD_HEALTH_ARMOR;
 	pGameInfoEx->m_Version = GAMEINFO_CURVERSION;
 
 	if(Server()->IsSixup(SnappingClient))

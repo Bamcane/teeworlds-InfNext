@@ -83,8 +83,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_FreezeStartTick = 0;
 	m_FreezeEndTick = 0;
 
-	m_LastHookDmgTick = 0;
-
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
 
@@ -116,6 +114,10 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 void CCharacter::InitState()
 {
 	m_pFirstEffect = 0;
+
+	m_TimeShiftTick = -1;
+
+	m_LastHookDmgTick = 0;
 }
 
 void CCharacter::Destroy()
@@ -455,19 +457,13 @@ void CCharacter::HandleEvents()
 	if(m_Alive && !GameServer()->m_pController->IsGameOver())
 	{
 		// handle infect-tiles
-		if(IsCollisionTile(CCollision::COLFLAG_INFECT) && m_pPlayer->IsHuman())
+		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_INFECTION) && m_pPlayer->IsHuman())
 		{
 			m_pPlayer->Infect();
 		}
-		
-		// handle water tiles
-		if(IsCollisionTile(CCollision::COLFLAG_WATER))
-		{
-			m_Core.m_Vel += vec2(0.f, -(m_pPlayer->GetNextTuningParams()->m_Gravity+0.1f));
-		}
 
 		// handle dead tiles
-		if(IsCollisionTile(CCollision::COLFLAG_DEATH) || GameLayerClipped(m_Pos))
+		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_DEATH) || GameLayerClipped(m_Pos))
 		{
 			Die(GetCID(), WEAPON_SELF);
 		}
@@ -518,6 +514,7 @@ void CCharacter::HandleClass()
 
 void CCharacter::HandleMenu()
 {
+	m_TimeShiftTick = -1;
 	if(m_pPlayer->GetClass())
 		return;
 	vec2 CursorPos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
@@ -1087,13 +1084,13 @@ void CCharacter::RemoveEffect(CEffect *pEffect)
 	delete pEffect;
 }
 
-bool CCharacter::IsCollisionTile(int Flags)
+bool CCharacter::IsCollisionTile(int Zone, int Flags)
 {
 	return 
-		Collision()->IsCollisionTile(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f, Flags) ||
-		Collision()->IsCollisionTile(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f, Flags) ||
-		Collision()->IsCollisionTile(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f, Flags) ||
-		Collision()->IsCollisionTile(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f, Flags);
+		Collision()->GetZoneValueAt(Zone, m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f) == Flags ||
+		Collision()->GetZoneValueAt(Zone, m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f) == Flags ||
+		Collision()->GetZoneValueAt(Zone, m_Pos.x-m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f) == Flags ||
+		Collision()->GetZoneValueAt(Zone, m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f) == Flags;
 }
 
 void CCharacter::UpdateTuning()
