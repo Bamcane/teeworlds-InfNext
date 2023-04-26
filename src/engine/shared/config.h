@@ -7,7 +7,10 @@ struct CConfiguration
 {
 	#define MACRO_CONFIG_INT(Name,ScriptName,Def,Min,Max,Save,Desc) int m_##Name;
 	#define MACRO_CONFIG_STR(Name,ScriptName,Len,Def,Save,Desc) char m_##Name[Len]; // Flawfinder: ignore
+	
+	#include <game/variables.h>
 	#include "config_variables.h"
+	
 	#undef MACRO_CONFIG_INT
 	#undef MACRO_CONFIG_STR
 };

@@ -1,0 +1,12 @@
+{
+    "maps": [
+        {
+            "name": "next_hill",
+            "timelimit": 1
+        },
+        {
+            "name": "next_jungle",
+            "timelimit": 2
+        }
+    ]
+}

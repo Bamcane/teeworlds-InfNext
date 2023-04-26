@@ -702,23 +702,25 @@ CConsole::CConsole(int FlagMask)
 	Register("mod_command", "s?i", CFGFLAG_SERVER, ConModCommandAccess, this, "Specify command accessibility for moderators");
 	Register("mod_status", "", CFGFLAG_SERVER, ConModCommandStatus, this, "List all commands which are accessible for moderators");
 
-	// TODO: this should disappear
-	#define MACRO_CONFIG_INT(Name,ScriptName,Def,Min,Max,Flags,Desc) \
+// TODO: this should disappear
+#define MACRO_CONFIG_INT(Name, ScriptName, Def, Min, Max, Flags, Desc) \
 	{ \
-		static CIntVariableData Data = { this, &g_Config.m_##Name, Min, Max }; \
-		Register(#ScriptName, "?i", Flags, IntVariableCommand, &Data, Desc); \
+		static CIntVariableData Data = {this, &g_Config.m_##Name, Min, Max}; \
+		Register(#ScriptName, "?i", Flags, IntVariableCommand, &Data, \
+			Min == Max ? Desc " (default: " #Def ")" : Max == 0 ? Desc " (default: " #Def ", min: " #Min ")" : Desc " (default: " #Def ", min: " #Min ", max: " #Max ")"); \
 	}
 
-	#define MACRO_CONFIG_STR(Name,ScriptName,Len,Def,Flags,Desc) \
+#define MACRO_CONFIG_STR(Name, ScriptName, Len, Def, Flags, Desc) \
 	{ \
-		static CStrVariableData Data = { this, g_Config.m_##Name, Len }; \
-		Register(#ScriptName, "?r", Flags, StrVariableCommand, &Data, Desc); \
+		static CStrVariableData Data = {this, g_Config.m_##Name, Len}; \
+		Register(#ScriptName, "?r", Flags, StrVariableCommand, &Data, Desc " (default: " #Def ", max length: " #Len ")"); \
 	}
 
-	#include "config_variables.h"
+#include <game/variables.h>
+#include "config_variables.h"
 
-	#undef MACRO_CONFIG_INT
-	#undef MACRO_CONFIG_STR
+#undef MACRO_CONFIG_INT
+#undef MACRO_CONFIG_STR
 }
 
 void CConsole::ParseArguments(int NumArgs, const char **ppArguments)
@@ -900,7 +902,7 @@ void CConsole::Chain(const char *pName, FChainCommandCallback pfnChainFunc, void
 		return;
 	}
 
-	CChain *pChainInfo = (CChain *)mem_alloc(sizeof(CChain), sizeof(void*));
+	CChain *pChainInfo = new CChain();
 
 	// store info
 	pChainInfo->m_pfnChainCallback = pfnChainFunc;
@@ -929,7 +931,7 @@ const IConsole::CCommandInfo *CConsole::GetCommandInfo(const char *pName, int Fl
 {
 	for(CCommand *pCommand = m_pFirstCommand; pCommand; pCommand = pCommand->m_pNext)
 	{
-		if(pCommand->m_Flags&FlagMask && pCommand->m_Temp == Temp)
+		if(pCommand->m_Flags & FlagMask && pCommand->m_Temp == Temp)
 		{
 			if(str_comp_nocase(pCommand->m_pName, pName) == 0)
 				return pCommand;

@@ -288,6 +288,7 @@ class CCache
 
 	char *GetMapName();
 	int LoadMap(const char *pMapName);
+	void LoadMapConfig(const char *pMapName);
 
 	int Run();
 

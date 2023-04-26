@@ -901,9 +901,29 @@ void CGameContext::OnClientEnter(int ClientID)
 	
 	if(Server()->IsSixup(ClientID))
 	{
+		{
+			protocol7::CNetMsg_Sv_GameInfo Msg;
+			Msg.m_GameFlags = protocol7::GAMEFLAG_RACE;
+			Msg.m_MatchCurrent = 1;
+			Msg.m_MatchNum = 0;
+			Msg.m_ScoreLimit = 0;
+			Msg.m_TimeLimit = 0;
+			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
+		}
+
+		// /team is essential
+		{
+			protocol7::CNetMsg_Sv_CommandInfoRemove Msg;
+			Msg.m_pName = "team";
+			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
+		}
+
 		for(const IConsole::CCommandInfo *pCmd = Console()->FirstCommandInfo(IConsole::ACCESS_LEVEL_USER, CFGFLAG_CHAT);
 			pCmd; pCmd = pCmd->NextCommandInfo(IConsole::ACCESS_LEVEL_USER, CFGFLAG_CHAT))
 		{
+			if(!str_comp_nocase(pCmd->m_pName, "w") || !str_comp_nocase(pCmd->m_pName, "whisper"))
+				continue;
+				
 			const char *pName = pCmd->m_pName;
 
 			protocol7::CNetMsg_Sv_CommandInfo Msg;
@@ -1041,6 +1061,112 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 bool CheckClientID2(int ClientID)
 {
 	return ClientID >= 0 && ClientID < MAX_CLIENTS;
+}
+
+void CGameContext::Whisper(int ClientID, char *pStr)
+{
+	if(g_Config.m_SvSpamprotection && m_apPlayers[ClientID]->m_LastChat && m_apPlayers[ClientID]->m_LastChat + Server()->TickSpeed() * ((15+str_length(pStr))/16) > Server()->Tick())
+		return;
+	else
+		m_apPlayers[ClientID]->m_LastChat = Server()->Tick();
+	pStr = str_skip_whitespaces(pStr);
+
+	char *pName;
+	int Victim;
+	bool Error = false;
+
+	// add token
+	if(*pStr == '"')
+	{
+		pStr++;
+
+		pName = pStr;
+		char *pDst = pStr; // we might have to process escape data
+		while(true)
+		{
+			if(pStr[0] == '"')
+			{
+				break;
+			}
+			else if(pStr[0] == '\\')
+			{
+				if(pStr[1] == '\\')
+					pStr++; // skip due to escape
+				else if(pStr[1] == '"')
+					pStr++; // skip due to escape
+			}
+			else if(pStr[0] == 0)
+			{
+				Error = true;
+				break;
+			}
+
+			*pDst = *pStr;
+			pDst++;
+			pStr++;
+		}
+
+		if(!Error)
+		{
+			// write null termination
+			*pDst = 0;
+
+			pStr++;
+
+			for(Victim = 0; Victim < MAX_CLIENTS; Victim++)
+				if(str_comp(pName, Server()->ClientName(Victim)) == 0)
+					break;
+		}
+	}
+	else
+	{
+		pName = pStr;
+		while(true)
+		{
+			if(pStr[0] == 0)
+			{
+				Error = true;
+				break;
+			}
+			if(pStr[0] == ' ')
+			{
+				pStr[0] = 0;
+				for(Victim = 0; Victim < MAX_CLIENTS; Victim++)
+					if(str_comp(pName, Server()->ClientName(Victim)) == 0)
+						break;
+
+				pStr[0] = ' ';
+
+				if(Victim < MAX_CLIENTS)
+					break;
+			}
+			pStr++;
+		}
+	}
+
+	if(pStr[0] != ' ')
+	{
+		Error = true;
+	}
+
+	*pStr = 0;
+	pStr++;
+
+	if(Error)
+	{
+		SendChatTarget(ClientID, "Invalid whisper");
+		return;
+	}
+
+	if(Victim >= MAX_CLIENTS || !CheckClientID2(Victim))
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "No player with name \"%s\" found", pName);
+		SendChatTarget(ClientID, aBuf);
+		return;
+	}
+
+	WhisperID(ClientID, Victim, pStr);
 }
 
 void CGameContext::WhisperID(int ClientID, int VictimID, const char *pMessage)
@@ -1296,23 +1422,38 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			
 			if(pMsg->m_pMessage[0] == '/' || pMsg->m_pMessage[0] == '\\')
 			{
-				switch(m_apPlayers[ClientID]->m_Authed)
+				if(str_startswith_nocase(pMsg->m_pMessage + 1, "w "))
 				{
-					case IServer::AUTHED_ADMIN:
-						Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_ADMIN);
-						break;
-					case IServer::AUTHED_MOD:
-						Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_MOD);
-						break;
-					default:
-						Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_USER);
-				}	
-				m_ChatResponseTargetID = ClientID;
+					char aWhisperMsg[256];
+					str_copy(aWhisperMsg, pMsg->m_pMessage + 3, 256);
+					Whisper(pPlayer->GetCID(), aWhisperMsg);
+				}
+				else if(str_startswith_nocase(pMsg->m_pMessage + 1, "whisper "))
+				{
+					char aWhisperMsg[256];
+					str_copy(aWhisperMsg, pMsg->m_pMessage + 9, 256);
+					Whisper(pPlayer->GetCID(), aWhisperMsg);
+				}
+				else
+				{
+					switch(m_apPlayers[ClientID]->m_Authed)
+					{
+						case IServer::AUTHED_ADMIN:
+							Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_ADMIN);
+							break;
+						case IServer::AUTHED_MOD:
+							Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_MOD);
+							break;
+						default:
+							Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_USER);
+					}	
+					m_ChatResponseTargetID = ClientID;
 
-				Console()->ExecuteLineFlag(pMsg->m_pMessage + 1, ClientID, CFGFLAG_CHAT);
-				
-				m_ChatResponseTargetID = -1;
-				Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_ADMIN);
+					Console()->ExecuteLineFlag(pMsg->m_pMessage + 1, ClientID, CFGFLAG_CHAT);
+					
+					m_ChatResponseTargetID = -1;
+					Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_ADMIN);
+				}
 			}
 			else
 			{
@@ -2117,12 +2258,6 @@ void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *p
 	}
 }
 
-void CGameContext::ConchainUpdateSixupGameInfo(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	CGameContext *pSelf = (CGameContext *)pUserData;
-	pSelf->m_pController->UpdateGameInfo(-1);
-}
-
 void CGameContext::ConAbout(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext* pSelf = (CGameContext*) pUserData;
@@ -2279,11 +2414,6 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("language", "?s", CFGFLAG_CHAT, ConLanguage, this, "change language");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
-	
-	Console()->Chain("sv_scorelimit", ConchainUpdateSixupGameInfo, this);
-	Console()->Chain("sv_timelimit", ConchainUpdateSixupGameInfo, this);
-	Console()->Chain("sv_rounds_per_map", ConchainUpdateSixupGameInfo, this);
-	Console()->Chain("sv_maprotation", ConchainUpdateSixupGameInfo, this);
 }
 
 void CGameContext::OnInit(/*class IKernel *pKernel*/)
