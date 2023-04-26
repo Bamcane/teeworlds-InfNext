@@ -27,6 +27,7 @@ enum class HTTPLOG
 
 enum class IPRESOLVE
 {
+	ERROR=-1,
 	WHATEVER,
 	V4,
 	V6,

@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "gamecore.h"
+#include "mapitems.h"
 
 const char *CTuningParams::m_apNames[] =
 {
@@ -243,7 +244,7 @@ void CCharacterCore::Tick(bool UseInput, const CTuningParams* pTuningParams)
 		int Hit = m_pCollision->IntersectLine(m_HookPos, NewPos, &NewPos, 0);
 		if(Hit)
 		{
-			if(Hit&CCollision::COLFLAG_NOHOOK)
+			if(Hit == TILE_NOHOOK)
 				GoingToRetract = true;
 			else
 				GoingToHitGround = true;
@@ -262,7 +263,10 @@ void CCharacterCore::Tick(bool UseInput, const CTuningParams* pTuningParams)
 				if(pCharCore->m_Infect == m_Infect)
 					continue;
 
-				vec2 ClosestPoint = closest_point_on_line(m_HookPos, NewPos, pCharCore->m_Pos);
+				vec2 ClosestPoint;
+				if(!closest_point_on_line(m_HookPos, NewPos, pCharCore->m_Pos, ClosestPoint))
+					continue;
+
 				if(distance(pCharCore->m_Pos, ClosestPoint) < PhysSize+2.0f)
 				{
 					if (m_HookedPlayer == -1 || distance(m_HookPos, pCharCore->m_Pos) < Distance)

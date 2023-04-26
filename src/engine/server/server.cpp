@@ -921,12 +921,12 @@ void CServer::SendMapData(int ClientID, int Chunk)
 	int Last = 0;
 
 	// drop faulty map data requests
-	if(Chunk < 0 || Offset > m_aCurrentMapSize[MapType])
+	if(Chunk < 0 || (int) Offset > m_aCurrentMapSize[MapType])
 		return;
 
-	if(Offset + ChunkSize >= m_aCurrentMapSize[MapType])
+	if((int)Offset + (int)ChunkSize >= m_aCurrentMapSize[MapType])
 	{
-		ChunkSize = m_aCurrentMapSize[MapType] - Offset;
+		ChunkSize = (unsigned int)m_aCurrentMapSize[MapType] - Offset;
 		Last = 1;
 	}
 
@@ -1955,7 +1955,6 @@ void CServer::PumpNetwork(bool PacketWaiting)
 	}
 	{
 		unsigned char aBuffer[NET_MAX_PAYLOAD];
-		int Flags;
 		mem_zero(&Packet, sizeof(Packet));
 		Packet.m_pData = aBuffer;
 	}
@@ -2018,7 +2017,7 @@ int CServer::LoadMap(const char *pMapName)
 		char aClientMapName[256];
 		str_format(aClientMapName, sizeof(aClientMapName), "clientmaps/next/%s.map", pMapName);
 		
-		CMapConverter6 MapConverter(Storage(), m_pMap, Console(), Classes());
+		CMapConverter MapConverter(Storage(), m_pMap, Console(), Classes());
 		if(!MapConverter.Load())
 			return 0;
 			
@@ -2042,7 +2041,7 @@ int CServer::LoadMap(const char *pMapName)
 			dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
 		}
 				
-		if(!MapConverter.CreateMap(aClientMapName))
+		if(!MapConverter.CreateMap(aClientMapName, pMapName))
 			return 0;
 			
 		CDataFileReader dfGeneratedMap;
@@ -2074,7 +2073,7 @@ int CServer::LoadMap(const char *pMapName)
 	// load complete map07 into memory for download
 	{
 		char aBufMsg[128];
-		str_format(aBuf, sizeof(aBuf), "maps7/%s.map", pMapName);
+		str_format(aBuf, sizeof(aBuf), "clientmaps/next/%s7.map", pMapName);
 		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 		m_aCurrentMapSize[MAP_TYPE_SIXUP] = (int)io_length(File);
 		if(m_apCurrentMapData[MAP_TYPE_SIXUP])
@@ -2088,6 +2087,7 @@ int CServer::LoadMap(const char *pMapName)
 		
 		char aSha256[SHA256_MAXSTRSIZE];
 		sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIXUP], aSha256, sizeof(aSha256));
+		
 		str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
 	}
@@ -2214,13 +2214,11 @@ int CServer::Run()
 				{
 					if(m_aClients[c].m_State != CClient::STATE_INGAME)
 						continue;
-					bool ClientHadInput = false;
 					for(auto &Input : m_aClients[c].m_aInputs)
 					{
 						if(Input.m_GameTick == Tick())
 						{
 							GameServer()->OnClientPredictedInput(c, Input.m_aData);
-							ClientHadInput = true;
 							break;
 						}
 					}
@@ -2564,15 +2562,6 @@ int main(int argc, const char **argv) // ignore_convention
 		}
 	}
 #endif
-	bool UseDefaultConfig = false;
-	for(int i = 1; i < argc; i++) // ignore_convention
-	{
-		if(str_comp("-d", argv[i]) == 0 || str_comp("--default", argv[i]) == 0) // ignore_convention
-		{
-			UseDefaultConfig = true;
-			break;
-		}
-	}
 
 	if(secure_random_init() != 0)
 	{

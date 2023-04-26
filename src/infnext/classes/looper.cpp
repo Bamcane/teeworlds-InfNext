@@ -28,19 +28,19 @@ CClassLooper::CClassLooper(CGameContext *pGameServer) : CClass(pGameServer)
     str_copy(m_Skin.m_apSkinPartNames[2], "");
     str_copy(m_Skin.m_apSkinPartNames[3], "standard");
     str_copy(m_Skin.m_apSkinPartNames[4], "standard");
-    str_copy(m_Skin.m_apSkinPartNames[5], "standard");
+    str_copy(m_Skin.m_apSkinPartNames[5], "negative");
 
     m_Skin.m_aUseCustomColors[0] = true;
     m_Skin.m_aUseCustomColors[1] = true;
     m_Skin.m_aUseCustomColors[2] = false;
     m_Skin.m_aUseCustomColors[3] = true;
     m_Skin.m_aUseCustomColors[4] = true;
-    m_Skin.m_aUseCustomColors[5] = false;
+    m_Skin.m_aUseCustomColors[5] = true;
 
     m_Skin.m_aSkinPartColors[0] = HSLtoint(132, 118, 184);
     m_Skin.m_aSkinPartColors[1] = HSLtoint(130, 109, 219);
     m_Skin.m_aSkinPartColors[2] = -8229413;
-    m_Skin.m_aSkinPartColors[3] = HSLtoint(120, 82, 232);
-    m_Skin.m_aSkinPartColors[4] = HSLtoint(120, 82, 232);
-    m_Skin.m_aSkinPartColors[5] = -8229413;
+    m_Skin.m_aSkinPartColors[3] = HSLtoint(120, 82, 235);
+    m_Skin.m_aSkinPartColors[4] = HSLtoint(135, 82, 233);
+    m_Skin.m_aSkinPartColors[5] = HSLtoint(137, 255, 0);
 }

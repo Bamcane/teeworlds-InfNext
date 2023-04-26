@@ -34,14 +34,14 @@ CClassCaptain::CClassCaptain(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aUseCustomColors[2] = false;
     m_Skin.m_aUseCustomColors[3] = true;
     m_Skin.m_aUseCustomColors[4] = true;
-    m_Skin.m_aUseCustomColors[5] = false;
+    m_Skin.m_aUseCustomColors[5] = true;
 
-    m_Skin.m_aSkinPartColors[0] = HSLtoint(132, 118, 184);
-    m_Skin.m_aSkinPartColors[1] = HSLtoint(130, 109, 219);
+    m_Skin.m_aSkinPartColors[0] = HSLtoint(70, 98, 195);
+    m_Skin.m_aSkinPartColors[1] = HSLtoint(69, 98, 224);
     m_Skin.m_aSkinPartColors[2] = -8229413;
-    m_Skin.m_aSkinPartColors[3] = HSLtoint(120, 82, 235);
-    m_Skin.m_aSkinPartColors[4] = HSLtoint(135, 82, 233);
-    m_Skin.m_aSkinPartColors[5] = HSLtoint(137, 255, 0);
+    m_Skin.m_aSkinPartColors[3] = HSLtoint(58, 104, 239);
+    m_Skin.m_aSkinPartColors[4] = HSLtoint(58, 104, 239);
+    m_Skin.m_aSkinPartColors[5] = HSLtoint(125, 250, 0);
 }
 
 void CClassCaptain::OnCharacterSnap(CNetObj_Character *pCharacter)

@@ -4,7 +4,8 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
-#include <base/tl/array.h>
+
+#include <vector>
 
 /*
 	Class: Game Controller
@@ -17,7 +18,7 @@ class IGameController
 	class IServer *m_pServer;
 
 protected:
-	array<vec2> m_aaSpawnPoints[2];
+	std::vector<vec2> m_aaSpawnPoints[2];
 
 	CGameContext *GameServer() const { return m_pGameServer; }
 	IServer *Server() const { return m_pServer; }
@@ -37,13 +38,14 @@ protected:
 
 	int m_Warmup;
 	int m_UnpauseTimer;
-	int m_RoundCount;
 
 	int m_GameFlags;
 	int m_UnbalancedTick;
 	bool m_ForceBalanced;
 
 public:
+	int m_RoundCount;
+	
 	const char *m_pGameType;
 
 	bool IsTeamplay() const;
@@ -86,7 +88,7 @@ public:
 		Returns:
 			bool?
 	*/
-	virtual bool OnEntity(int Index, vec2 Pos);
+	virtual bool OnEntity(const char* pName, vec2 Pivot, vec2 P0, vec2 P1, vec2 P2, vec2 P3, int PosEnv);
 
 	/*
 		Function: on_CCharacter_spawn
@@ -131,6 +133,8 @@ public:
 	virtual void OnPlayerSelectClass(CPlayer* pPlayer) = 0;
 
 	bool IsInfectionStarted();
+
+	double GetTime();
 };
 
 #endif

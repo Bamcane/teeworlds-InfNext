@@ -112,9 +112,9 @@ protected:
 	const char* LocalizeWithDepth(const char* pLanguageCode, const char* pText, int Depth);
 	const char* LocalizeWithDepth_P(const char* pLanguageCode, int Number, const char* pText, int Depth);
 	
-	void AppendNumber(std::string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number);
-	void AppendPercent(std::string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number);
-	void AppendDuration(std::string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number, icu::TimeUnit::UTimeUnitFields Type);
+	void AppendNumber(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number);
+	void AppendPercent(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number);
+	void AppendDuration(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number, icu::TimeUnit::UTimeUnitFields Type);
 
 public:
 	CLocalization(class CStorage* pStorage);
@@ -134,16 +134,16 @@ public:
 	const char* Localize_P(const char* pLanguageCode, int Number, const char* pText);
 	
 	//format
-	void Format_V(std::string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);
-	void Format(std::string& Buffer, const char* pLanguageCode, const char* pText, ...);
+	void Format_V(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);
+	void Format(dynamic_string& Buffer, const char* pText, ...);
 	//localize, format
-	void Format_VL(std::string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);
-	void Format_L(std::string& Buffer, const char* pLanguageCode, const char* pText, ...);
+	void Format_VL(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, va_list VarArgs);
+	void Format_L(dynamic_string& Buffer, const char* pLanguageCode, const char* pText, ...);
 	//localize, find the appropriate plural form based on Number and format
-	void Format_VLP(std::string& Buffer, const char* pLanguageCode, int Number, const char* pText, va_list VarArgs);
-	void Format_LP(std::string& Buffer, const char* pLanguageCode, int Number, const char* pText, ...);
+	void Format_VLP(dynamic_string& Buffer, const char* pLanguageCode, int Number, const char* pText, va_list VarArgs);
+	void Format_LP(dynamic_string& Buffer, const char* pLanguageCode, int Number, const char* pText, ...);
 	
-	void ArabicShaping(std::string& Buffer, int BufferStart = 0);
+	void ArabicShaping(dynamic_string& Buffer, int BufferStart = 0);
 };
 
 #endif

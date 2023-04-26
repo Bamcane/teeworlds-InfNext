@@ -15,7 +15,7 @@ CWeaponGrenade::CWeaponGrenade(CGameContext *pGameServer)
 
 void CWeaponGrenade::Fire(vec2 Pos, vec2 Dir, int Owner)
 {
-    CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_GRENADE,
+   new CProjectile(GameWorld(), WEAPON_GRENADE,
         Owner,
         Pos,
         Dir,

@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <random>
 
+const float pi = 3.1415926535897932384626433f;
+
 template <typename T>
 inline T clamp(T val, T min, T max)
 {
@@ -39,9 +41,15 @@ inline T mix(const T a, const T b, TB amount)
 	return a + (b-a)*amount;
 }
 
+inline float random_angle()
+{
+	return 2.0f * pi * (rand() / std::nextafter((float)RAND_MAX, std::numeric_limits<float>::max()));
+}
+
 float random_float();
 bool random_prob(float f);
 int random_int(int Min, int Max);
+inline int random_int() { return (((rand() & 0xffff) << 16) | (rand() & 0xffff)) & 0x7FFFFFFF; }
 int random_distribution(double* pProb, double* pProb2);
 inline float frandom() { return rand()/(float)(RAND_MAX); }
 
@@ -70,8 +78,6 @@ public:
 	fxp &operator = (float v) { value = (int)(v*(float)(1<<10)); return *this; }
 	operator float() const { return value/(float)(1<<10); }
 };
-
-const float pi = 3.1415926535897932384626433f;
 
 template <typename T> inline T min(T a, T b) { return a<b?a:b; }
 template <typename T> inline T max(T a, T b) { return a>b?a:b; }

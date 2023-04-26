@@ -5,11 +5,11 @@
 
 // this include should perhaps be removed
 #include <infnext/class.h>
+#include <infnext/infdefine.h>
 
 #include "entities/character.h"
 #include "gamecontext.h"
 #include "teeinfo.h"
-#include "infdefine.h"
 
 // player object
 class CPlayer

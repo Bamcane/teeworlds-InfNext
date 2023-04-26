@@ -22,6 +22,30 @@
 /* END EDIT ***********************************************************/
 #include <base/system.h>
 
+void str_append_num(char *dst, const char *src, int dst_size, int num);
+
+inline void str_append_num(char *dst, const char *src, int dst_size, int num)
+{
+	int s = str_length(dst);
+	int i = 0;
+	while(s < dst_size)
+	{
+		if(i >= num)
+		{
+			dst[s] = 0;
+			return;
+		}
+
+		dst[s] = src[i];
+		if(!src[i]) /* check for null termination */
+			return;
+		s++;
+		i++;
+	}
+
+	dst[dst_size - 1] = 0; /* assure null termination */
+}
+
 //String contained in a fixed length array
 template<int SIZE>
 class _fixed_string_core
@@ -170,16 +194,16 @@ public:
 };
 
 template<typename BASE>
-class string : public BASE
+class tu_string : public BASE
 {
 public:
-	string() :
+	tu_string() :
 		BASE()
 	{
 		
 	}
 	
-	string(const char* pBuffer) :
+	tu_string(const char* pBuffer) :
 		BASE()
 	{
 		BASE::copy(pBuffer);
@@ -269,13 +293,13 @@ public:
 	}
 };
 
-typedef string<_fixed_string_core<12> > fixed_string12;
-typedef string<_fixed_string_core<16> > fixed_string16;
-typedef string<_fixed_string_core<64> > fixed_string64;
-typedef string<_fixed_string_core<128> > fixed_string128;
-typedef string<_fixed_string_core<256> > fixed_string256;
+typedef tu_string<_fixed_string_core<12> > fixed_string12;
+typedef tu_string<_fixed_string_core<16> > fixed_string16;
+typedef tu_string<_fixed_string_core<64> > fixed_string64;
+typedef tu_string<_fixed_string_core<128> > fixed_string128;
+typedef tu_string<_fixed_string_core<256> > fixed_string256;
 
-typedef string<_dynamic_string_core<128> > dynamic_string;
+typedef tu_string<_dynamic_string_core<128> > dynamic_string;
 
 //Operations on strings
 

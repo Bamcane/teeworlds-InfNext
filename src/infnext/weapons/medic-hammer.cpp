@@ -9,9 +9,8 @@ CWeaponMedicHammer::CWeaponMedicHammer(CGameContext *pGameServer)
 void CWeaponMedicHammer::Fire(vec2 Pos, vec2 Direction, int Owner)
 {
     CCharacter *pOwnerChr = GameServer()->GetPlayerChar(Owner);
-    if(!pOwnerChr)
-        return;
-
+    if(!pOwnerChr) return;
+    
 	GameServer()->CreateSound(Pos, SOUND_HAMMER_FIRE);
 
     CCharacter *apEnts[MAX_CLIENTS];

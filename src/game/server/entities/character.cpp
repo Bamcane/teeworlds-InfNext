@@ -5,11 +5,13 @@
 #include <engine/server/mapconverter.h>
 
 #include <game/server/gamecontext.h>
-#include <game/server/infdefine.h>
 #include <game/mapitems.h>
 
 #include <infnext/classes.h>
+#include <infnext/infdefine.h>
 #include <infnext/weapons/hammer.h>
+
+#include <infnext/effect.h>
 
 #include "character.h"
 
@@ -52,6 +54,17 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Armor = 0;
 }
 
+CCharacter::~CCharacter()
+{
+	CEffect *p = m_pFirstEffect;
+	while(p)
+	{
+		RemoveEffect(p);
+
+		p = m_pFirstEffect;
+	}
+}
+
 void CCharacter::Reset()
 {
 	Destroy();
@@ -69,8 +82,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_DeepFreeze = 0;
 	m_FreezeStartTick = 0;
 	m_FreezeEndTick = 0;
-
-	m_LastHookDmgTick = 0;
 
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
@@ -92,6 +103,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		m_Core.m_Infect = pPlayer->GetClass()->m_Infect;
 	}
 
+	// infNext init
 	InitState();
 
 	GameServer()->m_pController->OnCharacterSpawn(this);
@@ -101,8 +113,11 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 void CCharacter::InitState()
 {
-	m_DehydrationTick = 0;
-	m_DehydrationFrom = -1;
+	m_pFirstEffect = 0;
+
+	m_TimeShiftTick = -1;
+
+	m_LastHookDmgTick = 0;
 }
 
 void CCharacter::Destroy()
@@ -437,34 +452,30 @@ void CCharacter::ResetInput()
 
 void CCharacter::HandleEvents()
 {
+	HandleEffects();
+
 	if(m_Alive && !GameServer()->m_pController->IsGameOver())
 	{
 		// handle infect-tiles
-		if(IsCollisionTile(CCollision::COLFLAG_INFECT) && m_pPlayer->IsHuman())
+		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_INFECTION) && m_pPlayer->IsHuman())
 		{
 			m_pPlayer->Infect();
 		}
-		
-		// handle water tiles
-		if(IsCollisionTile(CCollision::COLFLAG_WATER))
-		{
-			m_Core.m_Vel += vec2(0.f, -(m_pPlayer->GetNextTuningParams()->m_Gravity+0.1f));
-		}
 
 		// handle dead tiles
-		if(IsCollisionTile(CCollision::COLFLAG_DEATH) || GameLayerClipped(m_Pos))
+		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_DEATH) || GameLayerClipped(m_Pos))
 		{
 			Die(GetCID(), WEAPON_SELF);
 		}
 	}
 
+	if(!m_pPlayer)
+		return;
+
 	if(m_DeepFreeze)
 	{
 		Freeze(30.0f);
 	}
-
-	if(!m_pPlayer)
-		return;
 
 	// set emote
 	if (m_EmoteStop < Server()->Tick())
@@ -472,8 +483,6 @@ void CCharacter::HandleEvents()
 		m_EmoteType = EMOTE_NORMAL;
 		m_EmoteStop = -1;
 	}
-
-	HandleBuff();
 
 	UpdateTuning();
 }
@@ -505,11 +514,10 @@ void CCharacter::HandleClass()
 
 void CCharacter::HandleMenu()
 {
+	m_TimeShiftTick = -1;
 	if(m_pPlayer->GetClass())
 		return;
 	vec2 CursorPos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
-			
-	bool Broadcast = false;
 
 	m_pPlayer->m_MapMenuItem = -1;
 	
@@ -524,19 +532,10 @@ void CCharacter::HandleMenu()
 
 }
 
-void CCharacter::HandleBuff()
+void CCharacter::HandleEffects()
 {
-	if(m_DehydrationTick)
-	{
-		if(m_DehydrationTick%50 == 0)
-		{
-			TakeDamage(vec2(0.f, 0.f), 2, m_DehydrationFrom, WEAPON_HAMMER);
-			int Time = m_DehydrationTick/Server()->TickSpeed();
-			GameServer()->SendBroadcast_Localization(GetCID(), _("You are dehydrated: {sec:Time}"), 1.0f, BROADCAST_DEHYDRATED, Time);
-		}
-		
-		m_DehydrationTick--;
-	}
+	if(m_pFirstEffect)
+		m_pFirstEffect->OnPlayerTick();
 }
 
 void CCharacter::Tick()
@@ -549,6 +548,9 @@ void CCharacter::Tick()
 
 	// handle events
 	HandleEvents();
+
+	if(!m_pPlayer)
+		return;
 
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, m_pPlayer->GetNextTuningParams());
@@ -900,8 +902,6 @@ void CCharacter::Snap(int SnappingClient)
 
 	if(m_pPlayer->IsInfect())
 		Emote = EMOTE_ANGRY;
-	if(m_DehydrationTick)
-		Emote = EMOTE_PAIN;
 
 	if(m_aWeapons[WEAPON_HAMMER].m_Got)
 		pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_HAMMER;
@@ -967,6 +967,9 @@ void CCharacter::Snap(int SnappingClient)
 
 		if(GetClass())
 			GetClass()->OnCharacterSnap(pCharacter);
+			
+		if(m_pFirstEffect)
+			m_pFirstEffect->OnCharacterSnap(pCharacter);
 	}
 	else
 	{
@@ -996,6 +999,9 @@ void CCharacter::Snap(int SnappingClient)
 
 		if(GetClass())
 			GetClass()->OnCharacterSnap(pCharacter);
+
+		if(m_pFirstEffect)
+			m_pFirstEffect->OnCharacterSnap(pCharacter);
 	}
 }
 
@@ -1027,41 +1033,74 @@ void CCharacter::Freeze(float Seconds)
 	m_FreezeEndTick = m_FreezeStartTick + Server()->TickSpeed() * Seconds;
 }
 
-bool CCharacter::IsCollisionTile(int Flags)
+void CCharacter::AddEffect(CEffect *pEffect)
+{
+	for(CEffect *p = m_pFirstEffect; p; p = p->m_pNextEffect)
+	{
+		if(pEffect->m_Type == p->m_Type)
+		{
+			delete pEffect;
+			return;
+		}
+		if(!p->m_pNextEffect)
+		{
+			dbg_msg("yee", "add a effect");
+			p->m_pNextEffect = pEffect;
+			return;
+		}
+	}
+
+	dbg_msg("yee", "add a first effect");
+	m_pFirstEffect = pEffect;
+}
+
+void CCharacter::RemoveEffect(CEffect *pEffect)
+{
+	if(pEffect == m_pFirstEffect)
+	{
+		dbg_msg("yee", "remove a first effect");
+		m_pFirstEffect = pEffect->m_pNextEffect;
+		return;
+	}
+
+	CEffect *pLastEffect = 0;
+	for(CEffect *p = m_pFirstEffect; p; p = p->m_pNextEffect)
+	{
+		if(p->m_pNextEffect == pEffect)
+		{
+			pLastEffect = p;
+			break;
+		}
+	}
+
+	bool test = pLastEffect;
+	dbg_assert(test, "Effect is invalid");
+
+	if(!pEffect->m_pNextEffect)
+		pLastEffect->m_pNextEffect = 0;
+	else pLastEffect->m_pNextEffect = pEffect->m_pNextEffect;
+
+	dbg_msg("yee", "remove a effect");
+	delete pEffect;
+}
+
+bool CCharacter::IsCollisionTile(int Zone, int Flags)
 {
 	return 
-		Collision()->IsCollisionTile(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f, Flags) ||
-		Collision()->IsCollisionTile(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f, Flags) ||
-		Collision()->IsCollisionTile(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f, Flags) ||
-		Collision()->IsCollisionTile(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f, Flags);
+		Collision()->GetZoneValueAt(Zone, m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f) == Flags ||
+		Collision()->GetZoneValueAt(Zone, m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f) == Flags ||
+		Collision()->GetZoneValueAt(Zone, m_Pos.x-m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f) == Flags ||
+		Collision()->GetZoneValueAt(Zone, m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f) == Flags;
 }
 
 void CCharacter::UpdateTuning()
 {
-	CTuningParams *pTuning = m_pPlayer->GetNextTuningParams();
-
-	if(m_FreezeEndTick >= Server()->Tick())
-	{
-		pTuning->m_GroundControlAccel = 0.0f;
-		pTuning->m_AirControlAccel = 0.0f;
-		pTuning->m_GroundJumpImpulse = 0.0f;
-		pTuning->m_AirJumpImpulse = 0.0f;
-		pTuning->m_HookLength = 0.1f;
-		pTuning->m_HookFireSpeed = 0.1f;
-	}
+	m_pPlayer->GetNextTuningParams();
 }
 
 CCollision *CCharacter::Collision()
 {
 	return GameServer()->Collision();
-}
-
-void CCharacter::Dehydration(int From, float Seconds)
-{
-	if(m_DehydrationTick != 0)
-		return;
-	m_DehydrationFrom = From;
-	m_DehydrationTick = (int)(Seconds * Server()->TickSpeed());
 }
 
 void CCharacter::InitClassWeapon()

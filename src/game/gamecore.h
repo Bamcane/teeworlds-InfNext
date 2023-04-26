@@ -111,17 +111,14 @@ inline void IntsToStr(const int *pInts, int Num, char *pStr)
 	pStr[-1] = 0;
 }
 
-
-
 inline vec2 CalcPos(vec2 Pos, vec2 Velocity, float Curvature, float Speed, float Time)
 {
 	vec2 n;
 	Time *= Speed;
-	n.x = Pos.x + Velocity.x*Time;
-	n.y = Pos.y + Velocity.y*Time + Curvature/10000*(Time*Time);
+	n.x = Pos.x + Velocity.x * Time;
+	n.y = Pos.y + Velocity.y * Time + Curvature / 10000 * (Time * Time);
 	return n;
 }
-
 
 template<typename T>
 inline T SaturatedAdd(T Min, T Max, T Current, T Modifier)
@@ -145,7 +142,6 @@ inline T SaturatedAdd(T Min, T Max, T Current, T Modifier)
 		return Current;
 	}
 }
-
 
 float VelocityRamp(float Value, float Start, float Range, float Curvature);
 

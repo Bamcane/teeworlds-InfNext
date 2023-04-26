@@ -2,7 +2,7 @@
 #ifndef GAME_SERVER_GAMEMODES_INFNEXT_H
 #define GAME_SERVER_GAMEMODES_INFNEXT_H
 
-#include <base/tl/array.h>
+#include <vector>
 
 #include <game/server/gamecontroller.h>
 
@@ -28,9 +28,8 @@ public:
 	int RoundTick() const;
 	int RoundSecond() const;
 
-	array<int> m_LastInfect;
+	std::vector<int> m_LastInfect;
 
-	void SendClassChooser();
 	void CheckNoClass();
 	void CreateInfects();
 

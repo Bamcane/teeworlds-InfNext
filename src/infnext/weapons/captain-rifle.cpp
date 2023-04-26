@@ -13,7 +13,7 @@ CWeaponCaptainRifle::CWeaponCaptainRifle(CGameContext *pGameServer)
 
 void CWeaponCaptainRifle::Fire(vec2 Pos, vec2 Dir, int Owner)
 {
-    CSeaWater *pWater = new CSeaWater(GameWorld(), Owner, Pos, Dir, 3.0f, WEAPON_RIFLE);
+    new CSeaWater(GameWorld(), Owner, Pos, Dir, 3.0f, WEAPON_RIFLE);
 
     GameServer()->CreateSound(Pos, SOUND_RIFLE_BOUNCE);
     

@@ -16,6 +16,8 @@ enum
 	WEAPON_WORLD = -1, // death tiles etc
 };
 
+class CEffect;
+
 class CCharacter : public CEntity
 {
 	MACRO_ALLOC_POOL_ID()
@@ -25,6 +27,7 @@ public:
 	static const int ms_PhysSize = 28;
 
 	CCharacter(CGameWorld *pWorld);
+	~CCharacter();
 
 	void Reset() override;
 	void Destroy() override;
@@ -45,7 +48,7 @@ public:
 	void HandleInput();
 	void HandleClass();
 	void HandleMenu();
-	void HandleBuff();
+	void HandleEffects();
 
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);
@@ -139,14 +142,12 @@ private:
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
 private:
-	bool IsCollisionTile(int Flags);
+	bool IsCollisionTile(int Zone, int Flags);
 	void UpdateTuning();
 	int m_FreezeStartTick;
 	int m_FreezeEndTick;
 
-	// Dehydration
-	int m_DehydrationTick; 
-	int m_DehydrationFrom;
+	CEffect* m_pFirstEffect;
 
 public:
 	CCollision *Collision();
@@ -164,7 +165,9 @@ public:
 	bool IsHuman() const;
 	bool IsInfect() const;
 
-	void Dehydration(int From, float Seconds);
+	void AddEffect(CEffect *pEffect);
+	void RemoveEffect(CEffect *pEffect);
+	void EffectsSnap();
 
 /** Weapon Public for weapon system*/
 	NinjaInfo *GetNinjaInfo() {return &m_Ninja;}
@@ -176,6 +179,7 @@ public:
 	bool m_DeepFreeze;
 
 	int m_LastHookDmgTick;
+	int m_TimeShiftTick;
 };
 
 #endif

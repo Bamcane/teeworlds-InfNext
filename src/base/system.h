@@ -362,15 +362,15 @@ IOHANDLE io_stderr();
 void thread_sleep(int milliseconds);
 
 /*
-	Function: thread_init
-		Creates a new thread.
-
-	Parameters:
-		threadfunc - Entry point for the new thread.
-		user - Pointer to pass to the thread.
-
+ * Creates a new thread.
+ *
+ * @ingroup Threads
+ *
+ * @param threadfunc Entry point for the new thread.
+ * @param user Pointer to pass to the thread.
+ * @param name name describing the use of the thread
 */
-void *thread_init(void (*threadfunc)(void *), void *user);
+void *thread_init(void (*threadfunc)(void *), void *user, const char *name);
 
 /*
 	Function: thread_wait
@@ -871,10 +871,6 @@ int net_tcp_close(NETSOCKET sock);
 		- Garantees that dst string will contain zero-termination.
 */
 void str_append(char *dst, const char *src, int dst_size);
-
-//TeeUniverses
-void str_append_num(char *dst, const char *src, int dst_size, int num);
-
 
 /*
 	Function: str_copy
