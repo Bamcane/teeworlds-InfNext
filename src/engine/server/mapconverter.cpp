@@ -5,6 +5,7 @@
 #include <game/layers.h>
 
 #include <limits>
+#include <cstring>
 
 CMapConverter::CMapConverter(IStorage *pStorage, IEngineMap *pMap, IConsole* pConsole, CClasses* pClasses) :
 	m_pStorage(pStorage),
@@ -423,6 +424,7 @@ void CMapConverter::CopyImages()
 		char *pName = (char *)Map()->GetData(pItem->m_ImageName);
 
 		CMapItemImage ImageItem;
+		memset(&ImageItem,0,sizeof(CMapItemImage));
 		ImageItem.m_Version = 1;
 		ImageItem.m_Width = pItem->m_Width;
 		ImageItem.m_Height = pItem->m_Height;
@@ -618,6 +620,7 @@ void CMapConverter::CopyLayers()
 int CMapConverter::AddExternalImage(const char* pImageName, int Width, int Height)
 {
 	CMapItemImage Item;
+	memset(&Item, 0, sizeof(CMapItemImage));
 	Item.m_Version = 1;
 	Item.m_External = 1;
 	Item.m_ImageData = -1;
