@@ -80,9 +80,7 @@ class CGameContext : public IGameServer
 	static void ConClearVotes(IConsole::IResult *pResult, void *pUserData);
 	static void ConVote(IConsole::IResult *pResult, void *pUserData);
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-
-	static void ConchainUpdateSixupGameInfo(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-
+	
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
 	void AddVote(const char *pDescription, const char *pCommand);
@@ -217,6 +215,7 @@ public:
 	const char* Localize(const char *pLanguageCode, const char* pText) const;
 	const char* GetPlayerLanguage(int ClientID) const;
 
+	void Whisper(int ClientID, char *pStr);
 	void WhisperID(int ClientID, int VictimID, const char *pMessage);
 
 

@@ -37,6 +37,9 @@
 #include "mapconverter.h"
 
 #include <teeuniverses/components/localization.h>
+
+#include <engine/external/json-parser/json.h>
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -2091,7 +2094,68 @@ int CServer::LoadMap(const char *pMapName)
 		str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
 	}
+
+	LoadMapConfig(pMapName);
 	return 1;
+}
+
+void CServer::LoadMapConfig(const char *pMapName)
+{
+	char aBuf[512];
+	str_copy(aBuf, "maps/map.json");
+
+	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
+	if(!File)
+	{
+		str_format(aBuf, sizeof(aBuf), "Can't load the map config file %s", aBuf);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+		return;
+	}
+
+	// load the file as a string
+	int FileSize = (int)io_length(File);
+	int FileDataSize = FileSize + 1;
+	char *pFileData = new char[FileDataSize];
+	io_read(File, pFileData, FileSize);
+	pFileData[FileSize] = 0;
+	io_close(File);
+
+	// parse json data
+	json_settings JsonSettings;
+	mem_zero(&JsonSettings, sizeof(JsonSettings));
+	char aError[256];
+	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
+	if(pJsonData == 0)
+	{
+		str_format(aBuf, sizeof(aBuf), "Can't load the map config file %s : %s", aBuf, aError);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+		delete[] pFileData;
+		return;
+	}
+
+	const json_value &rStart = (*pJsonData)["maps"];
+	if(rStart.type == json_array)
+	{
+		for(unsigned i = 0; i < rStart.u.array.length; ++i)
+		{
+			if(str_comp((const char *)rStart[i]["name"], pMapName))
+				return;
+			long TimeLimit = (long)rStart[i]["timelimit"];
+
+			if(TimeLimit)
+			{
+				g_Config.m_SvTimelimit = TimeLimit;
+				dbg_msg("server", "Time limit: %dmin", TimeLimit);
+			}
+		}
+	}
+
+	// clean up
+	json_value_free(pJsonData);
+	delete[] pFileData;
+	
+	return;
+
 }
 
 int CServer::Run()
