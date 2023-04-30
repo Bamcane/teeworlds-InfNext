@@ -84,11 +84,11 @@ public:
 };
 
 template<typename T>
-constexpr inline vector2_base<T> rotate(const vector2_base<T> &a, float angle)
+inline vector2_base<T> rotate(const vector2_base<T> &a, float angle)
 {
 	angle = angle * pi / 180.0f;
-	float s = std::sin(angle);
-	float c = std::cos(angle);
+	float s = sinf(angle);
+	float c = cosf(angle);
 	return vector2_base<T>((T)(c * a.x - s * a.y), (T)(s * a.x + c * a.y));
 }
 

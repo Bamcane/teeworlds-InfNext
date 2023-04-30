@@ -63,26 +63,6 @@ void CMapConverter::QuantizeAnimation(int Quant)
 	}
 }
 
-// InfectionDust
-
-// Work with 'long long' to properly handle overflows (later)
-static inline long long gcd_long(long long a, long long b)
-{
-	while(b != 0)
-	{
-		long long c = a % b;
-		a = b;
-		b = c;
-	}
-	return a;
-}
-
-// Function to return LCM of two numbers
-static inline long long lcm(long long a, long long b)
-{
-	return (a / gcd_long(a, b)) * b;
-}
-
 bool CMapConverter::Load()
 {
 	m_AnimationCycle = 1;
@@ -156,25 +136,9 @@ bool CMapConverter::Load()
 		Map()->GetType(MAPITEMTYPE_ENVPOINTS, &Start, &Num);
 		pEnvPoints = (CEnvPoint *)Map()->GetItem(Start, 0, 0);
 	}
-
-
-	// InfectionDust
-	const int TIMESHIFT_MENUCLASS_MASK = Classes()->m_HumanClasses.size()+1;
-	const int MenuItemSyncMagic = TIMESHIFT_MENUCLASS * 1000;
-	long long AnimationCircle = m_AnimationCycle;
-	long long TimeShiftUnit = 0;
-			
-	int MASK_ALL = 0;
-	for(int i = 0; i < (int)Classes()->m_HumanClasses.size(); i++) 
-	{
-		MASK_ALL |= 1<<i;
-	}
-	
+					
 	if(pEnvPoints)
 	{
-		static const int Quant = 100;
-		QuantizeAnimation(Quant);
-
 		int Start, Num;
 		Map()->GetType(MAPITEMTYPE_ENVELOPE, &Start, &Num);
 		for(int i = 0; i < Num; i++)
@@ -185,35 +149,18 @@ bool CMapConverter::Load()
 				int Duration = pEnvPoints[pItem->m_StartPoint + pItem->m_NumPoints - 1].m_Time - pEnvPoints[pItem->m_StartPoint].m_Time;
 				if(Duration)
 				{
-					dbg_msg("MapConverter", "Duration found: %d", Duration);
-					AnimationCircle = lcm(AnimationCircle, Duration);
-					dbg_msg("MapConverter", "New AnimationCycle: %lld", AnimationCircle);
+					dbg_msg("InfNext", "Duration found: %d", m_AnimationCycle);
+					m_AnimationCycle *= Duration;
+					dbg_msg("InfNext", "Duration found: %d", m_AnimationCycle);
 				}
 			}
 		}
-
-		dbg_msg("MapConverter", "Final AnimationCycle: %lld", AnimationCircle);
-		if(AnimationCircle)
-			TimeShiftUnit = AnimationCircle*((MenuItemSyncMagic / AnimationCircle)+1);
+		
+		if(m_AnimationCycle)
+			m_TimeShiftUnit = m_AnimationCycle*((60*1000 / m_AnimationCycle)+1);
 		else
-			TimeShiftUnit = MenuItemSyncMagic;
+			m_TimeShiftUnit = 60*1000;
 	}
-
-	int Multiplier = 1 + TIMESHIFT_MENUCLASS + 3 * ((MASK_ALL + 1) * TIMESHIFT_MENUCLASS_MASK);
-	long long MaxUsedAnimationTime = Multiplier * TimeShiftUnit;
-	long long MaxAvailable = std::numeric_limits<int>::max();
-
-	if(MaxUsedAnimationTime > MaxAvailable)
-	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "WARNING! The animation duration is off the limit: %lld/%lld", MaxUsedAnimationTime, MaxAvailable);
-		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "MapConverter", aBuf);
-	}
-	else
-	{
-		dbg_msg("MapConverter", "The animation duration is within the limits: %lld/%lld", MaxUsedAnimationTime, MaxAvailable);
-	}
-	m_TimeShiftUnit = TimeShiftUnit;
 	
 	return true;
 }
@@ -520,17 +467,25 @@ void CMapConverter::CopyGameLayer()
 	Item.m_Height = m_Height;
 	Item.m_Flags = 1;
 	Item.m_Image = -1;
-	
-	CLayers Layers;
-	Layers.Init(Map());
 
-	for(int y=0; y<m_Height; y++)
+	//Cleanup the game layer
+	//This will make maps no more usable by a server, but the original ones are in the repository
+	for(int j=0; j<m_Height; j++)
 	{
-		for(int x=0; x<m_Width; x++)
+		for(int i=0; i<m_Width; i++)
 		{
-			m_pTiles[y*m_Width+x] = m_pPhysicsLayerTiles[y*m_Width+x];
-
-			x += m_pPhysicsLayerTiles[y*m_Width+x].m_Skip;
+			switch(m_pPhysicsLayerTiles[j*m_Width+i].m_Index)
+			{
+				case TILE_SOLID:
+					m_pTiles[j*m_Width+i].m_Index = TILE_SOLID;
+					break;
+				case TILE_NOHOOK:
+					m_pTiles[j*m_Width+i].m_Index = TILE_NOHOOK;
+					break;
+				default:
+					m_pTiles[j*m_Width+i].m_Index = TILE_AIR;
+			}
+			i += m_pPhysicsLayerTiles[j*m_Width+i].m_Skip;
 		}
 	}
 	
@@ -631,6 +586,7 @@ int CMapConverter::AddExternalImage(const char* pImageName, int Width, int Heigh
 
 void CMapConverter::Finalize()
 {	
+	int ClassNum = (int)Classes()->m_HumanClasses.size();
 	//Menu Group
 	{
 		CMapItemGroup Item;
@@ -640,7 +596,7 @@ void CMapConverter::Finalize()
 		Item.m_OffsetX = 0;
 		Item.m_OffsetY = 0;
 		Item.m_StartLayer = m_NumLayers;
-		Item.m_NumLayers = (int)Classes()->m_HumanClasses.size()+1;
+		Item.m_NumLayers = ClassNum+1;
 		Item.m_UseClipping = 0;
 		Item.m_ClipX = 0;
 		Item.m_ClipY = 0;
@@ -667,7 +623,7 @@ void CMapConverter::Finalize()
 		const float MenuRadius = MENU_RADIUS;
 		const float MenuAngleStart = MENU_ANGLE_START;
 		
-		const float MenuAngleStep = 360.0f/static_cast<float>((int)Classes()->m_HumanClasses.size());
+		const float MenuAngleStep = 360.0f/static_cast<float>(ClassNum);
 
 		for(int pass = 0; pass < 2; pass++)
 		{	
@@ -696,15 +652,15 @@ void CMapConverter::Finalize()
 				HighlightValues[3] = 1000;
 			}
 		
-			const int TIMESHIFT_MENUCLASS_MASK = (int)Classes()->m_HumanClasses.size()+1;
+			const int TIMESHIFT_MENUCLASS_MASK = ClassNum+1;
 			
 			int MASK_ALL = 0;
-			for(int i = 0; i < (int) Classes()->m_HumanClasses.size(); i++) 
+			for(int i = 0; i < ClassNum; i++) 
 			{
 				MASK_ALL |= 1<<i;
 			}
 
-			for(int i = 0; i < (int) Classes()->m_HumanClasses.size(); i++) 
+			for(int i = 0; i < ClassNum; i++) 
 			{
 				int ClassMask = 1<<i;
 				

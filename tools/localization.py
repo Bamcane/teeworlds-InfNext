@@ -34,4 +34,6 @@ def ConvertPo2Json(languageCode, plurals):
 
 		print(']}', end="\n", file=f)
 
-ConvertPo2Json("zh_CN", ["other"])
+def LocalizeGenerate():
+	ConvertPo2Json("zh_CL", ["other"])
+	ConvertPo2Json("zh_CN", ["other"])

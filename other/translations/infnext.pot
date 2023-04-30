@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-05 20:14+0800\n"
+"POT-Creation-Date: 2023-04-30 20:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,39 +17,39 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1573
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1717
 msgid "'{str:OldName}' changed name to '{str:NewName}'"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1376
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1520
 msgid "'{str:Option}' isn't an option on this server"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:317
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:401
 msgid "'{str:PlayerName}' has been infected"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1427
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1571
 msgid "'{str:Player}' called for vote to kick '{str:Player2}' ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1421
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1565
 msgid "'{str:Player}' called for vote to kick you"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1465
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1609
 msgid ""
 "'{str:Player}' called for vote to move '{str:Player2}' to spectators ({str:"
 "Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1362
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1506
 msgid ""
 "'{str:Player}' called vote to change server option '{str:Option}' ({str:"
 "Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:914
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:937
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr ""
 
@@ -65,11 +65,11 @@ msgstr ""
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2192
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2330
 msgid "Available languages: {str:List}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2136
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2274
 msgid "Based on the concept of infNext mod by pure_luck"
 msgstr ""
 
@@ -81,11 +81,7 @@ msgstr ""
 msgid "Captain"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:84
-msgid "HUM| Humans win!"
-msgstr ""
-
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:919
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:942
 msgid "Help us to translation mod on Crowdin!"
 msgstr ""
 
@@ -93,7 +89,11 @@ msgstr ""
 msgid "Hunter"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:79
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:90
+msgid "INF| Humans win!"
+msgstr ""
+
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:85
 msgid "INF| Infects win!"
 msgstr ""
 
@@ -101,23 +101,23 @@ msgstr ""
 msgid "Infection is coming in {sec:Time}!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1406
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1550
 msgid "Invalid client id to kick"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1454
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1598
 msgid "Invalid client id to move"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1553
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1697
 msgid "Invalid spectator id used"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1398
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1542
 msgid "Kick voting requires {int:Num} players on the server"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2169
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2307
 msgid "Language successfully switched to English"
 msgstr ""
 
@@ -129,15 +129,15 @@ msgstr ""
 msgid "Medic"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1532
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1676
 msgid "Only {int:Num} active players are allowed"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1384
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1528
 msgid "Server does not allow voting to kick players"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1447
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1591
 msgid "Server does not allow voting to move players to spectators"
 msgstr ""
 
@@ -149,43 +149,43 @@ msgstr ""
 msgid "Sniper"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1331
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1475
 msgid "Spectators aren't allowed to start a vote."
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1527
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1671
 msgid "Teams must be balanced, please join other team"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2135
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2273
 msgid "Thanks {str:List}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:64
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:70
 msgid "The game has been canceled"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1511
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1655
 msgid "Time to wait before changing team: {sec:Time}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2177
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2315
 msgid "Unknown language or no input language code"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:770
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:773
 msgid "Vote aborted"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:833
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:836
 msgid "Vote failed"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:825
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:828
 msgid "Vote passed"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1337
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1481
 msgid "Wait for current vote to end before calling a new one."
 msgstr ""
 
@@ -193,68 +193,68 @@ msgstr ""
 msgid "Wait game start!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:463
-msgid "You are '{lstr:Class}' "
-msgstr ""
-
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:535
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/infnext/effects/dehydration.cpp:17
 msgid "You are dehydrated: {sec:Time}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1420
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:463
+msgid "You are {lstr:Class}"
+msgstr ""
+
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1564
 msgid "You can't kick admins"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1411
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1555
 msgid "You can't kick yourself"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1459
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1603
 msgid "You can't move yourself"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:104
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:758
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:111
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:760
 msgid "You infected '{str:Player}'"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1345
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1489
 msgid "You must wait {sec:Time} before making another vote"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:105
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:759
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:112
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:761
 msgid "You're infected by '{str:Player}'"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2010
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2154
 msgid "admin forced server option '{str:Value}' ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2096
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2240
 msgid "admin forced vote no"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2091
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2235
 msgid "admin forced vote yes"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2058
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2202
 msgid "admin moved '{str:Player}' to spectator ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:99
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:101
 msgid "blue team"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:101
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
 msgid "game"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:97
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:99
 msgid "red team"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:105
 msgid "spectators"
 msgstr ""

@@ -567,20 +567,14 @@ endif()
 ########################################################################
 # VARIOUS TARGETS
 ########################################################################
-# Translation dev targets
-add_custom_target(generate_pot)
+add_custom_target(generate)
 
 add_custom_command(
-  TARGET generate_pot
-  COMMAND ${PYTHON_EXECUTABLE} tools/generate-po.py
+  TARGET generate
+  PRE_BUILD
+  COMMAND ${PYTHON_EXECUTABLE} tools/generate.py
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
-
-add_custom_target(update_json_files)
-add_custom_command(
-  TARGET update_json_files
-  COMMAND ${PYTHON_EXECUTABLE} tools/localization.py
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  DEPENDS tools/generate.py
 )
 
 ########################################################################
