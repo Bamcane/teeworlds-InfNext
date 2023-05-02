@@ -788,8 +788,10 @@ void CMapConverter::Finalize()
 				{
 					vec2 Pos = m_MenuPosition+rotate(vec2(MenuRadius, 0.0f), MenuAngleStart+MenuAngleStep*i);
 					
-					const char* SkinName = Classes()->m_HumanClasses[i].m_pClass->m_Skin.m_aSkinName;
-					const char* ClassName = Classes()->m_HumanClasses[i].m_pClass->m_ClassName;
+					CClass *NewClass = Classes()->m_HumanClasses[i].m_pClass->CreateNewOne(0, 0);
+
+					const char* SkinName = NewClass->m_Skin.m_aSkinName;
+					const char* ClassName = NewClass->m_ClassName;
 					char aSkinPath[IO_MAX_PATH_LENGTH];
 
 					str_format(aSkinPath, sizeof(aSkinPath), "../skins/%s", SkinName);
@@ -801,6 +803,8 @@ void CMapConverter::Finalize()
 					int ImageID = AddExternalImage(aSkinPath, 256, 128);
 					
 					AddTeeLayer(ClassName, ImageID, Pos, 64.0f, m_NumEnvs-1);
+
+					delete NewClass;
 				}
 			}
 		

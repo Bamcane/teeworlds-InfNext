@@ -11,10 +11,9 @@ class CClasses
 {
 	CGameContext *m_pGameServer;
 
-private:
+public:
 	CGameContext *GameServer() {return m_pGameServer;}
 
-public:
 	CClasses(CGameContext *pGameServer);
 	~CClasses();
 

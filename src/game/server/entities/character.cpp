@@ -116,8 +116,6 @@ void CCharacter::InitState()
 	m_pFirstEffect = 0;
 
 	m_TimeShiftTick = -1;
-
-	m_LastHookDmgTick = 0;
 }
 
 void CCharacter::Destroy()
@@ -509,7 +507,7 @@ void CCharacter::HandleClass()
 
 	m_Core.m_MaxJumps = m_pPlayer->GetClass()->m_MaxJumpNum;
 	
-	m_pPlayer->GetClass()->OnTick(this);
+	m_pPlayer->GetClass()->OnTick();
 }
 
 void CCharacter::HandleMenu()
@@ -731,7 +729,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// class check
 	if(m_pPlayer->GetClass())
-		m_pPlayer->GetClass()->OnPlayerDeath(GetCID(), Killer, m_Pos);
+		m_pPlayer->GetClass()->OnPlayerDeath(Killer, m_Pos);
 
 	// infection
 	if(m_pPlayer->IsHuman())

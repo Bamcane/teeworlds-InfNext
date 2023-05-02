@@ -6,7 +6,9 @@
 class CClassMedic : public CClass
 {
 public:
-    CClassMedic(CGameContext *pGameServer);
+    CClassMedic(CGameContext *pGameServer, CPlayer *pOwner);
+
+    CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };
 
 #endif

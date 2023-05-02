@@ -6,7 +6,9 @@
 class CClassLooper : public CClass
 {
 public:
-    CClassLooper(CGameContext *pGameServer);
+    CClassLooper(CGameContext *pGameServer, CPlayer *pOwner);
+
+    CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };
 
 #endif

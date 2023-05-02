@@ -2,7 +2,7 @@
 #include <infnext/weapons/infect-hammer.h>
 #include "hunter.h"
 
-CClassHunter::CClassHunter(CGameContext *pGameServer) : CClass(pGameServer)
+CClassHunter::CClassHunter(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Hunter"));
     m_MaxJumpNum = 3;
@@ -41,4 +41,9 @@ CClassHunter::CClassHunter(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[3] = HSLtoint(58, 255, 40);
     m_Skin.m_aSkinPartColors[4] = HSLtoint(0, 100, 0);
     m_Skin.m_aSkinPartColors[5] = -8229413;
+}
+
+CClass *CClassHunter::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassHunter(pGameServer, pOwner);
 }

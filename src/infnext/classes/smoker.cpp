@@ -2,7 +2,7 @@
 #include <infnext/weapons/infect-hammer.h>
 #include "smoker.h"
 
-CClassSmoker::CClassSmoker(CGameContext *pGameServer) : CClass(pGameServer)
+CClassSmoker::CClassSmoker(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Smoker"));
     m_MaxJumpNum = 2;
@@ -44,26 +44,34 @@ CClassSmoker::CClassSmoker(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[5] = -8229413;
 }
 
-void CClassSmoker::OnTick(class CCharacter *pOwner)
+void CClassSmoker::OnTick()
 {
-    if(!pOwner)
+    if(!Character() || Character()->IsAlive())
         return;
-    
-    CCharacterCore *pCore = pOwner->GetCore();
+
+    CCharacterCore *pCore = Character()->GetCore();
+
+    if(!pCore)
+        return;
 
     if(pCore->m_HookedPlayer != -1)
     {
         CCharacter *pHooked = GameServer()->GetPlayerChar(pCore->m_HookedPlayer);
-        if(pHooked && pHooked->GetPlayer()->IsHuman() && Server()->Tick() > pOwner->m_LastHookDmgTick + Server()->TickSpeed())
+        if(pHooked && pHooked->GetPlayer()->IsHuman() && Server()->Tick() > m_HookDmgTick + Server()->TickSpeed())
         {
-            pHooked->TakeDamage(vec2(0.f, 0.f), m_HookDamage, pOwner->GetCID(), WEAPON_NINJA);
+            pHooked->TakeDamage(vec2(0.f, 0.f), m_HookDamage, Character()->GetCID(), WEAPON_NINJA);
 
-            if(pOwner->IncreaseHealth(1))
-                pOwner->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
-            else if(pOwner->IncreaseArmor(1))
-                pOwner->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
+            if(Character()->IncreaseHealth(1))
+                Character()->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
+            else if(Character()->IncreaseArmor(1))
+                Character()->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
             
-            pOwner->m_LastHookDmgTick = Server()->Tick();
+            m_HookDmgTick = Server()->Tick();
         }
     }
+}
+
+CClass *CClassSmoker::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassSmoker(pGameServer, pOwner);
 }

@@ -2,9 +2,10 @@
 #include "weapons/hammer.h"
 #include "class.h"
 
-CClass::CClass(CGameContext *pGameServer)
+CClass::CClass(CGameContext *pGameServer, CPlayer *pOwner) :
+    m_pGameServer(pGameServer),
+    m_pOwner(pOwner)
 {
-    m_pGameServer = pGameServer;
     m_MaxJumpNum = 2;
 
     for(int i = 0;i < NUM_WEAPONS; i ++)
@@ -26,4 +27,9 @@ CClass::~CClass()
 IServer *CClass::Server()
 {
     return m_pGameServer->Server(); 
+}
+
+CCharacter *CClass::Character()
+{
+    return m_pOwner->GetCharacter(); 
 }

@@ -4,7 +4,7 @@
 #include <infnext/weapons/gun.h>
 #include "medic.h"
 
-CClassMedic::CClassMedic(CGameContext *pGameServer) : CClass(pGameServer)
+CClassMedic::CClassMedic(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Medic"));
     m_MaxJumpNum = 2;
@@ -43,4 +43,9 @@ CClassMedic::CClassMedic(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[3] = 15310519;
     m_Skin.m_aSkinPartColors[4] = 37600;
     m_Skin.m_aSkinPartColors[5] = 0;
+}
+
+CClass *CClassMedic::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassMedic(pGameServer, pOwner);
 }

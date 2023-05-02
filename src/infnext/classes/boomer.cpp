@@ -2,7 +2,7 @@
 #include <infnext/weapons/boomer-hammer.h>
 #include "boomer.h"
 
-CClassBoomer::CClassBoomer(CGameContext *pGameServer) : CClass(pGameServer)
+CClassBoomer::CClassBoomer(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Boomer"));
     m_MaxJumpNum = 2;
@@ -43,8 +43,13 @@ CClassBoomer::CClassBoomer(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[5] = -8229413;
 }
 
-void CClassBoomer::OnPlayerDeath(int ClientID, int KillerID, vec2 Pos)
+void CClassBoomer::OnPlayerDeath(int KillerID, vec2 Pos)
 {
     GameServer()->CreateSound(Pos, SOUND_GRENADE_EXPLODE);
-	GameServer()->CreateExplosion(Pos, ClientID, WEAPON_HAMMER, false, -1L, DAMAGEMODE_INFECTION);
+	GameServer()->CreateExplosion(Pos, Character()->GetCID(), WEAPON_HAMMER, false, -1L, DAMAGEMODE_INFECTION);
+}
+
+CClass *CClassBoomer::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassBoomer(pGameServer, pOwner);
 }

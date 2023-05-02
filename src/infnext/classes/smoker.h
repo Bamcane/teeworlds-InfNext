@@ -5,11 +5,14 @@
 
 class CClassSmoker : public CClass
 {
-public:
-    CClassSmoker(CGameContext *pGameServer);
     int m_HookDamage;
+    int m_HookDmgTick;
+public:
+    CClassSmoker(CGameContext *pGameServer, CPlayer *pOwner);
 
-    void OnTick(class CCharacter *pOwner) override;
+    void OnTick() override;
+
+    CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };
 
 #endif

@@ -55,6 +55,9 @@ CPlayer::~CPlayer()
 {
 	delete m_pCharacter;
 	m_pCharacter = 0;
+	if(m_pClass)
+		delete m_pClass;
+	m_pClass = 0;
 }
 
 void CPlayer::HandleTuningParams()
@@ -448,6 +451,8 @@ bool CPlayer::IsInfect() const
 
 void CPlayer::SetClass(CClass *pClass)
 {
+	if(m_pClass)
+		delete m_pClass;
 	m_pClass = pClass;
 	m_TeeInfos = m_pClass->m_Skin;
 	
@@ -497,6 +502,8 @@ void CPlayer::CureToDefault()
 			m_TeeInfos.m_aSkinPartColors[p] = g_DefaultSkin.m_aSkinPartColors[p];
 		}
 	}
+	if(m_pClass)
+		delete m_pClass;
 	m_pClass = 0;
 	
 	for (auto each : m_pGameServer->m_apPlayers) 

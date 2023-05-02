@@ -6,7 +6,9 @@
 class CClassSniper : public CClass
 {
 public:
-    CClassSniper(CGameContext *pGameServer);
+    CClassSniper(CGameContext *pGameServer, CPlayer *pOwner);
+
+    CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };
 
 #endif

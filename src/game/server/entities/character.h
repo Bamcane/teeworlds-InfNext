@@ -178,7 +178,6 @@ public:
 	void InitClassWeapon();
 	bool m_DeepFreeze;
 
-	int m_LastHookDmgTick;
 	int m_TimeShiftTick;
 };
 

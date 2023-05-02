@@ -4,7 +4,7 @@
 #include <infnext/weapons/sniper-rifle.h>
 #include "sniper.h"
 
-CClassSniper::CClassSniper(CGameContext *pGameServer) : CClass(pGameServer)
+CClassSniper::CClassSniper(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Sniper"));
     m_MaxJumpNum = 3;
@@ -43,4 +43,9 @@ CClassSniper::CClassSniper(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[3] = 750337;
     m_Skin.m_aSkinPartColors[4] = 1944919;
     m_Skin.m_aSkinPartColors[5] = 0;
+}
+
+CClass *CClassSniper::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassSniper(pGameServer, pOwner);
 }

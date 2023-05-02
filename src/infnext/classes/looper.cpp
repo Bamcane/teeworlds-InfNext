@@ -4,7 +4,7 @@
 #include <infnext/weapons/looper-rifle.h>
 #include "looper.h"
 
-CClassLooper::CClassLooper(CGameContext *pGameServer) : CClass(pGameServer)
+CClassLooper::CClassLooper(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Looper"));
     m_MaxJumpNum = 3;
@@ -43,4 +43,9 @@ CClassLooper::CClassLooper(CGameContext *pGameServer) : CClass(pGameServer)
     m_Skin.m_aSkinPartColors[3] = HSLtoint(120, 82, 235);
     m_Skin.m_aSkinPartColors[4] = HSLtoint(135, 82, 233);
     m_Skin.m_aSkinPartColors[5] = HSLtoint(137, 255, 0);
+}
+
+CClass *CClassLooper::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassLooper(pGameServer, pOwner);
 }

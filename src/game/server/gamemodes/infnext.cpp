@@ -71,7 +71,7 @@ void CGameControllerNext::Tick()
 	}
 
 	// start infection
-	if((Server()->Tick()-m_RoundStartTick) >= 500 && !Infects && Infects + Humans >= 2)
+	if((Server()->Tick()-m_RoundStartTick) >= 500 && Infects + Humans >= 2)
 	{
 		CreateInfects();
 		CheckNoClass();
@@ -174,13 +174,15 @@ CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 
 	int ClassID = random_distribution(Probability, Probability + ClassesNum);
 
+	CClass *NewClass = Classes()->m_InfectClasses[ClassID].m_pClass->CreateNewOne(GameServer(), pPlayer);
+
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "infected victim='%s' duration='%d' newclass='%s'", 
-		Server()->ClientName(pPlayer->GetCID()), Seconds, Classes()->m_InfectClasses[ClassID].m_pClass->m_ClassName);
+		Server()->ClientName(pPlayer->GetCID()), Seconds, NewClass->m_ClassName);
 
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
-	return Classes()->m_InfectClasses[ClassID].m_pClass;
+	return NewClass;
 }
 // from infclass
 void CGameControllerNext::Snap(int SnappingClient)
@@ -339,7 +341,7 @@ void CGameControllerNext::CheckNoClass()
 		}while(!Classes()->m_HumanClasses[Class].m_Value || ClassesNum[i] >= Classes()->m_HumanClasses[i].m_Limit);
 
 		// set class
-		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass);
+		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass->CreateNewOne(GameServer(), pPlayer));
 	}
 }
 
@@ -351,6 +353,19 @@ void CGameControllerNext::CreateInfects()
 	else if(m_LastPlayersNum > 4)
 		InfectNum = 2;
 	else InfectNum = 1;
+
+	for(int i = 0;i < MAX_CLIENTS; i ++)
+	{
+		if(!GameServer()->m_apPlayers[i])
+			continue;
+		if(!GameServer()->m_apPlayers[i]->GetClass())
+			continue;
+		if(GameServer()->m_apPlayers[i]->GetClass()->m_Infect)
+			InfectNum--;
+	}
+
+	if(InfectNum <= 0)
+		return;
 
 	std::vector<int> tmpList;
 
@@ -498,12 +513,15 @@ void CGameControllerNext::OnPlayerSelectClass(CPlayer* pPlayer)
 
 	CCharacter *pChr = pPlayer->GetCharacter();
 
+	CClass *NewClass = Classes()->m_HumanClasses[Class].m_pClass->CreateNewOne(GameServer(), pPlayer);
+
 	if(pChr->GetLatestInput()->m_Fire&1)
 	{
-		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass);
+		pPlayer->SetClass(NewClass);
 	}
 	else 
 	{
-		GameServer()->SendBroadcast_Localization(ClientID, Classes()->m_HumanClasses[Class].m_pClass->m_ClassName, 2, BROADCAST_CLASS);
+		GameServer()->SendBroadcast_Localization(ClientID, NewClass->m_ClassName, 2, BROADCAST_CLASS);
+		delete NewClass;
 	}
 }

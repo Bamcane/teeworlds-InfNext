@@ -6,7 +6,9 @@
 class CClassHunter : public CClass
 {
 public:
-    CClassHunter(CGameContext *pGameServer);
+    CClassHunter(CGameContext *pGameServer, CPlayer *pOwner);
+    
+    CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };
 
 #endif

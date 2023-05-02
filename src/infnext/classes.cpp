@@ -21,14 +21,14 @@ CClasses::~CClasses()
 // Init Class
 void CClasses::InitClasses()
 {
-	InitHumanClass(new CClassLooper(GameServer()), true, 32);
-	InitHumanClass(new CClassSniper(GameServer()), true, 32);
-	InitHumanClass(new CClassMedic(GameServer()), true, 32);
-	InitHumanClass(new CClassCaptain(GameServer()), true, 32);
+	InitHumanClass(new CClassLooper(0, 0), true, 32);
+	InitHumanClass(new CClassSniper(0, 0), true, 32);
+	InitHumanClass(new CClassMedic(0, 0), true, 32);
+	InitHumanClass(new CClassCaptain(0, 0), true, 32);
 
-	InitInfectClass(new CClassHunter(GameServer()), 33, 32);
-	InitInfectClass(new CClassBoomer(GameServer()), 33, 32);
-	InitInfectClass(new CClassSmoker(GameServer()), 33, 32);
+	InitInfectClass(new CClassHunter(0, 0), 33, 32);
+	InitInfectClass(new CClassBoomer(0, 0), 33, 32);
+	InitInfectClass(new CClassSmoker(0, 0), 33, 32);
 }
 
 // Humans

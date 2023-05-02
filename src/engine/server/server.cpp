@@ -2139,7 +2139,7 @@ void CServer::LoadMapConfig(const char *pMapName)
 		for(unsigned i = 0; i < rStart.u.array.length; ++i)
 		{
 			if(str_comp((const char *)rStart[i]["name"], pMapName))
-				return;
+				continue;
 			long TimeLimit = (long)rStart[i]["timelimit"];
 
 			if(TimeLimit)

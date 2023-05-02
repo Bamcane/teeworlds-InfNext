@@ -3,7 +3,7 @@
 #include <infnext/weapons/captain-rifle.h>
 #include "captain.h"
 
-CClassCaptain::CClassCaptain(CGameContext *pGameServer) : CClass(pGameServer)
+CClassCaptain::CClassCaptain(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pGameServer, pOwner)
 {
     str_copy(m_ClassName, _("Captain"));
     m_MaxJumpNum = 2;
@@ -54,4 +54,9 @@ void CClassCaptain::OnCharacterSnap(protocol7::CNetObj_Character *pCharacter)
 {
     if(pCharacter->m_Weapon == WEAPON_RIFLE)
         pCharacter->m_AmmoCount *= 2;
+}
+
+CClass *CClassCaptain::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
+{ 
+    return new CClassCaptain(pGameServer, pOwner);
 }
