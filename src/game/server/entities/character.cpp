@@ -1044,13 +1044,11 @@ void CCharacter::AddEffect(CEffect *pEffect)
 		}
 		if(!p->m_pNextEffect)
 		{
-			dbg_msg("yee", "add a effect");
 			p->m_pNextEffect = pEffect;
 			return;
 		}
 	}
 
-	dbg_msg("yee", "add a first effect");
 	m_pFirstEffect = pEffect;
 }
 
@@ -1058,7 +1056,6 @@ void CCharacter::RemoveEffect(CEffect *pEffect)
 {
 	if(pEffect == m_pFirstEffect)
 	{
-		dbg_msg("yee", "remove a first effect");
 		m_pFirstEffect = pEffect->m_pNextEffect;
 		return;
 	}
@@ -1080,7 +1077,6 @@ void CCharacter::RemoveEffect(CEffect *pEffect)
 		pLastEffect->m_pNextEffect = 0;
 	else pLastEffect->m_pNextEffect = pEffect->m_pNextEffect;
 
-	dbg_msg("yee", "remove a effect");
 	delete pEffect;
 }
 
