@@ -42,11 +42,13 @@ CClassSmoker::CClassSmoker(CGameContext *pGameServer, CPlayer *pOwner) : CClass(
     m_Skin.m_aSkinPartColors[3] = HSLtoint(58, 255, 40);
     m_Skin.m_aSkinPartColors[4] = HSLtoint(0, 100, 0);
     m_Skin.m_aSkinPartColors[5] = -8229413;
+
+    m_HookDmgTick = 0;
 }
 
 void CClassSmoker::OnTick()
 {
-    if(!Character() || Character()->IsAlive())
+    if(!Character() || !Character()->IsAlive())
         return;
 
     CCharacterCore *pCore = Character()->GetCore();

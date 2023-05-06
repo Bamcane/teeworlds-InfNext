@@ -1,11 +1,22 @@
 #include <game/server/gamecontext.h>
 
+#include <engine/shared/config.h>
+
+#include <engine/console.h>
+
 #include "class-define.h"
 #include "classes.h"
+
+IConsole *CClasses::Console()
+{
+	return GameServer()->Console();
+}
 
 CClasses::CClasses(CGameContext *pGameServer)
 {
     m_pGameServer = pGameServer;
+
+	Console()->Register("inf_set_class", "is", CFGFLAG_SERVER, ConSetClass, this, "");
 }
 
 CClasses::~CClasses()
@@ -49,4 +60,37 @@ void CClasses::InitInfectClass(CClass *pClass, int Proba, int Limit)
 	NewStatus.m_Value = Proba;
 	NewStatus.m_Limit = Limit;
 	m_InfectClasses.push_back(NewStatus);
+}
+
+void CClasses::ConSetClass(IConsole::IResult *pResult, void *pUserData)
+{
+	CClasses *pSelf = (CClasses *) pUserData;
+	
+	int ClientID = pResult->GetInteger(0);
+	CPlayer *pPlayer = pSelf->GameServer()->m_apPlayers[ClientID];
+
+	if(!pPlayer)
+		return;
+
+	const char* ClassName = pResult->GetString(1);
+
+	for(unsigned int i = 0;i < (unsigned int) pSelf->m_HumanClasses.size(); i ++)
+	{
+		if(str_comp_nocase(pSelf->m_HumanClasses[i].m_pClass->m_ClassName, ClassName) == 0)
+		{
+			CClass *pNewClass = pSelf->m_HumanClasses[i].m_pClass->CreateNewOne(pSelf->GameServer(), pPlayer);
+			pPlayer->SetClass(pNewClass);
+			return;
+		}
+	}
+
+	for(unsigned int i = 0;i < (unsigned int) pSelf->m_InfectClasses.size(); i ++)
+	{
+		if(str_comp_nocase(pSelf->m_InfectClasses[i].m_pClass->m_ClassName, ClassName) == 0)
+		{
+			CClass *pNewClass = pSelf->m_InfectClasses[i].m_pClass->CreateNewOne(pSelf->GameServer(), pPlayer);
+			pPlayer->SetClass(pNewClass);
+			return;
+		}
+	}
 }

@@ -169,6 +169,8 @@ public:
 	void RemoveEffect(CEffect *pEffect);
 	void EffectsSnap();
 
+	void DestroyChildEntites();
+
 /** Weapon Public for weapon system*/
 	NinjaInfo *GetNinjaInfo() {return &m_Ninja;}
 	void SetReloadTimer(int ReloadTimer) { m_ReloadTimer = ReloadTimer;}

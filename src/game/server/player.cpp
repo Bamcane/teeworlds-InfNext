@@ -465,7 +465,7 @@ void CPlayer::SetClass(CClass *pClass)
 		}
 	}
 	
-	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are {lstr:Class}"), 150, BROADCAST_CLASS,
+	GameServer()->SendBroadcast_Localization(m_ClientID, _("You are '{lstr:Class}' "), 150, BROADCAST_CLASS,
 		"Class", pClass->m_ClassName,
 		NULL);
 
@@ -474,6 +474,7 @@ void CPlayer::SetClass(CClass *pClass)
 		GameServer()->CreatePlayerSpawn(m_pCharacter->m_Pos);
 		m_pCharacter->InitClassWeapon();
 		m_pCharacter->GetCore()->m_Infect = pClass->m_Infect;
+		m_pCharacter->DestroyChildEntites();
 	}
 
 	Server()->ExpireServerInfo();
@@ -520,6 +521,7 @@ void CPlayer::CureToDefault()
 		GameServer()->CreatePlayerSpawn(m_pCharacter->m_Pos);
 		m_pCharacter->InitClassWeapon();
 		m_pCharacter->GetCore()->m_Infect = false;
+		m_pCharacter->DestroyChildEntites();
 	}
 }
 

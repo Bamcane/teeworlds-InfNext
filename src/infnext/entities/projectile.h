@@ -20,7 +20,6 @@ public:
 private:
 	vec2 m_Direction;
 	int m_LifeSpan;
-	int m_Owner;
 	int m_Type;
 	int m_Damage;
 	int m_SoundImpact;

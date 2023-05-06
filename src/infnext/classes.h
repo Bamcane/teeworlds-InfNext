@@ -12,7 +12,8 @@ class CClasses
 	CGameContext *m_pGameServer;
 
 public:
-	CGameContext *GameServer() {return m_pGameServer;}
+	CGameContext *GameServer() { return m_pGameServer; }
+	IConsole *Console();
 
 	CClasses(CGameContext *pGameServer);
 	~CClasses();
@@ -32,6 +33,10 @@ public:
 	void InitClasses();
 	void InitHumanClass(CClass *pClass, bool Enable, int Limit);
 	void InitInfectClass(CClass *pClass, int Proba, int Limit);
+	
+private:
+	static void ConSetClass(IConsole::IResult *pResult, void *pUserData);
+
 };
 
 #endif

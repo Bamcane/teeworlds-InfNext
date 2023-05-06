@@ -89,7 +89,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
   src/game/version.h
 )
 
-set(SERVER_EXECUTABLE teeworlds_srv CACHE STRING "Name of the built server executable")
+set(SERVER_EXECUTABLE InfNext-Server CACHE STRING "Name of the built server executable")
 
 ########################################################################
 # Compiler flags
@@ -571,7 +571,6 @@ add_custom_target(generate)
 
 add_custom_command(
   TARGET generate
-  PRE_BUILD
   COMMAND ${PYTHON_EXECUTABLE} tools/generate.py
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   DEPENDS tools/generate.py

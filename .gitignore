@@ -5,13 +5,10 @@ __pycache__
 *.pyc
 objs
 src/game/generated
-SDL.dll
-freetype.dll
 autoexec.cfg
 .vscode
-lastday-accounts.db
 
-teeworlds_srv
+InfNext-Server
 
 cmake_install.cmake
 CMakeCache.txt

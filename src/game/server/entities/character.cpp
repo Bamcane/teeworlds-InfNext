@@ -737,6 +737,8 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
+	
+	DestroyChildEntites();
 
 	m_Alive = false;
 	GameServer()->m_World.RemoveEntity(this);
@@ -1076,6 +1078,16 @@ void CCharacter::RemoveEffect(CEffect *pEffect)
 	else pLastEffect->m_pNextEffect = pEffect->m_pNextEffect;
 
 	delete pEffect;
+}
+
+void CCharacter::DestroyChildEntites()
+{
+	for(int i = 0; i < CGameWorld::NUM_ENTTYPES; i++)
+		for(CEntity *pEnt = GameWorld()->FindFirst(i); pEnt; pEnt = pEnt->TypeNext())
+		{
+			if(pEnt->GetOwner() == GetCID())
+				GameWorld()->DestroyEntity(pEnt);
+		}
 }
 
 bool CCharacter::IsCollisionTile(int Zone, int Flags)

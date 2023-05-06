@@ -17,7 +17,6 @@ private:
 	vec2 m_Direction;
 	vec2 m_ActualPos;
 	int m_LifeSpan;
-	int m_Owner;
 	int m_Weapon;
 	int m_StartTick;
 };

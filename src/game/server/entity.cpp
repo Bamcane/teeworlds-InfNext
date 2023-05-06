@@ -20,6 +20,8 @@ CEntity::CEntity(CGameWorld *pGameWorld, int ObjType)
 	m_MarkedForDestroy = false;
 	m_ID = Server()->SnapNewID();
 
+	m_Owner = -1;
+
 	m_pPrevTypeEntity = 0;
 	m_pNextTypeEntity = 0;
 }
