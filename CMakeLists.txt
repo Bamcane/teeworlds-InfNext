@@ -580,227 +580,31 @@ add_custom_command(
 # INSTALLATION
 ########################################################################
 
-function(escape_regex VAR STRING)
-  string(REGEX REPLACE "([][^$.+*?|()\\\\])" "\\\\\\1" ESCAPED "${STRING}")
-  set(${VAR} ${ESCAPED} PARENT_SCOPE)
-endfunction()
-
-function(escape_backslashes VAR STRING)
-  string(REGEX REPLACE "\\\\" "\\\\\\\\" ESCAPED "${STRING}")
-  set(${VAR} ${ESCAPED} PARENT_SCOPE)
-endfunction()
-
-function(max_length VAR)
-  set(MAX_LENGTH 0)
-  foreach(str ${ARGN})
-    string(LENGTH ${str} LENGTH)
-    if(LENGTH GREATER MAX_LENGTH)
-      set(MAX_LENGTH ${LENGTH})
-    endif()
-  endforeach()
-  set(${VAR} ${MAX_LENGTH} PARENT_SCOPE)
-endfunction()
-
-# Tries to generate a list of regex that matches everything except the given
-# parameters.
-function(regex_inverted VAR)
-  max_length(MAX_LENGTH ${ARGN})
-  math(EXPR UPPER_BOUND "${MAX_LENGTH}-1")
-
-  set(REMAINING ${ARGN})
-  set(RESULT)
-
-  foreach(i RANGE ${UPPER_BOUND})
-    set(TEMP ${REMAINING})
-    set(REMAINING)
-    foreach(str ${TEMP})
-      string(LENGTH ${str} LENGTH)
-      if(i LESS LENGTH)
-        list(APPEND REMAINING ${str})
-      endif()
-    endforeach()
-
-    set(ADDITIONAL)
-    foreach(outer ${REMAINING})
-      string(SUBSTRING ${outer} 0 ${i} OUTER_PREFIX)
-      set(CHARS "")
-      foreach(inner ${REMAINING})
-        string(SUBSTRING ${inner} 0 ${i} INNER_PREFIX)
-        if(OUTER_PREFIX STREQUAL INNER_PREFIX)
-          string(SUBSTRING ${inner} ${i} 1 INNER_NEXT)
-          set(CHARS "${CHARS}${INNER_NEXT}")
-        endif()
-      endforeach()
-      escape_regex(OUTER_PREFIX_ESCAPED "${OUTER_PREFIX}")
-
-      list(APPEND ADDITIONAL "${OUTER_PREFIX_ESCAPED}([^${CHARS}]|$)")
-    endforeach()
-    list(REMOVE_DUPLICATES ADDITIONAL)
-    list(APPEND RESULT ${ADDITIONAL})
-  endforeach()
-  set(${VAR} ${RESULT} PARENT_SCOPE)
-endfunction()
-
-set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-set(CPACK_GENERATOR TGZ TXZ)
-set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-set(CPACK_STRIP_FILES TRUE)
-set(CPACK_COMPONENTS_ALL portable)
-set(CPACK_SOURCE_GENERATOR ZIP TGZ TBZ2 TXZ)
-set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-if(VERSION_PATCH STREQUAL "0")
-  set(CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR})
-else()
-  set(CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-endif()
-set(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
-
-if(TARGET_OS AND TARGET_BITS)
-  if(TARGET_OS STREQUAL "windows")
-    set(CPACK_SYSTEM_NAME "win${TARGET_BITS}")
-    set(CPACK_GENERATOR ZIP)
-  elseif(TARGET_OS STREQUAL "linux")
-    # Assuming Intel here.
-    if(TARGET_BITS EQUAL 32)
-      set(CPACK_SYSTEM_NAME "linux_x86")
-    elseif(TARGET_BITS EQUAL 64)
-      set(CPACK_SYSTEM_NAME "linux_x86_64")
-    endif()
-  elseif(TARGET_OS STREQUAL "mac")
-    set(CPACK_SYSTEM_NAME "osx")
-    set(CPACK_GENERATOR DMG)
-  endif()
-endif()
-
-set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME})
-set(CPACK_ARCHIVE_PORTABLE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME})
-set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-src)
-set(CPACK_SOURCE_FILES
-  CMakeLists.txt
-  bam.lua
-  cmake/
-  configure.lua
-  data/
-  datasrc/
-  docs/
-  license.txt
-  objs/
-  other/
-  readme.txt
-  scripts/
-  src/
-  storage.cfg
+install(
+  DIRECTORY
+    "data/"
+  DESTINATION
+    "data"
 )
-set(CPACK_SOURCE_IGNORE_FILES
-  "\\\\.o$"
-  "\\\\.pyc$"
-  "/\\\\.git"
-  "/__pycache__/"
+install(
+  TARGETS
+    ${TARGET_SERVER}
+  DESTINATION
+    "${CMAKE_INSTALL_PREFIX}"
 )
-
-regex_inverted(CPACK_SOURCE_FILES_INVERTED ${CPACK_SOURCE_FILES})
-escape_regex(PROJECT_SOURCE_DIR_ESCAPED ${PROJECT_SOURCE_DIR})
-
-foreach(str ${CPACK_SOURCE_FILES_INVERTED})
-  escape_backslashes(STR_ESCAPED "${PROJECT_SOURCE_DIR_ESCAPED}/${str}")
-  list(APPEND CPACK_SOURCE_IGNORE_FILES "${STR_ESCAPED}")
-endforeach()
-
-set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME ${PROJECT_NAME})
-
-set(CPACK_TARGETS
-  ${TARGET_SERVER}
+install(
+  FILES
+    "license.txt"
+  DESTINATION
+    "${CMAKE_INSTALL_PREFIX}"
 )
-set(CPACK_DIRS data)
-set(CPACK_FILES
-  license.txt
-  storage.cfg
-  ${COPY_FILES}
+install(
+  FILES
+    "storage.cfg"
+    "Dockerfile"
+  DESTINATION
+    "${CMAKE_INSTALL_PREFIX}"
 )
-if(TARGET_OS STREQUAL "windows")
-  list(APPEND CPACK_FILES other/config_directory.bat)
-endif()
-
-if(NOT DEV)
-  install(DIRECTORY data DESTINATION share/${PROJECT_NAME} COMPONENT data)
-  install(TARGETS ${TARGET_SERVER} DESTINATION bin COMPONENT server)
-endif()
-
-if(DEV)
-  # Don't generate CPack targets.
-elseif(CMAKE_VERSION VERSION_LESS 3.6 OR CMAKE_VERSION VERSION_EQUAL 3.6)
-  message(WARNING "Cannot create CPack targets, CMake version too old. Use CMake 3.6 or newer.")
-else()
-  set(EXTRA_ARGS DESTINATION ${CPACK_PACKAGE_FILE_NAME} COMPONENT portable EXCLUDE_FROM_ALL)
-  install(TARGETS ${CPACK_TARGETS} ${EXTRA_ARGS})
-  install(DIRECTORY ${CPACK_DIRS} ${EXTRA_ARGS})
-  install(FILES ${CPACK_FILES} ${EXTRA_ARGS})
-endif()
-
-set(PACKAGE_TARGETS)
-
-foreach(ext zip tar.gz tar.xz)
-  set(TAR_MODE c)
-  set(TAR_EXTRA_ARGS)
-  string(REPLACE . _ EXT_SLUG ${ext})
-
-  set(TMPDIR pack_${CPACK_PACKAGE_FILE_NAME}_${EXT_SLUG}/${CPACK_PACKAGE_FILE_NAME})
-
-  set(COPY_FILE_COMMANDS)
-  set(COPY_DIR_COMMANDS)
-  set(COPY_TARGET_COMMANDS)
-  set(STRIP_TARGET_COMMANDS)
-  foreach(file ${CPACK_FILES})
-    list(APPEND COPY_FILE_COMMANDS COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/${file} ${TMPDIR}/)
-  endforeach()
-  foreach(dir ${CPACK_DIRS})
-    list(APPEND COPY_DIR_COMMANDS COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/${dir} ${TMPDIR}/${dir})
-  endforeach()
-  foreach(target ${CPACK_TARGETS})
-    list(APPEND COPY_TARGET_COMMANDS COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${TMPDIR}/)
-  endforeach()
-
-  if(ext STREQUAL zip)
-    set(TAR_EXTRA_ARGS --format=zip)
-  elseif(ext STREQUAL tar.gz)
-    set(TAR_MODE cz)
-  elseif(ext STREQUAL tar.xz)
-    set(TAR_MODE cJ)
-  endif()
-  add_custom_command(OUTPUT ${CPACK_PACKAGE_FILE_NAME}.${ext}
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${TMPDIR}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${TMPDIR}
-    ${COPY_FILE_COMMANDS}
-    ${COPY_DIR_COMMANDS}
-    ${COPY_TARGET_COMMANDS}
-    ${STRIP_TARGET_COMMANDS}
-    COMMAND ${CMAKE_COMMAND} -E chdir pack_${CPACK_PACKAGE_FILE_NAME}_${EXT_SLUG} ${CMAKE_COMMAND} -E tar ${TAR_MODE} ../${CPACK_PACKAGE_FILE_NAME}.${ext} ${TAR_EXTRA_ARGS} -- ${CPACK_PACKAGE_FILE_NAME}/
-    DEPENDS ${CPACK_TARGETS}
-  )
-  add_custom_target(package_${EXT_SLUG} DEPENDS ${CPACK_PACKAGE_FILE_NAME}.${ext})
-  list(APPEND PACKAGE_TARGETS package_${EXT_SLUG})
-endforeach()
-
-set(PACKAGE_DEFAULT tar_xz)
-if(TARGET_OS STREQUAL "windows")
-  set(PACKAGE_DEFAULT zip)
-elseif(TARGET_OS STREQUAL "mac")
-  set(PACKAGE_DEFAULT dmg)
-endif()
-add_custom_target(package_default DEPENDS package_${PACKAGE_DEFAULT})
-
-add_custom_target(package_all DEPENDS ${PACKAGE_TARGETS})
-
-# Unset these variables, they might do something in the future of CPack.
-unset(CPACK_SOURCE_FILES)
-unset(CPACK_SOURCE_FILES_INVERTED)
-unset(CPACK_TARGETS)
-unset(CPACK_DIRS)
-unset(CPACK_FILES)
-
-include(CPack)
 
 ########################################################################
 # COMPILER-SPECIFICS
