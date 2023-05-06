@@ -125,6 +125,9 @@ public:
 	bool CanChangeTeam(CPlayer *pPplayer, int JoinTeam);
 	int ClampTeam(int Team);
 
+	void CheckInactive();
+	void KickInactive(int ClientID);
+
 	virtual class CClass *OnPlayerInfect(class CPlayer *pPlayer) = 0;
 	virtual void PostReset();
 
