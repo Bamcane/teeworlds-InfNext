@@ -5,6 +5,7 @@ Teeworlds-InfNext
 ***
 
 InfNext(ddnet-infclass) by pure_luck
+
 InfNext(teeworlds-InfNext) by RemakePower
 
 Thanks to:
