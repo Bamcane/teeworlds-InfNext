@@ -2267,6 +2267,13 @@ void CGameContext::ConVote(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 }
 
+void CGameContext::ConAddMapVotes(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	pSelf->AddMapVotes();
+}
+
 void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
@@ -2432,6 +2439,8 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("force_vote", "ss?r", CFGFLAG_SERVER, ConForceVote, this, "Force a voting option");
 	Console()->Register("clear_votes", "", CFGFLAG_SERVER, ConClearVotes, this, "Clears the voting options");
 	Console()->Register("vote", "r", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
+
+	Console()->Register("add_map_votes", "", CFGFLAG_SERVER, ConAddMapVotes, this, "Add map votes");
 	
 	Console()->Register("about", "", CFGFLAG_CHAT, ConAbout, this, "Show information about the mod");
 	Console()->Register("language", "?s", CFGFLAG_CHAT, ConLanguage, this, "change language");
@@ -2490,8 +2499,6 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
 	m_pTiles = (CTile *)Kernel()->RequestInterface<IMap>()->GetData(pTileMap->m_Data);
-
-	AddMapVotes();
 
 
 	/*
@@ -2680,18 +2687,21 @@ void CGameContext::AddMapVotes()
 
 	AddVote("=======Map=======", "echo ?");
 
-	for(auto &Item : vMapList)
+	for(unsigned int i = 0;i < (unsigned int) vMapList.size(); i ++)
 	{
 		char aDescription[64];
-		str_format(aDescription, sizeof(aDescription), "%s", Item.m_aName);
+		str_format(aDescription, sizeof(aDescription), "%s", vMapList[i].m_aName);
 
 		char aCommand[IO_MAX_PATH_LENGTH * 2 + 10];
 		char aMapEscaped[IO_MAX_PATH_LENGTH * 2];
 		char *pDst = aMapEscaped;
-		str_escape(&pDst, Item.m_aName, aMapEscaped + sizeof(aMapEscaped));
+		str_escape(&pDst, vMapList[i].m_aName, aMapEscaped + sizeof(aMapEscaped));
 		str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", aMapEscaped);
 
-		str_format(g_Config.m_SvMaprotation, sizeof(g_Config.m_SvMaprotation), "%s %s", g_Config.m_SvMaprotation, aMapEscaped);
+		str_append(g_Config.m_SvMaprotation, vMapList[i].m_aName, sizeof(g_Config.m_SvMaprotation));
+
+		if(i != (unsigned int) vMapList.size() - 1)
+			str_append(g_Config.m_SvMaprotation, " ", sizeof(g_Config.m_SvMaprotation));
 
 		AddVote(aDescription, aCommand);
 	}
