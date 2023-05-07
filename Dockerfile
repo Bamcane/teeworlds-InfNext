@@ -13,7 +13,7 @@ RUN cmake --build . -t install
 FROM alpine:latest AS runtime_env
 WORKDIR /InfNext-Server/
 RUN apk update && apk upgrade
-RUN apk add --no-cache libstdc++ icu libmaxminddb
+RUN apk add --no-cache libstdc++ icu-dev icu
 COPY --from=build_env /install .
 
 EXPOSE 8303/udp
