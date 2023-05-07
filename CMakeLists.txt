@@ -600,6 +600,7 @@ install(
 )
 install(
   FILES
+    "autoexec.cfg"
     "storage.cfg"
     "Dockerfile"
   DESTINATION
