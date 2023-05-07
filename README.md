@@ -17,3 +17,6 @@ Thanks to:
 Based on [teeworlds-lastday](https://github.com/RemakePower/teeworlds-lastday)
 
 ***
+
+Before building docker image:
+Please write `autoexec.cfg`(Important)
