@@ -584,7 +584,7 @@ install(
   DIRECTORY
     "data/"
   DESTINATION
-    "data"
+    "${CMAKE_INSTALL_PREFIX}/data"
 )
 install(
   TARGETS

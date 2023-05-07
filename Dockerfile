@@ -1,26 +1,20 @@
-FROM ubuntu:jammy
+# build
+FROM alpine:latest AS build_env
 
-RUN apt-get upgrade && apt-get update && apt-get install -y git \
-        build-essential \
-        python3 \
-        libcurl4-openssl-dev \
-        zlib1g-dev \
-        libpnglite-dev \
-        openssl \
-        libssl-dev \
-        libicu-dev \
-        cmake
+RUN apk update && apk upgrade 
+RUN apk add --no-cache openssl gcc g++ make cmake python3 zlib-dev icu-dev curl-dev
 
 COPY . sources
-WORKDIR /sources
+WORKDIR /souces
+RUN cmake /sources -DCMAKE_INSTALL_PREFIX=/install
+RUN cmake --build . -t install
 
-RUN printf '#!/bin/bash\n \
-            cmake . && make' \
-          >> build-all.sh
-
-RUN chmod +x ./build-all.sh && bash ./build-all.sh
-
+# runtime
+FROM alpine:latest AS runtime_env
+WORKDIR /InfNext-Server/
+RUN apk update && apk upgrade
+RUN apk add --no-cache libstdc++ icu libmaxminddb
+COPY --from=build_env /install .
 
 EXPOSE 8303/udp
-
 ENTRYPOINT ["./InfNext-Server"]
