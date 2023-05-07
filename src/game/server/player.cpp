@@ -261,7 +261,7 @@ void CPlayer::FakeSnap(int SnappingClient)
 	Server()->GetClientInfo(SnappingClient, &info);
 	if (Server()->IsSixup(SnappingClient))
 		return;
-	if (info.m_CustClt)
+	if (info.m_DDNetVersion > VERSION_DDNET_OLD)
 		return;
 
 	int id = VANILLA_MAX_CLIENTS - 1;

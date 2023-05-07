@@ -105,6 +105,7 @@ public:
 		enum
 		{
 			STATE_EMPTY = 0,
+			STATE_PREAUTH,
 			STATE_AUTH,
 			STATE_CONNECTING,
 			STATE_READY,
@@ -149,8 +150,14 @@ public:
 		void Reset();
 
 		char m_aLanguage[16];
+
+		// DDNet
 		NETADDR m_Addr;
-		bool m_CustClt;
+		bool m_GotDDNetVersionPacket;
+		bool m_DDNetVersionSettled;
+		int m_DDNetVersion;
+		char m_aDDNetVersionStr[64];
+
 		bool m_Sixup;
 	};
 
@@ -219,7 +226,8 @@ public:
 
 	void SetRconCID(int ClientID);
 	bool IsAuthed(int ClientID);
-	int GetClientInfo(int ClientID, CClientInfo *pInfo);
+	bool GetClientInfo(int ClientID, CClientInfo *pInfo) const override;
+	void SetClientDDNetVersion(int ClientID, int DDNetVersion) override;
 	void GetClientAddr(int ClientID, char *pAddrStr, int Size);
 	const char *ClientName(int ClientID);
 	const char *ClientClan(int ClientID);
@@ -227,6 +235,7 @@ public:
 	bool ClientIngame(int ClientID);
 	int MaxClients() const;
 
+	int GetClientVersion(int ClientID) const override;
 	int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID) override;
 
 	void DoSnapshot();
@@ -324,7 +333,6 @@ public:
 	const char* GetClientLanguage(int ClientID) override;
 	void SetClientLanguage(int ClientID, const char* pLanguage) override;
 	int* GetIdMap(int ClientID) override;
-	void SetCustClt(int ClientID) override;
 	int GetTimeShiftUnit() const override { return m_TimeShiftUnit; } //In ms
 
 	bool IsSixup(int ClientID) const override { return ClientID != -1 && m_aClients[ClientID].m_Sixup; }

@@ -4,11 +4,13 @@
 
 #ifndef GAME_VERSION_H
 #define GAME_VERSION_H
-#define GAME_VERSION "0.6.4"
+
+#define MOD_NAME "InfNext"
+#define MOD_VERSION "next_0.1.5"
+#define GAME_VERSION "0.6.4, " MOD_VERSION
 #define GAME_NETVERSION "0.6 626fce9a778df4d4" //the std game version
 static const char GAME_RELEASE_VERSION[8] = "0.6.4";
 
-#define FCLIENT_STRING "fclient!"
-#define MOD_NAME "InfNext"
+#define CLIENT_VERSIONNR 16090
 
 #endif

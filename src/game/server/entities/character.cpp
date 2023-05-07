@@ -912,7 +912,7 @@ void CCharacter::Snap(int SnappingClient)
 	if(m_aWeapons[WEAPON_GRENADE].m_Got)
 		pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_GRENADE;
 	if(m_aWeapons[WEAPON_RIFLE].m_Got)
-		pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_LASER;
+		pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_RIFLE;
 	if(m_aWeapons[WEAPON_NINJA].m_Got)
 		pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_NINJA;
 

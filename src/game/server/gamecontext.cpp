@@ -1041,6 +1041,11 @@ void CGameContext::OnClientConnected(int ClientID)
 	m_pController->UpdateGameInfo(ClientID);
 }
 
+int CGameContext::GetClientVersion(int ClientID) const
+{
+	return Server()->GetClientVersion(ClientID);
+}
+
 void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 {
 	AbortVoteKickOnDisconnect(ClientID);
@@ -1192,6 +1197,15 @@ void CGameContext::WhisperID(int ClientID, int VictimID, const char *pMessage)
 
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
 	}
+	else if(GetClientVersion(ClientID) >= VERSION_DDNET_WHISPER)
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Team = CHAT_WHISPER_SEND;
+		Msg.m_ClientID = VictimID;
+		Msg.m_pMessage = aCensoredMessage;
+		
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
+	}
 	else
 	{
 		str_format(aBuf, sizeof(aBuf), "[→ %s] %s", Server()->ClientName(VictimID), aCensoredMessage);
@@ -1207,6 +1221,15 @@ void CGameContext::WhisperID(int ClientID, int VictimID, const char *pMessage)
 		Msg.m_TargetID = VictimID;
 
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, VictimID);
+	}
+	else if(GetClientVersion(VictimID) >= VERSION_DDNET_WHISPER)
+	{
+		CNetMsg_Sv_Chat Msg2;
+		Msg2.m_Team = CHAT_WHISPER_RECV;
+		Msg2.m_ClientID = ClientID;
+		Msg2.m_pMessage = aCensoredMessage;
+		
+		Server()->SendPackMsg(&Msg2, MSGFLAG_VITAL | MSGFLAG_NORECORD, VictimID);
 	}
 	else
 	{

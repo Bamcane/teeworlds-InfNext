@@ -186,6 +186,8 @@ public:
 		CHAT_SPEC=-1,
 		CHAT_RED=0,
 		CHAT_BLUE=1,
+		CHAT_WHISPER_SEND = 2,
+		CHAT_WHISPER_RECV = 3,
 
 		CHAT_SIX = 1 << 0,
 		CHAT_SIXUP = 1 << 1,
@@ -214,6 +216,9 @@ public:
 
 	const char* Localize(const char *pLanguageCode, const char* pText) const;
 	const char* GetPlayerLanguage(int ClientID) const;
+
+	int GetClientVersion(int ClientID) const;
+	bool PlayerExists(int ClientID) const override { return m_apPlayers[ClientID]; }
 
 	void Whisper(int ClientID, char *pStr);
 	void WhisperID(int ClientID, int VictimID, const char *pMessage);

@@ -37,7 +37,9 @@ public:
 		const char *m_pName;
 		int m_Latency;
 		int m_Authed;
-		bool m_CustClt;
+		bool m_GotDDNetVersion;
+		int m_DDNetVersion;
+		const char *m_pDDNetVersionStr;
 	};
 
 	inline class CLocalization* Localization() { return m_pLocalization; }
@@ -51,7 +53,8 @@ public:
 	virtual const char *ClientClan(int ClientID) = 0;
 	virtual int ClientCountry(int ClientID) = 0;
 	virtual bool ClientIngame(int ClientID) = 0;
-	virtual int GetClientInfo(int ClientID, CClientInfo *pInfo) = 0;
+	virtual bool GetClientInfo(int ClientID, CClientInfo *pInfo) const = 0;
+	virtual void SetClientDDNetVersion(int ClientID, int DDNetVersion) = 0;
 	virtual void GetClientAddr(int ClientID, char *pAddrStr, int Size) = 0;
 
 	/**
@@ -64,6 +67,7 @@ public:
 	 * For server demos this is always the latest client version.
 	 * On errors, VERSION_NONE is returned.
 	 */
+	virtual int GetClientVersion(int ClientID) const = 0;
 	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID) = 0;
 
 	template<class T, typename std::enable_if<!protocol7::is_sixup<T>::value, int>::type = 0>
@@ -153,7 +157,7 @@ public:
 	int SendPackMsgOne(const T *pMsg, int Flags, int ClientID)
 	{
 		dbg_assert(ClientID != -1, "SendPackMsgOne called with -1");
-		CMsgPacker Packer(pMsg->MsgID(), false, protocol7::is_sixup<T>::value);
+		CMsgPacker Packer(T::ms_MsgID, false, protocol7::is_sixup<T>::value);
 
 		if(pMsg->Pack(&Packer))
 			return -1;
@@ -164,9 +168,7 @@ public:
 	{
 		if(IsSixup(Client))
 			return true;
-		CClientInfo info;
-		GetClientInfo(Client, &info);
-		if (info.m_CustClt)
+		if(GetClientVersion(Client) >= VERSION_DDNET_OLD)
 			return true;
 		int *pMap = GetIdMap(Client);
 		bool Found = false;
@@ -186,9 +188,7 @@ public:
 	{
 		if(IsSixup(Client))
 			return true;
-		CClientInfo info;
-		GetClientInfo(Client, &info);
-		if (info.m_CustClt)
+		if(GetClientVersion(Client) >= VERSION_DDNET_OLD)
 			return true;
 		Target = clamp(Target, 0, VANILLA_MAX_CLIENTS - 1);
 		int *pMap = GetIdMap(Client);
@@ -226,7 +226,6 @@ public:
 	virtual const char* GetClientLanguage(int ClientID) = 0;
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage) = 0;
 	virtual int* GetIdMap(int ClientID) = 0;
-	virtual void SetCustClt(int ClientID) = 0;
 
 	virtual bool IsSixup(int ClientID) const = 0;
 	
@@ -252,6 +251,7 @@ public:
 	virtual void OnPostSnap() = 0;
 
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) = 0;
+	virtual bool PlayerExists(int ClientID) const = 0;
 
 	virtual void OnClientConnected(int ClientID) = 0;
 	virtual void OnClientEnter(int ClientID) = 0;
