@@ -358,7 +358,7 @@ void CGameControllerNext::CreateInfects()
 	{
 		if(!GameServer()->m_apPlayers[i])
 			continue;
-		if(GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+		if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
 			continue;
 		if(!GameServer()->m_apPlayers[i]->GetClass())
 			continue;
@@ -381,7 +381,7 @@ void CGameControllerNext::CreateInfects()
 		{
 			if(!GameServer()->m_apPlayers[j])
 				continue;
-			if(GameServer()->m_apPlayers[j]->GetTeam() != TEAM_SPECTATORS)
+			if(GameServer()->m_apPlayers[j]->GetTeam() == TEAM_SPECTATORS)
 				continue;
 			if(GameServer()->m_apPlayers[i]->GetClass() && GameServer()->m_apPlayers[i]->GetClass()->m_Infect)
 				continue;
