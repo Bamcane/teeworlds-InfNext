@@ -358,6 +358,8 @@ void CGameControllerNext::CreateInfects()
 	{
 		if(!GameServer()->m_apPlayers[i])
 			continue;
+		if(GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+			continue;
 		if(!GameServer()->m_apPlayers[i]->GetClass())
 			continue;
 		if(GameServer()->m_apPlayers[i]->GetClass()->m_Infect)
@@ -379,7 +381,11 @@ void CGameControllerNext::CreateInfects()
 		{
 			if(!GameServer()->m_apPlayers[j])
 				continue;
-
+			if(GameServer()->m_apPlayers[j]->GetTeam() != TEAM_SPECTATORS)
+				continue;
+			if(GameServer()->m_apPlayers[i]->GetClass() && GameServer()->m_apPlayers[i]->GetClass()->m_Infect)
+				continue;
+			
 			bool Next = false;
 			for(unsigned int k = 0;k < (unsigned int) tmpList.size();k ++)
 			{

@@ -29,6 +29,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_ScoreStartTick = Server()->Tick();
 	m_LastScore = 0;
 	m_pCharacter = 0;
+	m_pClass = 0;
 	m_ClientID = ClientID;
 	m_Team = Team;
 	m_SpectatorID = SPEC_FREEVIEW;

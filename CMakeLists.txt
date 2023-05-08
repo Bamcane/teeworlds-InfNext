@@ -542,6 +542,15 @@ endif()
 # Libraries
 set(LIBS_SERVER ${LIBS} ${OPENSSL_LIBRARIES})
 
+add_custom_target(generate)
+
+add_custom_command(
+  TARGET generate
+  COMMAND ${PYTHON_EXECUTABLE} tools/generate.py
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  DEPENDS tools/generate.py
+)
+
 # Target
 set(TARGET_SERVER ${SERVER_EXECUTABLE})
 add_executable(${TARGET_SERVER}
@@ -563,18 +572,6 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
 endif()
-
-########################################################################
-# VARIOUS TARGETS
-########################################################################
-add_custom_target(generate)
-
-add_custom_command(
-  TARGET generate
-  COMMAND ${PYTHON_EXECUTABLE} tools/generate.py
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  DEPENDS tools/generate.py
-)
 
 ########################################################################
 # INSTALLATION
