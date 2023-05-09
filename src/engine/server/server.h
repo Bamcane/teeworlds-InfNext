@@ -145,6 +145,8 @@ public:
 		int m_AuthTries;
 		int m_NextMapChunk;
 
+		bool m_Spec;
+
 		const IConsole::CCommandInfo *m_pRconCmdToSend;
 
 		void Reset();
@@ -332,6 +334,10 @@ class CCache
 public:
 	const char* GetClientLanguage(int ClientID) override;
 	void SetClientLanguage(int ClientID, const char* pLanguage) override;
+
+	bool GetClientSpec(int ClientID) override;
+	void SetClientSpec(int ClientID, bool Spec) override;
+	
 	int* GetIdMap(int ClientID) override;
 	int GetTimeShiftUnit() const override { return m_TimeShiftUnit; } //In ms
 

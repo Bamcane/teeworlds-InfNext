@@ -98,7 +98,7 @@ private:
 	{
 	public:
 		std::string m_Text;
-		int64_t m_StartTick;
+		int64_t m_LastBroadcast;
 		int m_Type;
 		int m_Time;
 	};
@@ -106,7 +106,6 @@ private:
 	struct CPlayerBroadcast
 	{
 		array<CBroadcast> m_aBroadcast;
-		int64_t m_LastBroadcast;
 	};
 
 	CPlayerBroadcast m_aBroadcast[MAX_CLIENTS];

@@ -411,7 +411,7 @@ void CGameContext::SendBroadcast(int ClientID, const char *pText, int Time, int 
 			Broadcast.m_Text = pText;
 			Broadcast.m_Time = Time;
 			Broadcast.m_Type = Type;
-			Broadcast.m_StartTick = Server()->Tick();
+			Broadcast.m_LastBroadcast = 0;
 
 			AddBroadcast(i, Broadcast);
 		}
@@ -495,16 +495,12 @@ void CGameContext::AddBroadcast(int ClientID, CBroadcast Broadcast)
 	
 	for(int i = 0; i < m_aBroadcast[ClientID].m_aBroadcast.size();i ++)
 	{
-		if(	m_aBroadcast[ClientID].m_aBroadcast[i].m_Type == Broadcast.m_Type)
+		if(	m_aBroadcast[ClientID].m_aBroadcast[i].m_Type == Broadcast.m_Type )
 		{
-			if(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text == Broadcast.m_Text)
-			{
-				Broadcast.m_StartTick = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick;
-				int LeftTime = m_aBroadcast[ClientID].m_aBroadcast[i].m_StartTick + m_aBroadcast[ClientID].m_aBroadcast[i].m_Time - Server()->Tick();
-				int UsedTime = m_aBroadcast[ClientID].m_aBroadcast[i].m_Time - LeftTime;
-				Broadcast.m_Time += UsedTime;
-			}
-			m_aBroadcast[ClientID].m_aBroadcast.remove_index(i);
+			if( str_comp(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text.c_str(), Broadcast.m_Text.c_str()) == 0)
+				Broadcast.m_LastBroadcast = m_aBroadcast[ClientID].m_aBroadcast[i].m_LastBroadcast;
+			m_aBroadcast[ClientID].m_aBroadcast[i] = Broadcast;
+			return;
 		}
 	}
 			
@@ -533,7 +529,7 @@ void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, i
 			Broadcast.m_Text = Buffer.buffer();
 			Broadcast.m_Time = Time;
 			Broadcast.m_Type = Type;
-			Broadcast.m_StartTick = Server()->Tick();
+			Broadcast.m_LastBroadcast = 0;
 
 			AddBroadcast(i, Broadcast);
 		}
@@ -564,7 +560,7 @@ void CGameContext::SendBroadcast_Localization_P(int ClientID, const char* pText,
 			Broadcast.m_Text = Buffer.buffer();
 			Broadcast.m_Time = Time;
 			Broadcast.m_Type = Type;
-			Broadcast.m_StartTick = Server()->Tick();
+			Broadcast.m_LastBroadcast = 0;
 			AddBroadcast(i, Broadcast);
 		}
 	}
@@ -743,15 +739,14 @@ void CGameContext::OnTick()
 
 			for(int j = 0; j < m_aBroadcast[i].m_aBroadcast.size(); j ++)
 			{
-				if(m_aBroadcast[i].m_aBroadcast[j].m_StartTick + 
-					m_aBroadcast[i].m_aBroadcast[j].m_Time
-						< Server()->Tick())
+				// don't break!!!!Must remove all need remove broadcast!
+				if(m_aBroadcast[i].m_aBroadcast[j].m_Time-- <= 0)
 				{
 					m_aBroadcast[i].m_aBroadcast.remove_index(j);
 					Broadcast = true;
 				}
 
-				if((Server()->Tick()-m_aBroadcast[i].m_aBroadcast[j].m_StartTick)%50 == 0)
+				if(m_aBroadcast[i].m_aBroadcast[j].m_LastBroadcast == 0 || (Server()->Tick()-m_aBroadcast[i].m_aBroadcast[j].m_LastBroadcast)%50 == 0)
 				{
 					Broadcast = true;
 				}
@@ -1011,7 +1006,7 @@ void CGameContext::OnClientConnected(int ClientID)
 	// Check which team the player should be on
 	const int StartTeam = g_Config.m_SvTournamentMode ? TEAM_SPECTATORS : m_pController->GetAutoTeam(ClientID);
 
-	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, StartTeam);
+	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, Server()->GetClientSpec(ClientID) ? TEAM_SPECTATORS : StartTeam);
 
 	if (m_pController->IsInfectionStarted())
 		m_apPlayers[ClientID]->Infect();
@@ -2714,6 +2709,7 @@ void CGameContext::UpdateBroadcast(int ClientID)
 	std::string Buffer;
 	for(int i = 0;i < m_aBroadcast[ClientID].m_aBroadcast.size(); i ++)
 	{
+		m_aBroadcast[ClientID].m_aBroadcast[i].m_LastBroadcast = Server()->Tick();
 		Buffer.append(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text);
 		if(i < m_aBroadcast[ClientID].m_aBroadcast.size()-1)
 			Buffer.append("\n");

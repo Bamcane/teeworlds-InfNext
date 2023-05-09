@@ -225,6 +225,10 @@ public:
 
 	virtual const char* GetClientLanguage(int ClientID) = 0;
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage) = 0;
+
+	virtual bool GetClientSpec(int ClientID) = 0;
+	virtual void SetClientSpec(int ClientID, bool Spec) = 0;
+
 	virtual int* GetIdMap(int ClientID) = 0;
 
 	virtual bool IsSixup(int ClientID) const = 0;

@@ -112,8 +112,6 @@ private:
 	int m_ClientID;
 	int m_Team;
 
-	char m_aLanguage[16];
-
 private:
 	CTuningParams m_PrevTuningParams;
 	CTuningParams m_NextTuningParams;

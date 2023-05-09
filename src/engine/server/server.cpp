@@ -286,7 +286,8 @@ void CServer::CClient::Reset()
 	m_LastInputTick = -1;
 	m_SnapRate = CClient::SNAPRATE_INIT;
 	m_Score = 0;
-	str_copy(m_aLanguage, g_Config.m_SvDefaultLanguage, sizeof(m_aLanguage));
+	// It's should be delete
+	//str_copy(m_aLanguage, g_Config.m_SvDefaultLanguage, sizeof(m_aLanguage));
 }
 
 const char* CServer::GetClientLanguage(int ClientID)
@@ -297,6 +298,16 @@ const char* CServer::GetClientLanguage(int ClientID)
 void CServer::SetClientLanguage(int ClientID, const char* pLanguage)
 {
 	str_copy(m_aClients[ClientID].m_aLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aLanguage));
+}
+
+bool CServer::GetClientSpec(int ClientID)
+{
+	return m_aClients[ClientID].m_Spec;
+}
+
+void CServer::SetClientSpec(int ClientID, bool Spec)
+{
+	m_aClients[ClientID].m_Spec = Spec;
 }
 
 CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
@@ -853,6 +864,9 @@ int CServer::NewClientNoAuthCallback(int ClientID, void *pUser)
 	pThis->m_aClients[ClientID].m_DDNetVersion = VERSION_NONE;
 	pThis->m_aClients[ClientID].m_GotDDNetVersionPacket = false;
 	pThis->m_aClients[ClientID].m_DDNetVersionSettled = false;
+
+	str_copy(pThis->m_aClients[ClientID].m_aLanguage, g_Config.m_SvDefaultLanguage);
+	pThis->m_aClients[ClientID].m_Spec = false;
 	pThis->m_aClients[ClientID].Reset();
 
 	pThis->SendMap(ClientID);
@@ -875,6 +889,10 @@ int CServer::NewClientCallback(int ClientID, void *pUser, bool Sixup)
 	pThis->m_aClients[ClientID].m_AuthTries = 0;
 	pThis->m_aClients[ClientID].m_pRconCmdToSend = 0;
 	memset(&pThis->m_aClients[ClientID].m_Addr, 0, sizeof(NETADDR));
+	
+	str_copy(pThis->m_aClients[ClientID].m_aLanguage, g_Config.m_SvDefaultLanguage);
+	pThis->m_aClients[ClientID].m_Spec = false;
+
 	pThis->m_aClients[ClientID].Reset();
 
 	pThis->m_aClients[ClientID].m_Sixup = Sixup;

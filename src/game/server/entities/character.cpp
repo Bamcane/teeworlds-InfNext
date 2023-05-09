@@ -732,7 +732,7 @@ void CCharacter::Die(int Killer, int Weapon)
 		m_pPlayer->GetClass()->OnPlayerDeath(Killer, m_Pos);
 
 	// infection
-	if(m_pPlayer->IsHuman())
+	if(m_pPlayer->IsHuman() && GameServer()->m_pController->IsInfectionStarted())
 		m_pPlayer->Infect();
 
 	// this is for auto respawn after 3 secs
