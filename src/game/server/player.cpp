@@ -380,6 +380,11 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 			NULL);	
 	}
 
+	if(Team == TEAM_SPECTATORS)
+		Server()->SetClientSpec(m_ClientID, true);
+	else 
+		Server()->SetClientSpec(m_ClientID, false);
+
 	if(Team != m_Team)
 		KillCharacter();
 

@@ -244,7 +244,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 
 	if(SnappingClient != -1)
 	{
-		if(GameServer()->m_apPlayers[SnappingClient])
+		if(GameServer()->m_apPlayers[SnappingClient] && GameServer()->m_apPlayers[SnappingClient]->GetTeam() != TEAM_SPECTATORS)
 		{
 			int Page = -1;
 			
