@@ -1,27 +1,27 @@
 {"translation":[
 	{
 		"key": "'{str:OldName}' changed name to '{str:NewName}'",
-		"value": "'{str:OldName}'\u540d\u66f0'{str:NewName}'\u4e5f\u3002"
+		"value": "'{str:OldName}'\u540d\u66f0'{str:NewName}'\u4e5f"
 	},
 	{
 		"key": "'{str:Option}' isn't an option on this server",
-		"value": "'{str:Option}'\u975e\u670d\u4e2d\u6b64\u689d\u4e5f\u3002"
+		"value": "'{str:Option}'\u975e\u670d\u4e2d\u6b64\u689d\u4e5f"
 	},
 	{
 		"key": "'{str:PlayerName}' has been infected",
-		"value": "'{str:PlayerName}'\u67d3\u75c5\u3002"
+		"value": "'{str:PlayerName}'\u67d3\u75c5"
 	},
 	{
 		"key": "'{str:Player}' called for vote to kick '{str:Player2}' ({str:Reason})",
-		"value": "'{str:Player2}'\u53d7'{str:Player}'\u4e0a\u594f\u9a45\u4e4b\uff0c\u56e0({str:Reason})\u4e5f\u3002"
+		"value": "'{str:Player2}'\u53d7'{str:Player}'\u4e0a\u594f\u9a45\u4e4b\uff0c\u56e0({str:Reason})\u4e5f"
 	},
 	{
 		"key": "'{str:Player}' called for vote to kick you",
-		"value": "'{str:Player}'\u671b\u9a71\u541b\u3002"
+		"value": "'{str:Player}'\u671b\u9a71\u541b"
 	},
 	{
 		"key": "'{str:Player}' called for vote to move '{str:Player2}' to spectators ({str:Reason})",
-		"value": "'{str:Player2}'\u53d7'{str:Player}'\u4e0a\u594f\u9a45\u4e4b\uff0c\u56e0({str:Reason})\u4e5f\u3002"
+		"value": "'{str:Player2}'\u53d7'{str:Player}'\u4e0a\u594f\u9a45\u4e4b\uff0c\u56e0({str:Reason})\u4e5f"
 	},
 	{
 		"key": "'{str:Player}' called vote to change server option '{str:Option}' ({str:Reason})",
@@ -60,16 +60,16 @@
 		"value": "\u8239\u5bb6"
 	},
 	{
-		"key": "HUM| Humans win!",
-		"value": "HUM| \u4eba\u985e\u8d0f\u54c9\uff01"
-	},
-	{
 		"key": "Help us to translation mod on Crowdin!",
 		"value": "\u52a9\u543e\u7b49\u7ffb\u8b6f\u65bc Crowdin \u54c9\uff01"
 	},
 	{
 		"key": "Hunter",
 		"value": "\u7375\u8005"
+	},
+	{
+		"key": "INF| Humans win!",
+		"value": "INF| \u4eba\u8d0f\u54c9\uff01"
 	},
 	{
 		"key": "INF| Infects win!",
@@ -172,8 +172,8 @@
 		"value": "\u5f85\u6230\u59cb\u54c9\uff01"
 	},
 	{
-		"key": "You are '{lstr:Class}' ",
-		"value": "\u541b\u4e43 '{lstr:Class}' \u4e5f\u3002 "
+		"key": "You are '{lstr:Class}'",
+		"value": "\u541b\u4e43 '{lstr:Class}' \u4e5f"
 	},
 	{
 		"key": "You are dehydrated: {sec:Time}",
@@ -234,5 +234,5 @@
 	{
 		"key": "spectators",
 		"value": "\u65c1\u89c2\u8005"
-	}
+	},
 ]}

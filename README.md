@@ -21,3 +21,10 @@ Based on [teeworlds-lastday](https://github.com/RemakePower/teeworlds-lastday)
 
 Before building docker image:
 Please write `autoexec.cfg`(Important)
+
+If you want to generate localization file.
+
+Please use `-DLOCALIZE=ON` and you must install gettext.
+
+###### On ubuntu:
+`sudo apt install gettext`

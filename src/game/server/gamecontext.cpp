@@ -504,7 +504,7 @@ void CGameContext::AddBroadcast(int ClientID, CBroadcast Broadcast)
 		}
 	}
 			
-	m_aBroadcast[ClientID].m_aBroadcast.add(Broadcast);
+	m_aBroadcast[ClientID].m_aBroadcast.push_back(Broadcast);
 }
 
 void CGameContext::SendBroadcast_Localization(int ClientID, const char *pText, int Time, int Type, ...)
@@ -742,8 +742,10 @@ void CGameContext::OnTick()
 				// don't break!!!!Must remove all need remove broadcast!
 				if(m_aBroadcast[i].m_aBroadcast[j].m_Time-- <= 0)
 				{
-					m_aBroadcast[i].m_aBroadcast.remove_index(j);
+					m_aBroadcast[i].m_aBroadcast.erase(m_aBroadcast[i].m_aBroadcast.begin() + j);
 					Broadcast = true;
+					// continue;
+					continue;
 				}
 
 				if(m_aBroadcast[i].m_aBroadcast[j].m_LastBroadcast == 0 || (Server()->Tick()-m_aBroadcast[i].m_aBroadcast[j].m_LastBroadcast)%50 == 0)

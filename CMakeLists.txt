@@ -73,6 +73,7 @@ if(TARGET_OS STREQUAL "windows")
 endif()
 
 option(DEV "Don't generate stuff necessary for packaging" OFF)
+option(LOCALIZE "Generate localize" OFF)
 
 # Set the default build type to Release
 if(NOT(CMAKE_BUILD_TYPE))
@@ -542,15 +543,54 @@ endif()
 # Libraries
 set(LIBS_SERVER ${LIBS} ${OPENSSL_LIBRARIES})
 
-add_custom_target(generate)
+# thanks to InfectionDust
+if(LOCALIZE)
+  add_custom_target(generate ALL)
 
-add_custom_command(
-  TARGET generate
-  COMMAND ${PYTHON_EXECUTABLE} tools/generate.py
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  DEPENDS tools/generate.py
-)
+  set(PO_TEMPlATE "other/translations/infnext.pot")
 
+  add_custom_command(
+    TARGET generate
+    COMMAND xgettext -o ${PO_TEMPlATE} -k_ -k_P:1,2 -k_C:1c,2 -k_CP:1c,2,3 -s --from-code=UTF-8 ${ENGINE_SERVER} ${TEEUNIVERSES} ${GAME_SERVER} ${INFNEXT}
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+  )
+  set(PO_LANGS
+    zh-CN
+    zh-CL
+  )
+
+  add_custom_target(update-po-files ALL)
+
+  foreach(PO_LANG ${PO_LANGS})
+    set(PO_LANG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/other/translations/${PO_LANG}/infnext.po")
+
+    if(EXISTS ${PO_LANG_FILE})
+      add_custom_command(
+        TARGET update-po-files
+        # BYPRODUCTS ${PO_LANG_FILE}
+        COMMAND msgmerge --sort-output --update --backup=off --width=200 ${PO_LANG_FILE} ${PO_TEMPlATE}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        DEPENDS ${PO_TEMPlATE}
+      )
+    else()
+      add_custom_command(
+        TARGET update-po-files
+        # BYPRODUCTS ${PO_LANG_FILE}
+        COMMAND msginit --width=200 --input=${PO_TEMPlATE} --no-translator --output-file=${PO_LANG_FILE}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        DEPENDS ${PO_TEMPlATE}
+      )
+    endif()
+  endforeach()
+
+  add_custom_target(generate-json ALL)
+
+  add_custom_command(
+    TARGET generate-json
+    COMMAND ${PYTHON_EXECUTABLE} scripts/translation-python3.py
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+  )
+endif()
 # Target
 set(TARGET_SERVER ${SERVER_EXECUTABLE})
 add_executable(${TARGET_SERVER}

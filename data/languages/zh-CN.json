@@ -60,16 +60,16 @@
 		"value": "\u8239\u957f"
 	},
 	{
-		"key": "HUM| Humans win!",
-		"value": "HUM| \u4eba\u7c7b\u80dc\u5229\uff01"
-	},
-	{
 		"key": "Help us to translation mod on Crowdin!",
 		"value": "\u5e2e\u52a9\u6211\u4eec\u5728Crowdin\u4e0a\u8fdb\u884c\u7ffb\u8bd1\uff01"
 	},
 	{
 		"key": "Hunter",
 		"value": "\u730e\u4eba"
+	},
+	{
+		"key": "INF| Humans win!",
+		"value": "INF| \u4eba\u7c7b\u80dc\u5229\uff01"
 	},
 	{
 		"key": "INF| Infects win!",
@@ -172,7 +172,7 @@
 		"value": "\u7b49\u5f85\u6e38\u620f\u5f00\u59cb!"
 	},
 	{
-		"key": "You are '{lstr:Class}' ",
+		"key": "You are '{lstr:Class}'",
 		"value": "\u4f60\u662f '{lstr:Class}'"
 	},
 	{
@@ -193,7 +193,7 @@
 	},
 	{
 		"key": "You infected '{str:Player}'",
-		"value": "\u60a8\u611f\u67d3\u4e86'{str:Player}'"
+		"value": "\u4f60\u611f\u67d3\u4e86'{str:Player}'"
 	},
 	{
 		"key": "You must wait {sec:Time} before making another vote",
@@ -234,5 +234,5 @@
 	{
 		"key": "spectators",
 		"value": "\u65c1\u89c2\u8005"
-	}
+	},
 ]}

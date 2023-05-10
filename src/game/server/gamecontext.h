@@ -105,7 +105,7 @@ private:
 
 	struct CPlayerBroadcast
 	{
-		array<CBroadcast> m_aBroadcast;
+		std::vector<CBroadcast> m_aBroadcast;
 	};
 
 	CPlayerBroadcast m_aBroadcast[MAX_CLIENTS];
