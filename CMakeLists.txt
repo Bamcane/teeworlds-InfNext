@@ -75,6 +75,9 @@ endif()
 option(DEV "Don't generate stuff necessary for packaging" OFF)
 option(LOCALIZE "Generate localize" OFF)
 
+# for clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS True)
+
 # Set the default build type to Release
 if(NOT(CMAKE_BUILD_TYPE))
   if(DEV)
