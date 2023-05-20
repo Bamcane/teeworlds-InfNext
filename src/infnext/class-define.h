@@ -9,5 +9,6 @@
 #include <infnext/classes/hunter.h>
 #include <infnext/classes/boomer.h>
 #include <infnext/classes/smoker.h>
+#include <infnext/classes/queen.h>
 
 #endif

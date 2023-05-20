@@ -109,6 +109,7 @@ private:
 
 	//
 	bool m_Spawning;
+	bool m_ChangeClass;// change class when respawn
 	int m_ClientID;
 	int m_Team;
 
@@ -125,9 +126,10 @@ public:
 	CClass *GetClass() const { return m_pClass; }
 	int m_MapMenuItem;
 
-
 	bool IsHuman() const;
 	bool IsInfect() const;
+
+	void ChangeClass() { m_ChangeClass = true; }
 
 	void SetClass(CClass *pClass);
 	void CureToDefault();

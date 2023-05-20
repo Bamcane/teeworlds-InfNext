@@ -420,6 +420,9 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 
+	if(m_ChangeClass)
+		Infect();
+
 	if(!GameServer()->m_pController->PreSpawn(this, &SpawnPos))
 		return;
 		
@@ -455,6 +458,8 @@ bool CPlayer::IsInfect() const
 
 void CPlayer::SetClass(CClass *pClass)
 {
+	m_ChangeClass = 0;
+
 	if(m_pClass)
 		delete m_pClass;
 	m_pClass = pClass;
@@ -496,6 +501,8 @@ void CPlayer::SetClass(CClass *pClass)
 
 void CPlayer::CureToDefault()
 {
+	m_ChangeClass = 0;
+
 	{
 		str_copy(m_TeeInfos.m_aSkinName, "default");
 		m_TeeInfos.m_UseCustomColor = 0;
@@ -531,7 +538,7 @@ void CPlayer::CureToDefault()
 
 void CPlayer::Infect()
 {
-	if(IsInfect())
+	if(IsInfect() && !m_ChangeClass)
 		return;
 	
 	if(m_pCharacter)

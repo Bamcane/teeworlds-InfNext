@@ -8,7 +8,7 @@ class CClassBoomer : public CClass
 public:
     CClassBoomer(CGameContext *pGameServer, CPlayer *pOwner);
 
-    void OnPlayerDeath(int KillerID, vec2 Pos) override;
+    int OnPlayerDeath(int KillerID, vec2 Pos) override;
     
     CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };

@@ -73,6 +73,11 @@ void CClassSmoker::OnTick()
     }
 }
 
+int CClassSmoker::OnPlayerDeath(int KillerID, vec2 Pos)
+{
+    return 1;
+}
+
 CClass *CClassSmoker::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
 { 
     return new CClassSmoker(pGameServer, pOwner);

@@ -151,15 +151,17 @@ private:
 
 public:
 	CCollision *Collision();
-	CCharacterCore *GetCore() {return &m_Core;}
-	WeaponStat *GetWeaponStat() {return m_aWeapons;}
-	CNetObj_PlayerInput *GetInput() {return &m_Input;}
-	CNetObj_PlayerInput *GetPrevInput() {return &m_PrevInput;}
-	CNetObj_PlayerInput *GetLatestInput() {return &m_LatestInput;}
-	int GetActiveWeapon() {return m_ActiveWeapon; }
-	int GetHealth() const {return m_Health; }
-	int GetMaxHealth() const {return m_MaxHealth; }
+	CCharacterCore *GetCore() { return &m_Core;}
+	WeaponStat *GetWeaponStat() { return m_aWeapons;}
+	CNetObj_PlayerInput *GetInput() { return &m_Input;}
+	CNetObj_PlayerInput *GetPrevInput() { return &m_PrevInput;}
+	CNetObj_PlayerInput *GetLatestInput() { return &m_LatestInput;}
+	int GetActiveWeapon() { return m_ActiveWeapon; }
+	int GetHealth() const { return m_Health; }
+	int GetMaxHealth() const { return m_MaxHealth; }
 	int GetCID() const;
+
+	vec2 GetPos() const { return m_Pos; }
 
 	CClass *GetClass() const;
 	bool IsHuman() const;
@@ -172,7 +174,7 @@ public:
 	void DestroyChildEntites();
 
 /** Weapon Public for weapon system*/
-	NinjaInfo *GetNinjaInfo() {return &m_Ninja;}
+	NinjaInfo *GetNinjaInfo() { return &m_Ninja; }
 	void SetReloadTimer(int ReloadTimer) { m_ReloadTimer = ReloadTimer;}
 
 	void Freeze(float Seconds);

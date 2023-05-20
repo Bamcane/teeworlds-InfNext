@@ -45,6 +45,11 @@ CClassSniper::CClassSniper(CGameContext *pGameServer, CPlayer *pOwner) : CClass(
     m_Skin.m_aSkinPartColors[5] = 0;
 }
 
+int CClassSniper::OnPlayerDeath(int KillerID, vec2 Pos)
+{
+    return 1;
+}
+
 CClass *CClassSniper::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
 { 
     return new CClassSniper(pGameServer, pOwner);

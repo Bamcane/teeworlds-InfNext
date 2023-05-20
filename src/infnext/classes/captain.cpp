@@ -56,6 +56,11 @@ void CClassCaptain::OnCharacterSnap(protocol7::CNetObj_Character *pCharacter)
         pCharacter->m_AmmoCount *= 2;
 }
 
+int CClassCaptain::OnPlayerDeath(int KillerID, vec2 Pos)
+{
+    return 3;
+}
+
 CClass *CClassCaptain::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
 { 
     return new CClassCaptain(pGameServer, pOwner);

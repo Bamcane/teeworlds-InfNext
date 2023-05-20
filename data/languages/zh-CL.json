@@ -200,6 +200,10 @@
 		"value": "\u541b\u9700\u5f85 {sec:Time} \u5f8c\u65b9\u53ef\u4e0a\u594f\u3002"
 	},
 	{
+		"key": "You were infected by '{str:Player}'",
+		"value": "\u541b\u53d7'{str:Player}'\u67d3\u75c5\u3002"
+	},
+	{
 		"key": "You're infected by '{str:Player}'",
 		"value": "\u541b\u53d7'{str:Player}'\u67d3\u75c5\u3002"
 	},

@@ -112,6 +112,10 @@
 		"value": "\u53ea\u5141\u8bb8 {int:Num} \u540d\u73a9\u5bb6\u6e38\u73a9"
 	},
 	{
+		"key": "Queen",
+		"value": "\u5973\u738b"
+	},
+	{
 		"key": "Server does not allow voting to kick players",
 		"value": "\u670d\u52a1\u5668\u4e0d\u5141\u8bb8\u6295\u7968\u8e22\u73a9\u5bb6"
 	},
@@ -144,6 +148,14 @@
 		"value": "\u6e38\u620f\u5df2\u7ecf\u88ab\u53d6\u6d88"
 	},
 	{
+		"key": "The queen '{str:Queen}' was killed by human '{str:Player}'!",
+		"value": "\u5973\u738b'{str:Queen}'\u5728\u4eba\u7c7b'{str:Player}'\u7684\u523a\u6740\u4e0b\u9a7e\u5d29\u4e86!"
+	},
+	{
+		"key": "The queen '{str:Queen}' was killed by infected '{str:Player}'!?",
+		"value": "\u5973\u738b'{str:Queen}'\u5728\u611f\u67d3\u8005'{str:Player}'\u7684\u53cd\u5411\u4fdd\u62a4\u4e0b\u9a7e\u5d29\u4e86!"
+	},
+	{
 		"key": "Time to wait before changing team: {sec:Time}",
 		"value": "\u5fc5\u987b\u7b49\u5f85{sec:Time}\u624d\u80fd\u66f4\u6539\u961f\u4f0d"
 	},
@@ -172,6 +184,14 @@
 		"value": "\u7b49\u5f85\u6e38\u620f\u5f00\u59cb!"
 	},
 	{
+		"key": "What? You killed your teammates?!",
+		"value": "\u4ec0\u4e48? \u4f60\u6740\u6b7b\u4e86\u4f60\u7684\u961f\u53cb?!"
+	},
+	{
+		"key": "What? You were killed by your teammates?!",
+		"value": "\u4ec0\u4e48? \u4f60\u88ab\u4f60\u7684\u961f\u53cb\u6740\u4e86?"
+	},
+	{
 		"key": "You are '{lstr:Class}'",
 		"value": "\u4f60\u662f '{lstr:Class}'"
 	},
@@ -196,8 +216,20 @@
 		"value": "\u4f60\u611f\u67d3\u4e86'{str:Player}'"
 	},
 	{
+		"key": "You killed the queen, +5 score!",
+		"value": "\u4f60\u6740\u6b7b\u4e86\u5973\u738b, +5\u5206!"
+	},
+	{
+		"key": "You killed the queen, -5 score!",
+		"value": "\u4f60\u6740\u6b7b\u4e86\u5973\u738b, -5\u5206!"
+	},
+	{
 		"key": "You must wait {sec:Time} before making another vote",
 		"value": "\u4f60\u5fc5\u987b\u7b49\u5f85 {sec:Time} \u624d\u80fd\u518d\u8fdb\u884c\u4e00\u6b21\u6295\u7968"
+	},
+	{
+		"key": "You were infected by '{str:Player}'",
+		"value": "\u4f60\u88ab'{str:Player}'\u611f\u67d3\u4e86"
 	},
 	{
 		"key": "You're infected by '{str:Player}'",

@@ -103,19 +103,31 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 
+	int Score = pVictim->GetClass()->OnPlayerDeath(pKiller->GetCID(), pVictim->GetPos());
+
 	if(pVictim->GetPlayer() == pKiller)
 		return 0;
-	
-	if(pKiller->IsInfect())
+
+	if(pKiller->IsInfect() == pVictim->IsInfect())
 	{
-		GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '{str:Player}'"), "Player", Server()->ClientName(pVictim->GetCID()), NULL);
-		GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You're infected by '{str:Player}'"), "Player", Server()->ClientName(pKiller->GetCID()), NULL);
-		pKiller->m_Score += 3;
-	}else
-	{
-		pKiller->m_Score += 1;
+		GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("What? You killed your teammates?!"), NULL);
+		GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("What? You were killed by your teammates?!"), NULL);
+
+		pKiller->m_Score -= Score;
+
+		GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_DROP, CmaskOne(pKiller->GetCID()));
 	}
-	GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(pKiller->GetCID()));
+	else 
+	{
+		if(pKiller->IsInfect())
+		{
+			GameServer()->SendChatTarget_Localization(pKiller->GetCID(), _("You infected '{str:Player}'"), "Player", Server()->ClientName(pVictim->GetCID()), NULL);
+			GameServer()->SendChatTarget_Localization(pVictim->GetCID(), _("You were infected by '{str:Player}'"), "Player", Server()->ClientName(pKiller->GetCID()), NULL);
+		}
+		pKiller->m_Score += Score;
+		
+		GameServer()->CreateSound(pKiller->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(pKiller->GetCID()));
+	}
 
 	return 1;
 }
@@ -151,7 +163,7 @@ CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 			continue;
 		for(int j = 0; j < ClassesNum; j ++)
 		{
-			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_InfectClasses[j].m_pClass)
+			if(str_comp(GameServer()->m_apPlayers[i]->GetClass()->m_ClassName, Classes()->m_InfectClasses[j].m_pClass->m_ClassName) == 0)
 			{
 				InfClassesNum[j]++;
 				break;
@@ -227,7 +239,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 			continue;
 		for(unsigned int j = 0; j < (unsigned int) Classes()->m_HumanClasses.size(); j ++)
 		{
-			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_HumanClasses[j].m_pClass)
+			if(str_comp(GameServer()->m_apPlayers[i]->GetClass()->m_ClassName, Classes()->m_HumanClasses[j].m_pClass->m_ClassName) == 0)
 			{
 				ClassesNum[j]++;
 				break;
@@ -312,7 +324,7 @@ void CGameControllerNext::CheckNoClass()
 			continue;
 		for(unsigned int j = 0; j < Size; j ++)
 		{
-			if(GameServer()->m_apPlayers[i]->GetClass() == Classes()->m_HumanClasses[j].m_pClass)
+			if(str_comp(GameServer()->m_apPlayers[i]->GetClass()->m_ClassName, Classes()->m_HumanClasses[j].m_pClass->m_ClassName) == 0)
 			{
 				ClassesNum[j]++;
 				break;
@@ -491,6 +503,26 @@ bool CGameControllerNext::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 		pPlayer->Infect();
 			
 	int Type = (pPlayer->IsInfect() ? TEAM_RED : TEAM_BLUE);
+
+	{
+		vec2 Pos;
+
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(!GameServer()->m_apPlayers[i])
+				continue;
+			if(!GameServer()->m_apPlayers[i]->GetClass())
+				continue;
+			if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+				continue;
+			
+			if(GameServer()->m_apPlayers[i]->GetClass()->OnPlayerSpawn(pPlayer->IsInfect(), &Pos))
+			{
+				*pOutPos = Pos;
+				return true;
+			}
+		}
+	}
 
 	// get spawn point
 	int RandomShift = random_int(0, m_aaSpawnPoints[Type].size()-1);

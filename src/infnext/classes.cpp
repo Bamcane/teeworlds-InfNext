@@ -37,9 +37,10 @@ void CClasses::InitClasses()
 	InitHumanClass(new CClassMedic(0, 0), true, 32);
 	InitHumanClass(new CClassCaptain(0, 0), true, 32);
 
-	InitInfectClass(new CClassHunter(0, 0), 33, 32);
-	InitInfectClass(new CClassBoomer(0, 0), 33, 32);
-	InitInfectClass(new CClassSmoker(0, 0), 33, 32);
+	InitInfectClass(new CClassHunter(0, 0), 30, 32);
+	InitInfectClass(new CClassBoomer(0, 0), 30, 32);
+	InitInfectClass(new CClassSmoker(0, 0), 30, 32);
+	InitInfectClass(new CClassQueen(0, 0), 10, 1);
 }
 
 // Humans

@@ -11,6 +11,8 @@ public:
     void OnCharacterSnap(class CNetObj_Character *pCharacter) override;
     void OnCharacterSnap(class protocol7::CNetObj_Character *pCharacter) override;
 
+    int OnPlayerDeath(int KillerID, vec2 Pos) override;
+
     CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };
 

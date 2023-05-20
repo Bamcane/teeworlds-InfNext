@@ -463,7 +463,7 @@ void CCharacter::HandleEvents()
 		// handle dead tiles
 		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_DEATH) || GameLayerClipped(m_Pos))
 		{
-			Die(GetCID(), WEAPON_SELF);
+			Die(GetCID(), WEAPON_GAME);
 		}
 	}
 
@@ -726,10 +726,6 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// a nice sound
 	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
-
-	// class check
-	if(m_pPlayer->GetClass())
-		m_pPlayer->GetClass()->OnPlayerDeath(Killer, m_Pos);
 
 	// infection
 	if(m_pPlayer->IsHuman() && GameServer()->m_pController->IsInfectionStarted())

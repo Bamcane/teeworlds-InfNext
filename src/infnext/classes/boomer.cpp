@@ -43,10 +43,12 @@ CClassBoomer::CClassBoomer(CGameContext *pGameServer, CPlayer *pOwner) : CClass(
     m_Skin.m_aSkinPartColors[5] = -8229413;
 }
 
-void CClassBoomer::OnPlayerDeath(int KillerID, vec2 Pos)
+int CClassBoomer::OnPlayerDeath(int KillerID, vec2 Pos)
 {
     GameServer()->CreateSound(Pos, SOUND_GRENADE_EXPLODE);
-	GameServer()->CreateExplosion(Pos, Character()->GetCID(), WEAPON_HAMMER, false, -1L, DAMAGEMODE_INFECTION);
+	GameServer()->CreateExplosion(Pos, Player()->GetCID(), WEAPON_HAMMER, false, -1L, DAMAGEMODE_INFECTION);
+
+    return 1;
 }
 
 CClass *CClassBoomer::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 

@@ -45,6 +45,11 @@ CClassMedic::CClassMedic(CGameContext *pGameServer, CPlayer *pOwner) : CClass(pG
     m_Skin.m_aSkinPartColors[5] = 0;
 }
 
+int CClassMedic::OnPlayerDeath(int KillerID, vec2 Pos)
+{
+    return 3;
+}
+
 CClass *CClassMedic::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
 { 
     return new CClassMedic(pGameServer, pOwner);

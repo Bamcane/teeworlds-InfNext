@@ -493,7 +493,7 @@ void CGameContext::AddBroadcast(int ClientID, CBroadcast Broadcast)
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
 	}
 	
-	for(int i = 0; i < m_aBroadcast[ClientID].m_aBroadcast.size();i ++)
+	for(int i = 0; i < (int) m_aBroadcast[ClientID].m_aBroadcast.size();i ++)
 	{
 		if(	m_aBroadcast[ClientID].m_aBroadcast[i].m_Type == Broadcast.m_Type )
 		{
@@ -737,7 +737,7 @@ void CGameContext::OnTick()
 
 			bool Broadcast = false;
 
-			for(int j = 0; j < m_aBroadcast[i].m_aBroadcast.size(); j ++)
+			for(int j = 0; j < (int) m_aBroadcast[i].m_aBroadcast.size(); j ++)
 			{
 				// don't break!!!!Must remove all need remove broadcast!
 				if(m_aBroadcast[i].m_aBroadcast[j].m_Time-- <= 0)
@@ -889,8 +889,11 @@ void CGameContext::OnClientPredictedInput(int ClientID, void *pInput)
 void CGameContext::OnClientEnter(int ClientID)
 {
 	//world.insert_entity(&players[client_id]);
+	if (m_pController->IsInfectionStarted())
+		m_apPlayers[ClientID]->Infect();
+	else m_apPlayers[ClientID]->CureToDefault();
+	
 	m_apPlayers[ClientID]->Respawn();
-	m_apPlayers[ClientID]->CureToDefault();
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), m_apPlayers[ClientID]->GetTeam());
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
@@ -1010,8 +1013,6 @@ void CGameContext::OnClientConnected(int ClientID)
 
 	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, Server()->GetClientSpec(ClientID) ? TEAM_SPECTATORS : StartTeam);
 
-	if (m_pController->IsInfectionStarted())
-		m_apPlayers[ClientID]->Infect();
 	(void)m_pController->CheckTeamBalance();
 	//players[client_id].init(client_id);
 	//players[client_id].client_id = client_id;
@@ -2709,11 +2710,11 @@ void CGameContext::AddMapVotes()
 void CGameContext::UpdateBroadcast(int ClientID)
 {
 	std::string Buffer;
-	for(int i = 0;i < m_aBroadcast[ClientID].m_aBroadcast.size(); i ++)
+	for(int i = 0;i < (int) m_aBroadcast[ClientID].m_aBroadcast.size(); i ++)
 	{
 		m_aBroadcast[ClientID].m_aBroadcast[i].m_LastBroadcast = Server()->Tick();
 		Buffer.append(m_aBroadcast[ClientID].m_aBroadcast[i].m_Text);
-		if(i < m_aBroadcast[ClientID].m_aBroadcast.size()-1)
+		if(i < (int) m_aBroadcast[ClientID].m_aBroadcast.size()-1)
 			Buffer.append("\n");
 	}
 

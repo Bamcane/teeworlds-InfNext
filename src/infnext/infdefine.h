@@ -23,5 +23,6 @@ enum BroadcastType
     BROADCAST_DEHYDRATED,
     BROADCAST_CLASS,
     BROADCAST_INFO,
+    BROADCAST_QUEEN,
 };
 #endif

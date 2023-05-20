@@ -43,6 +43,11 @@ CClassHunter::CClassHunter(CGameContext *pGameServer, CPlayer *pOwner) : CClass(
     m_Skin.m_aSkinPartColors[5] = -8229413;
 }
 
+int CClassHunter::OnPlayerDeath(int KillerID, vec2 Pos)
+{
+    return 1;
+}
+
 CClass *CClassHunter::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
 { 
     return new CClassHunter(pGameServer, pOwner);
