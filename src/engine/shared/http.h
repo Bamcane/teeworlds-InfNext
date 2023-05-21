@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <bits/unique_ptr.h>
 #include <engine/shared/jobs.h>
 
 typedef struct _json_value json_value;
@@ -82,7 +81,7 @@ class CHttpRequest : public IJob
 	std::atomic<int> m_State{HTTP_QUEUED};
 	std::atomic<bool> m_Abort{false};
 
-	void Run();
+	void Run() override;
 	// Abort the request with an error if `BeforeInit()` returns false.
 	bool BeforeInit();
 	int RunImpl(void *pUser);

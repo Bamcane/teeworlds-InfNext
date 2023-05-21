@@ -12,7 +12,6 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN
-
 #include <curl/curl.h>
 
 // TODO: Non-global pls?
@@ -125,7 +124,7 @@ bool HttpHasIpresolveBug()
 
 CHttpRequest::CHttpRequest(const char *pUrl)
 {
-	str_copy(m_aUrl, pUrl, sizeof(m_aUrl));
+	str_copy(m_aUrl, pUrl);
 }
 
 CHttpRequest::~CHttpRequest()
@@ -216,21 +215,38 @@ int CHttpRequest::RunImpl(CURL *pUser)
 	}
 
 	curl_easy_setopt(pHandle, CURLOPT_SHARE, gs_pShare);
+	// ‘CURLOPT_PROTOCOLS’ is deprecated: since 7.85.0. Use CURLOPT_PROTOCOLS_STR
+	// Wait until all platforms have 7.85.0
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 	curl_easy_setopt(pHandle, CURLOPT_PROTOCOLS, Protocols);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 	curl_easy_setopt(pHandle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(pHandle, CURLOPT_MAXREDIRS, 4L);
 	curl_easy_setopt(pHandle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(pHandle, CURLOPT_URL, m_aUrl);
 	curl_easy_setopt(pHandle, CURLOPT_NOSIGNAL, 1L);
-	const char *pInfo = MOD_NAME " 0.6.4 (" CONF_PLATFORM_STRING "; " CONF_ARCH_STRING ")";
-	curl_easy_setopt(pHandle, CURLOPT_USERAGENT, pInfo);
+	curl_easy_setopt(pHandle, CURLOPT_USERAGENT, MOD_NAME " " MOD_VERSION " (" CONF_PLATFORM_STRING "; " CONF_ARCH_STRING ")");
 	curl_easy_setopt(pHandle, CURLOPT_ACCEPT_ENCODING, ""); // Use any compression algorithm supported by libcurl.
 
 	curl_easy_setopt(pHandle, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(pHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
 	curl_easy_setopt(pHandle, CURLOPT_NOPROGRESS, 0L);
 	curl_easy_setopt(pHandle, CURLOPT_PROGRESSDATA, this);
+	// ‘CURLOPT_PROGRESSFUNCTION’ is deprecated: since 7.32.0. Use CURLOPT_XFERINFOFUNCTION
+	// See problems with curl_off_t type in header file in https://github.com/ddnet/ddnet/pull/6185/
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 	curl_easy_setopt(pHandle, CURLOPT_PROGRESSFUNCTION, ProgressCallback);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 	curl_easy_setopt(pHandle, CURLOPT_IPRESOLVE, m_IpResolve == IPRESOLVE::V4 ? CURL_IPRESOLVE_V4 : m_IpResolve == IPRESOLVE::V6 ? CURL_IPRESOLVE_V6 : CURL_IPRESOLVE_WHATEVER);
 	if(g_Config.m_Bindaddr[0] != '\0')
 	{
@@ -342,6 +358,9 @@ int CHttpRequest::ProgressCallback(void *pUser, double DlTotal, double DlCurr, d
 
 int CHttpRequest::OnCompletion(int State)
 {
+	if(m_Abort)
+		State = HTTP_ABORTED;
+
 	if(m_WriteToFile)
 	{
 		if(m_File && io_close(m_File) != 0)
@@ -361,9 +380,8 @@ int CHttpRequest::OnCompletion(int State)
 void CHttpRequest::WriteToFile(IStorage *pStorage, const char *pDest, int StorageType)
 {
 	m_WriteToFile = true;
-	str_copy(m_aDest, pDest, sizeof(m_aDest));
+	str_copy(m_aDest, pDest);
 	pStorage->GetCompletePath(StorageType, m_aDest, m_aDestAbsolute, sizeof(m_aDestAbsolute));
-	
 }
 
 void CHttpRequest::Header(const char *pNameColonValue)

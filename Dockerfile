@@ -16,5 +16,4 @@ RUN apk update && apk upgrade
 RUN apk add --no-cache libstdc++ curl icu icu-data-full
 COPY --from=build_env /install .
 
-EXPOSE 8303/udp
 ENTRYPOINT ["./InfNext-Server"]
