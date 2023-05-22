@@ -2,6 +2,7 @@
     "maps": [
         {
             "name": "next_basin",
+            "author": "RemakePower",
             "timelimit": 1
         }
     ]
