@@ -64,14 +64,12 @@ bool IGameController::PreSpawn(CPlayer* pPlayer, vec2 *pOutPos)
 }
 
 
-bool IGameController::OnEntity(const char* pName, vec2 Pivot, vec2 P0, vec2 P1, vec2 P2, vec2 P3, int PosEnv)
+bool IGameController::OnEntity(int Index, vec2 Pos)
 {
-	vec2 Pos = (P0 + P1 + P2 + P3)/4.0f;
-	
-	if(str_comp(pName, "inInfect") == 0)
-		m_aaSpawnPoints[0].push_back(Pos);
-	else if(str_comp(pName, "inHuman") == 0)
-		m_aaSpawnPoints[1].push_back(Pos);
+	if(Index == ENTITY_SPAWN_RED)
+		m_aaSpawnPoints[TEAM_RED].push_back(Pos); // infected
+	else if(Index == ENTITY_SPAWN_BLUE)
+		m_aaSpawnPoints[TEAM_BLUE].push_back(Pos); // humans
 	
 	return false;
 }

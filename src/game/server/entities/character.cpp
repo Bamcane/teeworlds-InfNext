@@ -452,16 +452,75 @@ void CCharacter::HandleEvents()
 {
 	HandleEffects();
 
+	int Index = Collision()->GetMapIndex(m_Pos);
+
+	// handle speedup tiles
+	if(Collision()->IsSpeedup(Index))
+	{
+		vec2 Direction, TempVel = m_Core.m_Vel;
+		int Force, MaxSpeed = 0;
+		float TeeAngle, SpeederAngle, DiffAngle, SpeedLeft, TeeSpeed;
+		Collision()->GetSpeedup(Index, &Direction, &Force, &MaxSpeed);
+		if(Force == 255 && MaxSpeed)
+		{
+			m_Core.m_Vel = Direction * (MaxSpeed / 5);
+		}
+		else
+		{
+			if(MaxSpeed > 0 && MaxSpeed < 5)
+				MaxSpeed = 5;
+			if(MaxSpeed > 0)
+			{
+				if(Direction.x > 0.0000001f)
+					SpeederAngle = -std::atan(Direction.y / Direction.x);
+				else if(Direction.x < 0.0000001f)
+					SpeederAngle = std::atan(Direction.y / Direction.x) + 2.0f * std::asin(1.0f);
+				else if(Direction.y > 0.0000001f)
+					SpeederAngle = std::asin(1.0f);
+				else
+					SpeederAngle = std::asin(-1.0f);
+
+				if(SpeederAngle < 0)
+					SpeederAngle = 4.0f * std::asin(1.0f) + SpeederAngle;
+
+				if(TempVel.x > 0.0000001f)
+					TeeAngle = -std::atan(TempVel.y / TempVel.x);
+				else if(TempVel.x < 0.0000001f)
+					TeeAngle = std::atan(TempVel.y / TempVel.x) + 2.0f * std::asin(1.0f);
+				else if(TempVel.y > 0.0000001f)
+					TeeAngle = std::asin(1.0f);
+				else
+					TeeAngle = std::asin(-1.0f);
+
+				if(TeeAngle < 0)
+					TeeAngle = 4.0f * std::asin(1.0f) + TeeAngle;
+
+				TeeSpeed = std::sqrt(std::pow(TempVel.x, 2) + std::pow(TempVel.y, 2));
+
+				DiffAngle = SpeederAngle - TeeAngle;
+				SpeedLeft = MaxSpeed / 5.0f - std::cos(DiffAngle) * TeeSpeed;
+				if(absolute((int)SpeedLeft) > Force && SpeedLeft > 0.0000001f)
+					TempVel += Direction * Force;
+				else if(absolute((int)SpeedLeft) > Force)
+					TempVel += Direction * -Force;
+				else
+					TempVel += Direction * SpeedLeft;
+			}
+			else
+				TempVel += Direction * Force;
+		}
+	}
+
 	if(m_Alive && !GameServer()->m_pController->IsGameOver())
 	{
 		// handle infect-tiles
-		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_INFECTION) && m_pPlayer->IsHuman())
+		if(IsCollisionTile(TILE_TELEINWEAPON) && m_pPlayer->IsHuman())
 		{
 			m_pPlayer->Infect();
 		}
 
 		// handle dead tiles
-		if(IsCollisionTile(GameServer()->m_ZoneHandle_Next, ZONE_DEATH) || GameLayerClipped(m_Pos))
+		if(IsCollisionTile(TILE_DEATH) || GameLayerClipped(m_Pos))
 		{
 			Die(GetCID(), WEAPON_GAME);
 		}
@@ -1086,13 +1145,13 @@ void CCharacter::DestroyChildEntites()
 		}
 }
 
-bool CCharacter::IsCollisionTile(int Zone, int Flags)
+bool CCharacter::IsCollisionTile(int Flags)
 {
 	return 
-		Collision()->GetZoneValueAt(Zone, m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f) == Flags ||
-		Collision()->GetZoneValueAt(Zone, m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f) == Flags ||
-		Collision()->GetZoneValueAt(Zone, m_Pos.x-m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f) == Flags ||
-		Collision()->GetZoneValueAt(Zone, m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f) == Flags;
+		Collision()->IsCollisionTile(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f, Flags) ||
+		Collision()->IsCollisionTile(m_Pos.x+m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f, Flags) ||
+		Collision()->IsCollisionTile(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y-m_ProximityRadius/3.f, Flags) ||
+		Collision()->IsCollisionTile(m_Pos.x-m_ProximityRadius/3.f, m_Pos.y+m_ProximityRadius/3.f, Flags);
 }
 
 void CCharacter::UpdateTuning()

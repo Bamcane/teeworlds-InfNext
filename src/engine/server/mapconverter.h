@@ -61,6 +61,8 @@ protected:
 	void CopyImages();
 	void CopySounds();
 	void CopyGameLayer();
+	void CopyTeleLayer();
+	void CopySpeedupLayer();
 	void CopyLayers();
 	void CopyAnimations();
 	

@@ -4,13 +4,6 @@
 #define GAME_COLLISION_H
 
 #include <base/vmath.h>
-#include <base/tl/array.h>
-
-struct ZoneData
-{
-	int Index = -1;
-	int ExtraData = -1;
-};
 
 class CCollision
 {
@@ -18,10 +11,6 @@ class CCollision
 	int m_Width;
 	int m_Height;
 	class CLayers *m_pLayers;
-	
-	double m_Time;
-
-	array< array<int> > m_Zones;
 
 	bool IsTileSolid(int x, int y);
 	int GetTile(int x, int y);
@@ -41,16 +30,20 @@ public:
 	void MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *pBounces);
 	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity);
 	bool TestBox(vec2 Pos, vec2 Size);
-	
-	void Dest();
 
-	void SetTime(double Time) { m_Time = Time; }
+	int GetMapIndex(vec2 Pos) const;
+
+	int IsSpeedup(int Index) const;
+	void GetSpeedup(int Index, vec2 *pDir, int *pForce, int *pMaxSpeed) const;
+
+	void Dest();
 	
-	//This function return an Handle to access all zone layers with the name "pName"
-	int GetZoneHandle(const char* pName);
-	int GetZoneValueAt(int ZoneHandle, float x, float y, ZoneData *pData = nullptr);
-	int GetZoneValueAt(int ZoneHandle, vec2 Pos, ZoneData *pData = nullptr) { return GetZoneValueAt(ZoneHandle, Pos.x, Pos.y, pData); }
-	
+	class CTeleTile *TeleLayer() { return m_pTele; }
+	class CSpeedupTile *SpeedupLayer() { return m_pSpeedup; }
+
+private:
+	class CTeleTile *m_pTele;
+	class CSpeedupTile *m_pSpeedup;
 };
 
 #endif

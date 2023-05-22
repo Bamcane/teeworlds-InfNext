@@ -2469,8 +2469,6 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 
 	// select gametype
 	m_pController = new CGameControllerNext(this);
-	//Get zones
-	m_ZoneHandle_Next = Collision()->GetZoneHandle("NextZones");
 
 	const char *pCensorFilename = "censorlist.txt";
 	IOHANDLE File = Storage()->OpenFile(pCensorFilename, IOFLAG_READ, IStorage::TYPE_ALL);
@@ -2496,41 +2494,18 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
-	m_pTiles = (CTile *)Kernel()->RequestInterface<IMap>()->GetData(pTileMap->m_Data);
+	CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>()->GetData(pTileMap->m_Data);
 
-
-	/*
-	num_spawn_points[0] = 0;
-	num_spawn_points[1] = 0;
-	num_spawn_points[2] = 0;
-	*/
-
-	// create all entities from entity layers
-	if(m_Layers.EntityGroup())
+	for(int y = 0; y < pTileMap->m_Height; y++)
 	{
-		char aLayerName[12];
-		
-		const CMapItemGroup* pGroup = m_Layers.EntityGroup();
-		for(int l = 0; l < pGroup->m_NumLayers; l++)
+		for(int x = 0; x < pTileMap->m_Width; x++)
 		{
-			CMapItemLayer *pLayer = m_Layers.GetLayer(pGroup->m_StartLayer+l);
-			if(pLayer->m_Type == LAYERTYPE_QUADS)
-			{
-				CMapItemLayerQuads *pQLayer = (CMapItemLayerQuads *)pLayer;
-			
-				IntsToStr(pQLayer->m_aName, sizeof(aLayerName)/sizeof(int), aLayerName);
-				
-				const CQuad *pQuads = (const CQuad *) Kernel()->RequestInterface<IMap>()->GetDataSwapped(pQLayer->m_Data);
+			int Index = pTiles[y*pTileMap->m_Width+x].m_Index;
 
-				for(int q = 0; q < pQLayer->m_NumQuads; q++)
-				{
-					vec2 P0(fx2f(pQuads[q].m_aPoints[0].x), fx2f(pQuads[q].m_aPoints[0].y));
-					vec2 P1(fx2f(pQuads[q].m_aPoints[1].x), fx2f(pQuads[q].m_aPoints[1].y));
-					vec2 P2(fx2f(pQuads[q].m_aPoints[2].x), fx2f(pQuads[q].m_aPoints[2].y));
-					vec2 P3(fx2f(pQuads[q].m_aPoints[3].x), fx2f(pQuads[q].m_aPoints[3].y));
-					vec2 Pivot(fx2f(pQuads[q].m_aPoints[4].x), fx2f(pQuads[q].m_aPoints[4].y));
-					m_pController->OnEntity(aLayerName, Pivot, P0, P1, P2, P3, pQuads[q].m_PosEnv);
-				}
+			if(Index >= ENTITY_OFFSET)
+			{
+				vec2 Pos(x*32.0f+16.0f, y*32.0f+16.0f);
+				m_pController->OnEntity(Index-ENTITY_OFFSET, Pos);
 			}
 		}
 	}

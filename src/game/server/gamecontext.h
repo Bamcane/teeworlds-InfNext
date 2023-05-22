@@ -113,7 +113,6 @@ private:
 	void AddBroadcast(int ClientID, CBroadcast Broadcast);
 
 public:
-	int m_ZoneHandle_Next;
 
 	IServer *Server() const { return m_pServer; }
 	IStorage *Storage() const { return m_pStorage; }
@@ -133,8 +132,6 @@ public:
 	IGameController *m_pController;
 	CGameWorld m_World;
 	std::vector<std::string> m_vCensorlist;
-
-	CTile *m_pTiles;
 
 	// helper functions
 	class CCharacter *GetPlayerChar(int ClientID);

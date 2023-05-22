@@ -470,27 +470,109 @@ void CMapConverter::CopyGameLayer()
 
 	//Cleanup the game layer
 	//This will make maps no more usable by a server, but the original ones are in the repository
-	for(int j=0; j<m_Height; j++)
+	for(int j=0; j < m_Height; j++)
 	{
-		for(int i=0; i<m_Width; i++)
+		for(int i=0; i < m_Width; i++)
 		{
-			switch(m_pPhysicsLayerTiles[j*m_Width+i].m_Index)
-			{
-				case TILE_SOLID:
-					m_pTiles[j*m_Width+i].m_Index = TILE_SOLID;
-					break;
-				case TILE_NOHOOK:
-					m_pTiles[j*m_Width+i].m_Index = TILE_NOHOOK;
-					break;
-				default:
-					m_pTiles[j*m_Width+i].m_Index = TILE_AIR;
-			}
+			m_pTiles[j*m_Width+i].m_Index = m_pPhysicsLayerTiles[j*m_Width+i].m_Index;
 			i += m_pPhysicsLayerTiles[j*m_Width+i].m_Skip;
 		}
 	}
 	
-	Item.m_Data = m_DataFile.AddData(m_Width*m_Height*sizeof(CTile), m_pTiles);
-	StrToInts(Item.m_aName, sizeof(Item.m_aName)/sizeof(int), "Game");
+	Item.m_Data = m_DataFile.AddData(m_Width * m_Height * sizeof(CTile), m_pTiles);
+	Item.m_Tele = -1;
+	Item.m_Speedup = -1;
+	Item.m_Front = -1;
+	Item.m_Switch = -1;
+	Item.m_Tune = -1;
+
+	StrToInts(Item.m_aName, sizeof(Item.m_aName) / sizeof(int), "Game");
+	m_DataFile.AddItem(MAPITEMTYPE_LAYER, m_NumLayers++, sizeof(Item), &Item);
+}
+
+void CMapConverter::CopyTeleLayer()
+{
+	CLayers Layers;
+	Layers.Init(Map());
+
+	CCollision Collision;
+	Collision.Init(&Layers);
+
+	int Width = Layers.TeleLayer()->m_Width;
+	int Height = Layers.TeleLayer()->m_Height;
+
+	CMapItemLayerTilemap Item;
+	Item.m_Version = Item.m_Layer.m_Version = 3;
+	Item.m_Layer.m_Flags = 0;
+	Item.m_Layer.m_Type = LAYERTYPE_TILES;
+	Item.m_Color.r = 255;
+	Item.m_Color.g = 255;
+	Item.m_Color.b = 255;
+	Item.m_Color.a = 255;
+	Item.m_ColorEnv = -1;
+	Item.m_ColorEnvOffset = 0;
+	Item.m_Width = Width;
+	Item.m_Height = Height;
+	Item.m_Flags = TILESLAYERFLAG_TELE;
+	Item.m_Image = -1;
+
+	CTile *pEmptyTiles = (CTile *)calloc((size_t)Width * Height, sizeof(CTile));
+	mem_zero(pEmptyTiles, (size_t)Width * Height * sizeof(CTile));
+
+	Item.m_Data = m_DataFile.AddData((size_t)Width * Height * sizeof(CTile), pEmptyTiles);
+	free(pEmptyTiles);
+
+	Item.m_Tele = -1;
+	Item.m_Speedup = -1;
+	Item.m_Front = -1;
+	Item.m_Switch = -1;
+	Item.m_Tune = -1;
+
+	Item.m_Tele = m_DataFile.AddData((size_t)Width * Height * sizeof(CTeleTile), Collision.TeleLayer());
+	
+	StrToInts(Item.m_aName, sizeof(Item.m_aName)/sizeof(int), "Tele");
+	m_DataFile.AddItem(MAPITEMTYPE_LAYER, m_NumLayers++, sizeof(Item), &Item);
+}
+
+void CMapConverter::CopySpeedupLayer()
+{
+	CLayers Layers;
+	Layers.Init(Map());
+
+	CCollision Collision;
+	Collision.Init(&Layers);
+
+	int Width = Layers.SpeedupLayer()->m_Width;
+	int Height = Layers.SpeedupLayer()->m_Height;
+
+	CMapItemLayerTilemap Item;
+	Item.m_Version = Item.m_Layer.m_Version = 3;
+	Item.m_Layer.m_Flags = 0;
+	Item.m_Layer.m_Type = LAYERTYPE_TILES;
+	Item.m_Color.r = 255;
+	Item.m_Color.g = 255;
+	Item.m_Color.b = 255;
+	Item.m_Color.a = 255;
+	Item.m_ColorEnv = -1;
+	Item.m_ColorEnvOffset = 0;
+	Item.m_Width = Width;
+	Item.m_Height = Height;
+	Item.m_Flags = TILESLAYERFLAG_SPEEDUP;
+	Item.m_Image = -1;
+
+	CTile *pEmptyTiles = (CTile *)calloc((size_t)Width * Height, sizeof(CTile));
+	mem_zero(pEmptyTiles, (size_t)Width * Height * sizeof(CTile));
+
+	Item.m_Data = m_DataFile.AddData((size_t)Width * Height * sizeof(CTile), pEmptyTiles);
+	free(pEmptyTiles);
+
+	Item.m_Tele = -1;
+	Item.m_Speedup = m_DataFile.AddData((size_t)Width * Height * sizeof(CTeleTile), Collision.SpeedupLayer());
+	Item.m_Front = -1;
+	Item.m_Switch = -1;
+	Item.m_Tune = -1;
+	
+	StrToInts(Item.m_aName, sizeof(Item.m_aName)/sizeof(int), "Speedup");
 	m_DataFile.AddItem(MAPITEMTYPE_LAYER, m_NumLayers++, sizeof(Item), &Item);
 }
 
@@ -531,6 +613,16 @@ void CMapConverter::CopyLayers()
 					CopyGameLayer();
 					GroupLayers++;
 				}
+				else if(pTilemapItem->m_Flags&TILESLAYERFLAG_TELE)
+				{
+					CopyTeleLayer();
+					GroupLayers++;
+				}
+				else if(pTilemapItem->m_Flags&TILESLAYERFLAG_SPEEDUP)
+				{
+					CopySpeedupLayer();
+					GroupLayers++;
+				}
 				else
 				{
 					void *pData = Map()->GetData(pTilemapItem->m_Data);
@@ -539,6 +631,12 @@ void CMapConverter::CopyLayers()
 					LayerItem = *pTilemapItem;
 					LayerItem.m_Data = m_DataFile.AddData(LayerItem.m_Width*LayerItem.m_Height*sizeof(CTile), pData);
 					
+					LayerItem.m_Tele = -1;
+					LayerItem.m_Speedup = -1;
+					LayerItem.m_Front = -1;
+					LayerItem.m_Switch = -1;
+					LayerItem.m_Tune = -1;
+
 					m_DataFile.AddItem(MAPITEMTYPE_LAYER, m_NumLayers++, sizeof(LayerItem), &LayerItem);
 
 					Map()->UnloadData(pTilemapItem->m_Data);
@@ -560,6 +658,22 @@ void CMapConverter::CopyLayers()
 
 				Map()->UnloadData(pQuadsItem->m_Data);
 				
+				GroupLayers++;
+			}
+			else if(pLayerItem->m_Type == LAYERTYPE_SOUNDS)
+			{
+				CMapItemLayerSounds *pSoundsItem = (CMapItemLayerSounds *)pLayerItem;
+
+				void *pData = Map()->GetData(pSoundsItem->m_Data);
+
+				CMapItemLayerSounds LayerItem;
+				LayerItem = *pSoundsItem;
+				LayerItem.m_Data = m_DataFile.AddData(LayerItem.m_NumSources*sizeof(CSoundSource), pData);
+
+				m_DataFile.AddItem(MAPITEMTYPE_LAYER, m_NumLayers++, sizeof(LayerItem), &LayerItem);
+
+				Map()->UnloadData(pSoundsItem->m_Data);
+
 				GroupLayers++;
 			}
 		}

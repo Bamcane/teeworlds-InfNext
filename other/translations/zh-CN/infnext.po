@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: teeworlds-infnext\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-20 12:34+0800\n"
+"POT-Creation-Date: 2023-05-22 20:53+0800\n"
 "PO-Revision-Date: 2023-05-20 04:37\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
@@ -49,15 +49,15 @@ msgstr "'{str:Player}' 发起投票更改服务器选项 '{str:Option}' ({str:Re
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr "'{str:Player}' 连接服务器并加入{lstr:Team}"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:290
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:293
 msgid "'{str:Player}' has left the game"
 msgstr "'{str:Player}'离开了游戏"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:285
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:288
 msgid "'{str:Player}' has left the game ({str:Reason})"
 msgstr "'{str:Player}'离开了游戏 ({str:Reason})"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:377
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:381
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr "'{str:Player}' 加入了{lstr:Team}"
 
@@ -209,7 +209,7 @@ msgstr "什么? 你杀死了你的队友?!"
 msgid "What? You were killed by your teammates?!"
 msgstr "什么? 你被你的队友杀了?"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:477
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:484
 msgid "You are '{lstr:Class}'"
 msgstr "你是 '{lstr:Class}'"
 
@@ -229,8 +229,7 @@ msgstr "你不能踢出你自己"
 msgid "You can't move yourself"
 msgstr "你不能移动自己"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:756
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:815 /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
 msgid "You infected '{str:Player}'"
 msgstr "你感染了'{str:Player}'"
 
@@ -250,7 +249,7 @@ msgstr "你必须等待 {sec:Time} 才能再进行一次投票"
 msgid "You were infected by '{str:Player}'"
 msgstr "你被'{str:Player}'感染了"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:757
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:816
 msgid "You're infected by '{str:Player}'"
 msgstr "你被'{str:Player}' 感染了"
 
@@ -270,19 +269,18 @@ msgstr "管理员通过投票"
 msgid "admin moved '{str:Player}' to spectator ({str:Reason})"
 msgstr "管理员移动'{str:Player}'到旁观者({str:Reason})"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:101
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:99
 msgid "blue team"
 msgstr "蓝队"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:101
 msgid "game"
 msgstr "游戏"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:99
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:97
 msgid "red team"
 msgstr "红队"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:105
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
 msgid "spectators"
 msgstr "旁观者"
-

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-21 17:00+0800\n"
+"POT-Creation-Date: 2023-05-22 21:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,15 +53,15 @@ msgstr ""
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:290
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:293
 msgid "'{str:Player}' has left the game"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:285
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:288
 msgid "'{str:Player}' has left the game ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:377
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:381
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr ""
 
@@ -213,7 +213,7 @@ msgstr ""
 msgid "What? You were killed by your teammates?!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:477
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:484
 msgid "You are '{lstr:Class}'"
 msgstr ""
 
@@ -233,7 +233,7 @@ msgstr ""
 msgid "You can't move yourself"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:756
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:815
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
 msgid "You infected '{str:Player}'"
 msgstr ""
@@ -254,7 +254,7 @@ msgstr ""
 msgid "You were infected by '{str:Player}'"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:757
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:816
 msgid "You're infected by '{str:Player}'"
 msgstr ""
 
@@ -274,18 +274,18 @@ msgstr ""
 msgid "admin moved '{str:Player}' to spectator ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:101
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:99
 msgid "blue team"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:101
 msgid "game"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:99
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:97
 msgid "red team"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:105
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
 msgid "spectators"
 msgstr ""
