@@ -55,8 +55,10 @@ CPlayer::~CPlayer()
 {
 	delete m_pCharacter;
 	m_pCharacter = 0;
+
 	if(m_pClass)
 		delete m_pClass;
+	
 	m_pClass = 0;
 }
 
@@ -68,8 +70,10 @@ void CPlayer::HandleTuningParams()
 		{
 			CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
 			int *pParams = (int *)&m_NextTuningParams;
+
 			for(unsigned i = 0; i < sizeof(m_NextTuningParams)/sizeof(int); i++)
-			Msg.AddInt(pParams[i]);
+				Msg.AddInt(pParams[i]);
+			
 			Server()->SendMsg(&Msg, MSGFLAG_VITAL, GetCID());
 		}
 
@@ -81,9 +85,6 @@ void CPlayer::HandleTuningParams()
 
 void CPlayer::Tick()
 {
-#ifdef CONF_DEBUG
-	if(!g_Config.m_DbgDummies || m_ClientID < MAX_CLIENTS-g_Config.m_DbgDummies)
-#endif
 	if(!Server()->ClientIngame(m_ClientID))
 		return;
 
@@ -92,12 +93,14 @@ void CPlayer::Tick()
 	// do latency stuff
 	{
 		IServer::CClientInfo Info;
+
 		if(Server()->GetClientInfo(m_ClientID, &Info))
 		{
 			m_Latency.m_Accum += Info.m_Latency;
 			m_Latency.m_AccumMax = max(m_Latency.m_AccumMax, Info.m_Latency);
 			m_Latency.m_AccumMin = min(m_Latency.m_AccumMin, Info.m_Latency);
 		}
+		
 		// each second
 		if(Server()->Tick()%Server()->TickSpeed() == 0)
 		{
@@ -164,9 +167,6 @@ void CPlayer::PostTick()
 
 void CPlayer::Snap(int SnappingClient)
 {
-#ifdef CONF_DEBUG
-	if(!g_Config.m_DbgDummies || m_ClientID < MAX_CLIENTS-g_Config.m_DbgDummies)
-#endif
 	if(!Server()->ClientIngame(m_ClientID))
 		return;
 
@@ -180,8 +180,9 @@ void CPlayer::Snap(int SnappingClient)
 
 	StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
 	StrToInts(&pClientInfo->m_Clan0, 3, !m_pClass ? "????" : m_pClass->m_ClassName);
-	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_TeeInfos.m_aSkinName);
+	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
+	
 	pClientInfo->m_UseCustomColor = GetClass() ? GetClass()->m_Skin.m_UseCustomColor : m_TeeInfos.m_UseCustomColor;
 	pClientInfo->m_ColorBody = m_TeeInfos.m_ColorBody;
 	pClientInfo->m_ColorFeet = m_TeeInfos.m_ColorFeet;
@@ -258,8 +259,10 @@ void CPlayer::FakeSnap(int SnappingClient)
 {
 	IServer::CClientInfo info;
 	Server()->GetClientInfo(SnappingClient, &info);
+
 	if (Server()->IsSixup(SnappingClient))
 		return;
+	
 	if (info.m_DDNetVersion > VERSION_DDNET_OLD)
 		return;
 
@@ -353,6 +356,7 @@ void CPlayer::KillCharacter(int Weapon)
 	if(m_pCharacter)
 	{
 		m_pCharacter->Die(m_ClientID, Weapon);
+		
 		delete m_pCharacter;
 		m_pCharacter = 0;
 	}
@@ -377,7 +381,7 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 		GameServer()->SendChatTarget_Localization(-1, _("'{str:Player}' joined the {lstr:Team}"), 
 			"Player", Server()->ClientName(m_ClientID), 
 			"Team", GameServer()->m_pController->GetTeamName(Team),
-			NULL);	
+			NULL);
 	}
 
 	if(Team == TEAM_SPECTATORS)
@@ -446,6 +450,7 @@ bool CPlayer::IsHuman() const
 {
 	if(!m_pClass)
 		return 1;
+	
 	return !m_pClass->m_Infect;
 }
 
@@ -453,6 +458,7 @@ bool CPlayer::IsInfect() const
 {
 	if(!m_pClass)
 		return 0;
+	
 	return m_pClass->m_Infect;
 }
 
@@ -462,6 +468,7 @@ void CPlayer::SetClass(CClass *pClass)
 
 	if(m_pClass)
 		delete m_pClass;
+	
 	m_pClass = pClass;
 	m_TeeInfos = m_pClass->m_Skin;
 	
@@ -493,7 +500,7 @@ void CPlayer::SetClass(CClass *pClass)
 	GameInfoMsg.m_ScoreLimit = g_Config.m_SvScorelimit;
 	GameInfoMsg.m_TimeLimit = g_Config.m_SvTimelimit;
 	GameInfoMsg.m_MatchNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
-	GameInfoMsg.m_MatchCurrent = GameServer()->m_pController->m_RoundCount+1;
+	GameInfoMsg.m_MatchCurrent = GameServer()->m_pController->m_RoundCount + 1;
 
 	protocol7::CNetMsg_Sv_GameInfo *pInfoMsg = &GameInfoMsg;
 	Server()->SendPackMsg(pInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, m_ClientID);
