@@ -567,7 +567,7 @@ void CMapConverter::CopySpeedupLayer()
 	free(pEmptyTiles);
 
 	Item.m_Tele = -1;
-	Item.m_Speedup = m_DataFile.AddData((size_t)Width * Height * sizeof(CTeleTile), Collision.SpeedupLayer());
+	Item.m_Speedup = m_DataFile.AddData((size_t)Width * Height * sizeof(CSpeedupTile), Collision.SpeedupLayer());
 	Item.m_Front = -1;
 	Item.m_Switch = -1;
 	Item.m_Tune = -1;

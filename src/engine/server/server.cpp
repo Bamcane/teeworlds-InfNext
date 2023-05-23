@@ -286,6 +286,8 @@ void CServer::CClient::Reset()
 	m_LastInputTick = -1;
 	m_SnapRate = CClient::SNAPRATE_INIT;
 	m_Score = 0;
+	
+	m_NextMapChunk = 0;
 	// It's should be delete
 	//str_copy(m_aLanguage, g_Config.m_SvDefaultLanguage, sizeof(m_aLanguage));
 }
@@ -970,6 +972,8 @@ void CServer::SendMap(int ClientID)
 		}
 		SendMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH, ClientID);
 	}
+
+	m_aClients[ClientID].m_NextMapChunk = 0;
 }
 
 void CServer::SendMapData(int ClientID, int Chunk)

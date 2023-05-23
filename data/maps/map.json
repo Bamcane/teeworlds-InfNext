@@ -4,6 +4,11 @@
             "name": "next_basin",
             "author": "RemakePower",
             "timelimit": 1
+        },
+        {
+            "name": "next_snowland",
+            "author": "RemakePower",
+            "timelimit": 3
         }
     ]
 }

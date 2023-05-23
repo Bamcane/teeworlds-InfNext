@@ -508,6 +508,8 @@ void CCharacter::HandleEvents()
 			}
 			else
 				TempVel += Direction * Force;
+
+			m_Core.m_Vel = TempVel;
 		}
 	}
 

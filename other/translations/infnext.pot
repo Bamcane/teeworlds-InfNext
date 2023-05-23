@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-22 21:03+0800\n"
+"POT-Creation-Date: 2023-05-23 21:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -233,7 +233,7 @@ msgstr ""
 msgid "You can't move yourself"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:815
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:817
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
 msgid "You infected '{str:Player}'"
 msgstr ""
@@ -254,7 +254,7 @@ msgstr ""
 msgid "You were infected by '{str:Player}'"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:816
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:818
 msgid "You're infected by '{str:Player}'"
 msgstr ""
 

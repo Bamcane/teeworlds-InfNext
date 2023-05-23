@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: teeworlds-infnext\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-22 20:53+0800\n"
+"POT-Creation-Date: 2023-05-23 21:10+0800\n"
 "PO-Revision-Date: 2023-05-10 13:09\n"
 "Last-Translator: \n"
 "Language-Team: Classical Chinese\n"
@@ -229,7 +229,7 @@ msgstr "君不可驅出君也。"
 msgid "You can't move yourself"
 msgstr "君不可驅君入室也。"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:815 /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:817 /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
 msgid "You infected '{str:Player}'"
 msgstr "君使 『{str:Player}』 染病。"
 
@@ -250,7 +250,7 @@ msgstr "君需待 {sec:Time} 後方可上奏。"
 msgid "You were infected by '{str:Player}'"
 msgstr "君受'{str:Player}'染病。"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:816
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:818
 msgid "You're infected by '{str:Player}'"
 msgstr "君受'{str:Player}'染病。"
 
