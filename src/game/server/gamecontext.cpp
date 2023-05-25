@@ -106,7 +106,7 @@ class CCharacter *CGameContext::GetPlayerChar(int ClientID)
 	return m_apPlayers[ClientID]->GetCharacter();
 }
 
-void CGameContext::CreateDamageInd(vec2 Pos, float Angle, int Amount, int64_t Mask)
+void CGameContext::CreateDamageInd(vec2 Pos, float Angle, int Amount, CClientMask Mask)
 {
 	float a = 3 * 3.14159f / 2 + Angle;
 	//float a = get_angle(dir);
@@ -125,7 +125,7 @@ void CGameContext::CreateDamageInd(vec2 Pos, float Angle, int Amount, int64_t Ma
 	}
 }
 
-void CGameContext::CreateHammerHit(vec2 Pos, int64_t Mask)
+void CGameContext::CreateHammerHit(vec2 Pos, CClientMask Mask)
 {
 	// create the event
 	CNetEvent_HammerHit *pEvent = (CNetEvent_HammerHit *)m_Events.Create(NETEVENTTYPE_HAMMERHIT, sizeof(CNetEvent_HammerHit), Mask);
@@ -137,7 +137,7 @@ void CGameContext::CreateHammerHit(vec2 Pos, int64_t Mask)
 }
 
 
-void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int64_t Mask, int DamageMode)
+void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, CClientMask Mask, int DamageMode)
 {
 	// create the event
 	CNetEvent_Explosion *pEvent = (CNetEvent_Explosion *)m_Events.Create(NETEVENTTYPE_EXPLOSION, sizeof(CNetEvent_Explosion), Mask);
@@ -169,19 +169,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 	}
 }
 
-/*
-void create_smoke(vec2 Pos)
-{
-	// create the event
-	EV_EXPLOSION *pEvent = (EV_EXPLOSION *)events.create(EVENT_SMOKE, sizeof(EV_EXPLOSION));
-	if(pEvent)
-	{
-		pEvent->x = (int)Pos.x;
-		pEvent->y = (int)Pos.y;
-	}
-}*/
-
-void CGameContext::CreatePlayerSpawn(vec2 Pos, int64_t Mask)
+void CGameContext::CreatePlayerSpawn(vec2 Pos, CClientMask Mask)
 {
 	// create the event
 	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn), Mask);
@@ -192,7 +180,7 @@ void CGameContext::CreatePlayerSpawn(vec2 Pos, int64_t Mask)
 	}
 }
 
-void CGameContext::CreateDeath(vec2 Pos, int ClientID, int64_t Mask)
+void CGameContext::CreateDeath(vec2 Pos, int ClientID, CClientMask Mask)
 {
 	// create the event
 	CNetEvent_Death *pEvent = (CNetEvent_Death *)m_Events.Create(NETEVENTTYPE_DEATH, sizeof(CNetEvent_Death), Mask);
@@ -204,7 +192,7 @@ void CGameContext::CreateDeath(vec2 Pos, int ClientID, int64_t Mask)
 	}
 }
 
-void CGameContext::CreateSound(vec2 Pos, int Sound, int64_t Mask)
+void CGameContext::CreateSound(vec2 Pos, int Sound, CClientMask Mask)
 {
 	if (Sound < 0)
 		return;

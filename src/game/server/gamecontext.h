@@ -168,12 +168,12 @@ public:
 	CVoteOptionServer *m_pVoteOptionLast;
 
 	// helper functions
-	void CreateDamageInd(vec2 Pos, float AngleMod, int Amount, int64_t Mask=-1LL);
-	void CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int64_t Mask=-1LL, int DamageMode=0);
-	void CreateHammerHit(vec2 Pos, int64_t Mask=-1LL);
-	void CreatePlayerSpawn(vec2 Pos, int64_t Mask=-1LL);
-	void CreateDeath(vec2 Pos, int Who, int64_t Mask=-1LL);
-	void CreateSound(vec2 Pos, int Sound, int64_t Mask=-1LL);
+	void CreateDamageInd(vec2 Pos, float AngleMod, int Amount, CClientMask Mask=CClientMask().set());
+	void CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, CClientMask Mask=CClientMask().set(), int DamageMode=0);
+	void CreateHammerHit(vec2 Pos, CClientMask Mask=CClientMask().set());
+	void CreatePlayerSpawn(vec2 Pos, CClientMask Mask=CClientMask().set());
+	void CreateDeath(vec2 Pos, int Who, CClientMask Mask=CClientMask().set());
+	void CreateSound(vec2 Pos, int Sound, CClientMask Mask=CClientMask().set());
 	void CreateSoundGlobal(int Sound, int Target=-1);
 
 
@@ -280,9 +280,9 @@ public:
 	void AddMapVotes();
 };
 
-inline int64_t CmaskAll() { return -1LL; }
-inline int64_t CmaskOne(int ClientID) { return 1LL<<ClientID; }
-inline int64_t CmaskAllExceptOne(int ClientID) { return CmaskAll()^CmaskOne(ClientID); }
-inline bool CmaskIsSet(int64_t Mask, int ClientID) { return (Mask&CmaskOne(ClientID)) != 0; }
+inline CClientMask CmaskAll() { return CClientMask().set(); }
+inline CClientMask CmaskOne(int ClientID) { return CClientMask().set()<<ClientID; }
+inline CClientMask CmaskAllExceptOne(int ClientID) { return CmaskAll()^CmaskOne(ClientID); }
+inline bool CmaskIsSet(CClientMask Mask, int ClientID) { return (Mask&CmaskOne(ClientID)) != 0; }
 
 #endif
