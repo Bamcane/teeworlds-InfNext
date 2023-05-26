@@ -277,6 +277,7 @@ public:
 	inline bool IsKickVote() const { return m_VoteType == VOTE_TYPE_KICK; }
 	inline bool IsSpecVote() const { return m_VoteType == VOTE_TYPE_SPECTATE; }
 
+	void LoadMapInJson(const char* pFileName);
 	void AddMapVotes();
 };
 

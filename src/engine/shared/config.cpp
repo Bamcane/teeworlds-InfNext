@@ -56,6 +56,7 @@ public:
 		#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc) g_Config.m_##Name = def;
 		#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) str_copy(g_Config.m_##Name, def, len);
 
+		#include <infnext/config.h>
 		#include <game/variables.h>
 		#include "config_variables.h"
 
@@ -68,6 +69,7 @@ public:
 		#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc)	// nop
 		#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) if(!g_Config.m_##Name[0] && def[0]) str_copy(g_Config.m_##Name, def, len);
 
+		#include <infnext/config.h>
 		#include <game/variables.h>
 		#include "config_variables.h"
 
@@ -90,6 +92,7 @@ public:
 		#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc) if((flags)&CFGFLAG_SAVE){ str_format(aLineBuf, sizeof(aLineBuf), "%s %i", #ScriptName, g_Config.m_##Name); WriteLine(aLineBuf); }
 		#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) if((flags)&CFGFLAG_SAVE){ EscapeParam(aEscapeBuf, g_Config.m_##Name, sizeof(aEscapeBuf)); str_format(aLineBuf, sizeof(aLineBuf), "%s \"%s\"", #ScriptName, aEscapeBuf); WriteLine(aLineBuf); }
 
+		#include <infnext/config.h>
 		#include <game/variables.h>
 		#include "config_variables.h"
 

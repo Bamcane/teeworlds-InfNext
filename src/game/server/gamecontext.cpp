@@ -2641,33 +2641,71 @@ int CGameContext::MapScan(const char *pName, int IsDir, int DirType, void *pUser
 	return 0;
 }
 
-void CGameContext::AddMapVotes()
+void CGameContext::LoadMapInJson(const char* pFileName)
 {
-	std::vector<CMapNameItem> vMapList;
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "maps", MapScan, &vMapList);
+	char aBuf[IO_MAX_PATH_LENGTH];
+	str_format(aBuf, sizeof(aBuf), "maps/%s", pFileName);
 
-	AddVote("=======Map=======", "echo ?");
-
-	for(unsigned int i = 0;i < (unsigned int) vMapList.size(); i ++)
+	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
+	if(!File)
 	{
-		char aDescription[64];
-		str_format(aDescription, sizeof(aDescription), "%s", vMapList[i].m_aName);
-
-		char aCommand[IO_MAX_PATH_LENGTH * 2 + 10];
-		char aMapEscaped[IO_MAX_PATH_LENGTH * 2];
-		char *pDst = aMapEscaped;
-		str_escape(&pDst, vMapList[i].m_aName, aMapEscaped + sizeof(aMapEscaped));
-		str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", aMapEscaped);
-
-		str_append(g_Config.m_SvMaprotation, vMapList[i].m_aName, sizeof(g_Config.m_SvMaprotation));
-
-		if(i != (unsigned int) vMapList.size() - 1)
-			str_append(g_Config.m_SvMaprotation, " ", sizeof(g_Config.m_SvMaprotation));
-
-		AddVote(aDescription, aCommand);
+		str_format(aBuf, sizeof(aBuf), "Couldn't load the map config file %s", aBuf);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+		return;
 	}
 
+	// load the file as a string
+	int FileSize = (int)io_length(File);
+	int FileDataSize = FileSize + 1;
+	char *pFileData = new char[FileDataSize];
+	io_read(File, pFileData, FileSize);
+	pFileData[FileSize] = 0;
+	io_close(File);
+
+	// parse json data
+	json_settings JsonSettings;
+	mem_zero(&JsonSettings, sizeof(JsonSettings));
+	char aError[256];
+	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
+	if(pJsonData == 0)
+	{
+		str_format(aBuf, sizeof(aBuf), "Couldn't load the map config file %s : %s", aBuf, aError);
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+		delete[] pFileData;
+		return;
+	}
+
+	const json_value &rStart = (*pJsonData)["maps"];
+	if(rStart.type == json_array)
+	{
+		for(unsigned i = 0; i < rStart.u.array.length; ++i)
+		{
+			const char* pMapName = (const char *)rStart[i]["name"];
+			if(!pMapName || !pMapName[0])
+				continue;
+			char aCommand[256];
+			str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", pMapName);
+			AddVote(pMapName, aCommand);
+		}
+	}
+
+	// clean up
+	json_value_free(pJsonData);
+	delete[] pFileData;
+	
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "added maps to votes");
+
+	return;
+}
+
+void CGameContext::AddMapVotes()
+{
+	AddVote("=====Map=====", "echo \"Choose your map\"");
+
+	LoadMapInJson("map.json");
+	LoadMapInJson(g_Config.m_InfUnpushMapJson);
+
+	return;
 }
 
 void CGameContext::UpdateBroadcast(int ClientID)

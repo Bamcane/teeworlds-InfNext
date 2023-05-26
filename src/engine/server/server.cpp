@@ -2175,17 +2175,17 @@ int CServer::LoadMap(const char *pMapName)
 	return 1;
 }
 
-void CServer::LoadMapConfig(const char *pMapName)
+bool CServer::LoadMapConfigInJson(const char* pFileName, const char *pMapName)
 {
-	char aBuf[512];
-	str_copy(aBuf, "maps/map.json");
+	char aBuf[IO_MAX_PATH_LENGTH];
+	str_format(aBuf, sizeof(aBuf), "maps/%s", pFileName);
 
 	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
 	if(!File)
 	{
 		str_format(aBuf, sizeof(aBuf), "Can't load the map config file %s", aBuf);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
-		return;
+		return false;
 	}
 
 	// load the file as a string
@@ -2206,7 +2206,7 @@ void CServer::LoadMapConfig(const char *pMapName)
 		str_format(aBuf, sizeof(aBuf), "Can't load the map config file %s : %s", aBuf, aError);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
 		delete[] pFileData;
-		return;
+		return false;
 	}
 
 	const json_value &rStart = (*pJsonData)["maps"];
@@ -2221,7 +2221,11 @@ void CServer::LoadMapConfig(const char *pMapName)
 			if(TimeLimit)
 			{
 				g_Config.m_SvTimelimit = TimeLimit;
-				dbg_msg("server", "Time limit: %dmin", TimeLimit);
+
+				str_format(aBuf, sizeof(aBuf), "Time limit: %dmin", TimeLimit);
+
+				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "Map", aBuf);
+				return true;
 			}
 		}
 	}
@@ -2230,8 +2234,18 @@ void CServer::LoadMapConfig(const char *pMapName)
 	json_value_free(pJsonData);
 	delete[] pFileData;
 	
-	return;
+	return true;
+}
 
+void CServer::LoadMapConfig(const char *pMapName)
+{
+	if(LoadMapConfigInJson("map.json", pMapName))
+		return;
+
+	if(LoadMapConfigInJson(g_Config.m_InfUnpushMapJson, pMapName))
+		return;
+
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "Map", "Couldn't load map config in config file");
 }
 
 int CServer::Run()

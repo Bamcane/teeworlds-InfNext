@@ -716,6 +716,7 @@ CConsole::CConsole(int FlagMask)
 		Register(#ScriptName, "?r", Flags, StrVariableCommand, &Data, Desc " (default: " #Def ", max length: " #Len ")"); \
 	}
 
+#include <infnext/config.h>
 #include <game/variables.h>
 #include "config_variables.h"
 

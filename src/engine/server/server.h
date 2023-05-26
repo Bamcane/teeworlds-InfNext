@@ -299,6 +299,7 @@ class CCache
 
 	char *GetMapName();
 	int LoadMap(const char *pMapName);
+	bool LoadMapConfigInJson(const char* pFileName, const char *pMapName);
 	void LoadMapConfig(const char *pMapName);
 
 	int Run();
