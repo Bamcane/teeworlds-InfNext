@@ -126,7 +126,7 @@ class CRegister : public IRegister
 	char m_aConnlessTokenHex[16];
 
 	std::shared_ptr<CGlobal> m_pGlobal = std::make_shared<CGlobal>();
-	bool m_aProtocolEnabled[NUM_PROTOCOLS] = {true, true};
+	bool m_aProtocolEnabled[NUM_PROTOCOLS] = {true, true, true, true};
 	CProtocol m_aProtocols[NUM_PROTOCOLS];
 
 	int m_NumExtraHeaders = 0;
@@ -506,7 +506,7 @@ CRegister::CRegister(IConsole *pConsole, IEngine *pEngine, int ServerPort, unsig
 	m_aVerifyPacketPrefix[HEADER_LEN + UUID_MAXSTRSIZE - 1] = ':';
 
 	// The DDNet code uses the `unsigned` security token in memory byte order.
-	unsigned char aTokenBytes[4];
+	unsigned char aTokenBytes[sizeof(int32_t)];
 	mem_copy(aTokenBytes, &SixupSecurityToken, sizeof(aTokenBytes));
 	str_format(m_aConnlessTokenHex, sizeof(m_aConnlessTokenHex), "%08x", bytes_be_to_uint(aTokenBytes));
 
@@ -658,7 +658,7 @@ bool CRegister::OnPacket(const CNetChunk *pPacket)
 		const char *pToken = Unpacker.GetString(0);
 		if(Unpacker.Error())
 		{
-			dbg_msg("register", "got errorneous challenge packet from master");
+			dbg_msg("register", "got erroneous challenge packet from master");
 			return true;
 		}
 
