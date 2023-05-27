@@ -2671,6 +2671,8 @@ void CGameContext::LoadMapInJson(const char* pFileName)
 			char aCommand[256];
 			str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", pMapName);
 			AddVote(pMapName, aCommand);
+
+			str_format(g_Config.m_SvMaprotation, sizeof(g_Config.m_SvMaprotation), "%s %s", g_Config.m_SvMaprotation, pMapName);
 		}
 	}
 

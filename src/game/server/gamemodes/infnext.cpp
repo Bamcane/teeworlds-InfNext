@@ -145,7 +145,7 @@ int CGameControllerNext::RoundSecond() const
 CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 {
 	int ClassesNum = Classes()->m_InfectClasses.size();
-	double Probability[ClassesNum];
+	int Probability[ClassesNum];
 
 	int InfClassesNum[ClassesNum];
 	for(int i = 0; i < ClassesNum; i ++)
@@ -175,16 +175,16 @@ CClass* CGameControllerNext::OnPlayerInfect(CPlayer *pPlayer)
 	{
 		if(InfClassesNum[i] < Classes()->m_InfectClasses[i].m_Limit)
 		{
-			Probability[i] = (double)Classes()->m_InfectClasses[i].m_Value;
+			Probability[i] = Classes()->m_InfectClasses[i].m_Value;
 		}else
 		{
-			Probability[i] = (double)(0.f);
+			Probability[i] = 0;
 		}
 	}
 
-	int Seconds = (Server()->Tick()-m_RoundStartTick)/((float)Server()->TickSpeed());
+	int Seconds = (Server()->Tick()-m_RoundStartTick) / ((float) Server()->TickSpeed());
 
-	int ClassID = random_distribution(Probability, Probability + ClassesNum);
+	int ClassID = random_distribution(Probability);
 
 	CClass *NewClass = Classes()->m_InfectClasses[ClassID].m_pClass->CreateNewOne(GameServer(), pPlayer);
 

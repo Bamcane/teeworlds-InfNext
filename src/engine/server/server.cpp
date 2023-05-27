@@ -2296,6 +2296,10 @@ int CServer::Run()
 		UpdateServerInfo();
 		while(m_RunServer)
 		{
+			unsigned int Seed;
+			secure_random_fill(&Seed, sizeof(Seed));
+			srand(Seed);
+			
 			if(NonActive)
 				PumpNetwork(PacketWaiting);
 

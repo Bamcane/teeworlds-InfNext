@@ -3,20 +3,13 @@
 #ifndef BASE_MATH_H
 #define BASE_MATH_H
 
-#include <stdlib.h>
-#include <random>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+
+using std::clamp;
 
 const float pi = 3.1415926535897932384626433f;
-
-template <typename T>
-inline T clamp(T val, T min, T max)
-{
-	if(val < min)
-		return min;
-	if(val > max)
-		return max;
-	return val;
-}
 
 inline float sign(float f)
 {
@@ -41,16 +34,37 @@ inline T mix(const T a, const T b, TB amount)
 	return a + (b-a)*amount;
 }
 
+inline float random_float()
+{
+	return rand() / (float)(RAND_MAX);
+}
+
+inline float random_float(float min, float max)
+{
+	return min + random_float() * (max - min);
+}
+
+inline float random_float(float max)
+{
+	return random_float(0.0f, max);
+}
+
+inline int random_int(int Min, int Max)
+{
+	return rand() % (Max - Min) + Min;
+}
+
 inline float random_angle()
 {
 	return 2.0f * pi * (rand() / std::nextafter((float)RAND_MAX, std::numeric_limits<float>::max()));
 }
 
-float random_float();
-bool random_prob(float f);
-int random_int(int Min, int Max);
-inline int random_int() { return (((rand() & 0xffff) << 16) | (rand() & 0xffff)) & 0x7FFFFFFF; }
-int random_distribution(double* pProb, double* pProb2);
+inline bool random_prob(float f)
+{
+	return random_float() < f;
+}
+
+int random_distribution(int* probs);
 inline float frandom() { return rand()/(float)(RAND_MAX); }
 
 // float to fixed
