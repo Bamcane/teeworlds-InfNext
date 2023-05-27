@@ -410,5 +410,5 @@ json_value *CHttpRequest::ResultJson() const
 	{
 		return nullptr;
 	}
-	return json_parse((char *)pResult);
+	return json_parse((char *)pResult, ResultLength);
 }

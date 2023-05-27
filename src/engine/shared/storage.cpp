@@ -392,6 +392,20 @@ public:
 		GetPath(Type, pDir, pBuffer, BufferSize);
 	}
 
+	virtual bool ReadFile(const char *pFilename, int Type, void **ppResult, unsigned *pResultLen)
+	{
+		IOHANDLE File = OpenFile(pFilename, IOFLAG_READ, Type);
+		if(!File)
+		{
+			*ppResult = nullptr;
+			*pResultLen = 0;
+			return false;
+		}
+		io_read_all(File, ppResult, pResultLen);
+		io_close(File);
+		return true;
+	}
+
 	static IStorage *Create(const char *pApplicationName, int StorageType, int NumArgs, const char **ppArguments)
 	{
 		CStorage *p = new CStorage();

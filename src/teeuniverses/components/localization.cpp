@@ -9,7 +9,7 @@
 #include <unicode/ushape.h>
 #include <unicode/ubidi.h>
 
-#include <engine/external/json-parser/json.h>
+#include <engine/shared/json.h>
 
 #include <fstream>
 
@@ -116,111 +116,95 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "languages/%s.json", m_aFilename);
 	
-	IOHANDLE File = pStorage->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
-	if(!File)
-		return false;
+	void* pBuf;
+	unsigned Length;
 	
-	// load the file as a string
-	int FileSize = (int)io_length(File);
-	int FileDataSize = FileSize + 1;
-	char *pFileData = new char[FileDataSize];
-	io_read(File, pFileData, FileSize);
-	pFileData[FileSize] = 0;
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
-	if(pJsonData == 0)
+	if(!pStorage->ReadFile(aBuf, IStorage::TYPE_ALL, &pBuf, &Length))
 	{
-		dbg_msg("Localization", "Can't load the localization file %s : %s", aBuf, aError);
-		delete[] pFileData;
+		dbg_msg("Localization", "Couldn't open %s", aBuf);
 		return false;
 	}
+
+	json_value *rStart = json_parse( (json_char *) pBuf, Length);
+	free(pBuf);
 	
 	dynamic_string Buffer;
-	int Length;
+	int StrLength;
 
-	// extract data
-	const json_value &rStart = (*pJsonData)["translation"];
-	if(rStart.type == json_array)
+	if(rStart && rStart->type == json_array)
 	{
-		for(unsigned i = 0; i < rStart.u.array.length; ++i)
+		for(unsigned i = 0; i < json_array_length(rStart); ++i)
 		{
-			const char* pKey = rStart[i]["key"];
+			const json_value *pCurrent = json_array_get(rStart, i);
+
+			const char* pKey = json_string_get(json_object_get(pCurrent, "key"));
 			if(pKey && pKey[0])
 			{
 				CEntry* pEntry = m_Translations.set(pKey);
 				
-				const char* pSingular = rStart[i]["value"];
+				const char* pSingular = json_string_get(json_object_get(pCurrent, "value"));
 				if(pSingular && pSingular[0])
 				{
-					Length = str_length(pSingular)+1;
-					pEntry->m_apVersions[PLURALTYPE_NONE] = new char[Length];
-					str_copy(pEntry->m_apVersions[PLURALTYPE_NONE], pSingular, Length);
+					StrLength = str_length(pSingular)+1;
+					pEntry->m_apVersions[PLURALTYPE_NONE] = new char[StrLength];
+					str_copy(pEntry->m_apVersions[PLURALTYPE_NONE], pSingular, StrLength);
 				}
 				else
 				{
 					const char* pPlural;
 					
 					//Zero
-					pPlural = rStart[i]["zero"];
+					pPlural = json_string_get(json_object_get(pCurrent, "zero"));
 					if(pPlural && pPlural[PLURALTYPE_ZERO])
 					{
-						Length = str_length(pPlural)+1;
-						pEntry->m_apVersions[PLURALTYPE_ZERO] = new char[Length];
-						str_copy(pEntry->m_apVersions[PLURALTYPE_ZERO], pPlural, Length);
+						StrLength = str_length(pPlural)+1;
+						pEntry->m_apVersions[PLURALTYPE_ZERO] = new char[StrLength];
+						str_copy(pEntry->m_apVersions[PLURALTYPE_ZERO], pPlural, StrLength);
 					}
 					//One
-					pPlural = rStart[i]["one"];
+					pPlural = json_string_get(json_object_get(pCurrent, "one"));
 					if(pPlural && pPlural[PLURALTYPE_ONE])
 					{
-						Length = str_length(pPlural)+1;
-						pEntry->m_apVersions[PLURALTYPE_ONE] = new char[Length];
-						str_copy(pEntry->m_apVersions[PLURALTYPE_ONE], pPlural, Length);
+						StrLength = str_length(pPlural)+1;
+						pEntry->m_apVersions[PLURALTYPE_ONE] = new char[StrLength];
+						str_copy(pEntry->m_apVersions[PLURALTYPE_ONE], pPlural, StrLength);
 					}
 					//Two
-					pPlural = rStart[i]["two"];
+					pPlural = json_string_get(json_object_get(pCurrent, "two"));
 					if(pPlural && pPlural[PLURALTYPE_TWO])
 					{
-						Length = str_length(pPlural)+1;
-						pEntry->m_apVersions[PLURALTYPE_TWO] = new char[Length];
-						str_copy(pEntry->m_apVersions[PLURALTYPE_TWO], pPlural, Length);
+						StrLength = str_length(pPlural)+1;
+						pEntry->m_apVersions[PLURALTYPE_TWO] = new char[StrLength];
+						str_copy(pEntry->m_apVersions[PLURALTYPE_TWO], pPlural, StrLength);
 					}
 					//Few
-					pPlural = rStart[i]["few"];
+					pPlural = json_string_get(json_object_get(pCurrent, "few"));
 					if(pPlural && pPlural[PLURALTYPE_FEW])
 					{
-						Length = str_length(pPlural)+1;
-						pEntry->m_apVersions[PLURALTYPE_FEW] = new char[Length];
-						str_copy(pEntry->m_apVersions[PLURALTYPE_FEW], pPlural, Length);
+						StrLength = str_length(pPlural)+1;
+						pEntry->m_apVersions[PLURALTYPE_FEW] = new char[StrLength];
+						str_copy(pEntry->m_apVersions[PLURALTYPE_FEW], pPlural, StrLength);
 					}
 					//Many
-					pPlural = rStart[i]["many"];
+					pPlural = json_string_get(json_object_get(pCurrent, "many"));
 					if(pPlural && pPlural[PLURALTYPE_MANY])
 					{
-						Length = str_length(pPlural)+1;
-						pEntry->m_apVersions[PLURALTYPE_MANY] = new char[Length];
-						str_copy(pEntry->m_apVersions[PLURALTYPE_MANY], pPlural, Length);
+						StrLength = str_length(pPlural)+1;
+						pEntry->m_apVersions[PLURALTYPE_MANY] = new char[StrLength];
+						str_copy(pEntry->m_apVersions[PLURALTYPE_MANY], pPlural, StrLength);
 					}
 					//Other
-					pPlural = rStart[i]["other"];
+					pPlural = json_string_get(json_object_get(pCurrent, "other"));
 					if(pPlural && pPlural[PLURALTYPE_OTHER])
 					{
-						Length = str_length(pPlural)+1;
-						pEntry->m_apVersions[PLURALTYPE_OTHER] = new char[Length];
-						str_copy(pEntry->m_apVersions[PLURALTYPE_OTHER], pPlural, Length);
+						StrLength = str_length(pPlural)+1;
+						pEntry->m_apVersions[PLURALTYPE_OTHER] = new char[StrLength];
+						str_copy(pEntry->m_apVersions[PLURALTYPE_OTHER], pPlural, StrLength);
 					}
 				}
 			}
 		}
 	}
-
-	// clean up
-	json_value_free(pJsonData);
-	delete[] pFileData;
 	
 	m_Loaded = true;
 	
@@ -293,48 +277,37 @@ bool CLocalization::Init()
 	m_pUtf8Converter = ucnv_open("utf8", &Status);
 	if(U_FAILURE(Status))
 	{
-		dbg_msg("Localization", "Can't create UTF8/UTF16 convertert");
+		dbg_msg("Localization", "Couldn't create UTF8/UTF16 convertert");
 		return false;
 	}
 	
-	// read file data into buffer
-	const char *pFilename = "languages/index.json";
-	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, CStorage::TYPE_ALL);
-	if(!File)
+	
+	void* pBuf;
+	unsigned Length;
+	
+	if(!Storage()->ReadFile("languages/index.json", IStorage::TYPE_ALL, &pBuf, &Length))
 	{
-		dbg_msg("Localization", "can't open languages/index.json");
-		return true; //return true because it's not a critical error
+		dbg_msg("Localization", "Couldn't open languages/index.json");
+		return false;
 	}
 	
-	int FileSize = (int)io_length(File);
-	int FileDataSize = FileSize + 1;
-	char *pFileData = new char[FileDataSize];
-	io_read(File, pFileData, FileSize);
-	pFileData[FileSize] = 0;
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
-	if(pJsonData == 0)
-	{
-		delete[] pFileData;
-		return true; //return true because it's not a critical error
-	}
+	json_value *rStart = json_parse( (json_char *) pBuf, Length);
+	free(pBuf);
 
 	// extract data
 	m_pMainLanguage = 0;
-	const json_value &rStart = (*pJsonData)["language indices"];
-	if(rStart.type == json_array)
+	if(rStart && rStart->type == json_array)
 	{
-		for(unsigned i = 0; i < rStart.u.array.length; ++i)
+		for(unsigned i = 0; i < json_array_length(rStart); ++i)
 		{
+			const json_value *pCurrent = json_array_get(rStart, i);
+
 			CLanguage*& pLanguage = m_pLanguages.increment();
-			pLanguage = new CLanguage((const char *)rStart[i]["name"], (const char *)rStart[i]["file"], (const char *)rStart[i]["parent"]);
+			pLanguage = new CLanguage(json_string_get(json_object_get(pCurrent, "Name")),
+				json_string_get(json_object_get(pCurrent, "File")), 
+				json_string_get(json_object_get(pCurrent, "Parent")));
 				
-			if((const char *)rStart[i]["direction"] && str_comp((const char *)rStart[i]["direction"], "rtl") == 0)
+			if(json_string_get(json_object_get(pCurrent, "Direction")) && str_comp(json_string_get(json_object_get(pCurrent, "Direction")), "RTL") == 0)
 				pLanguage->SetWritingDirection(DIRECTION_RTL);
 				
 			if(str_comp(g_Config.m_SvDefaultLanguage, pLanguage->GetFilename()) == 0)
@@ -345,10 +318,6 @@ bool CLocalization::Init()
 			}
 		}
 	}
-
-	// clean up
-	json_value_free(pJsonData);
-	delete[] pFileData;
 	
 	return true;
 }

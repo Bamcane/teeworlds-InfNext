@@ -1,19 +1,17 @@
-{
-	"language indices": 
-	[	
-		{
-			"file": "en",
-			"name": "English"
-		},
-		{
-			"file": "zh-CN",
-			"name": "简体中文",
-			"parent": "en"
-		},
-		{
-			"file": "zh-CL",
-			"name": "文言",
-			"parent": "zh-CN"
-		}
-	]
-}
+[	
+	{
+		"Name": "English", 
+		"File": "en",
+		"Parent": "en"
+	},
+	{
+		"Name": "简体中文", 
+		"File": "zh-CN", 
+		"Parent": "en"
+	},
+	{
+		"Name": "文言", 
+		"File": "zh-CL", 
+		"Parent": "zh-CN"
+	}
+]

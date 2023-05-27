@@ -229,6 +229,20 @@ IOHANDLE io_open(const char *filename, int flags);
 */
 unsigned io_read(IOHANDLE io, void *buffer, unsigned size);
 
+/**
+ * Reads the rest of the file into a buffer.
+ *
+ * @ingroup File-IO
+ *
+ * @param io Handle to the file to read data from.
+ * @param result Receives the file's remaining contents.
+ * @param result_len Receives the file's remaining length.
+ *
+ * @remark Does NOT guarantee that there are no internal null bytes.
+ * @remark The result must be freed after it has been used.
+ */
+void io_read_all(IOHANDLE io, void **result, unsigned *result_len);
+
 /*
 	Function: io_skip
 		Skips data in a file.

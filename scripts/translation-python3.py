@@ -10,22 +10,22 @@ def ConvertPo2Json(languageCode, plurals):
 
 		f = open(jsonFileName, "w")
 
-		print('{"translation":[', end="\n", file=f)
+		print('[', end="\n", file=f)
 
 		for entry in po:
 			if entry.msgstr:
 				print('\t{', end="\n", file=f)
-				print('\t\t"key": '+json.dumps(str(entry.msgid))+',', end="\n", file=f)
-				print('\t\t"value": '+json.dumps(str(entry.msgstr))+'', end="\n", file=f)
+				print('\t\t"key": "'+str(entry.msgid)+'",', end="\n", file=f)
+				print('\t\t"value": "'+str(entry.msgstr)+'"', end="\n", file=f)
 				print('\t},', end="\n", file=f)
 			elif entry.msgstr_plural.keys():
 				print('\t{', end="\n", file=f)
-				print('\t\t"key": '+json.dumps(str(entry.msgid_plural))+',', end="\n", file=f)
+				print('\t\t"key": "'+str(entry.msgid_plural)+'",', end="\n", file=f)
 				for index in sorted(entry.msgstr_plural.keys()):
-					print('\t\t"'+plurals[index]+'": '+json.dumps(entry.msgstr_plural[index])+',', end="\n", file=f)
+					print('\t\t"'+plurals[index]+'": "'+str(entry.msgstr_plural[index])+'",', end="\n", file=f)
 				print('\t},', end="\n", file=f)
 
-		print(']}', end="\n", file=f)
+		print(']', end="\n", file=f)
 
 ConvertPo2Json("zh-CN", ["other"])
 ConvertPo2Json("zh-CL", ["other"])

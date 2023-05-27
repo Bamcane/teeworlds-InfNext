@@ -1,270 +1,270 @@
-{"translation":[
+[
 	{
 		"key": "'{str:OldName}' changed name to '{str:NewName}'",
-		"value": "'{str:OldName}' \u5df2\u6539\u540d\u4e3a'{str:NewName}'"
+		"value": "'{str:OldName}' 已改名为'{str:NewName}'"
 	},
 	{
 		"key": "'{str:Option}' isn't an option on this server",
-		"value": "'{str:Option}' \u4e0d\u662f\u6b64\u670d\u52a1\u5668\u4e0a\u7684\u4e00\u4e2a\u9009\u9879"
+		"value": "'{str:Option}' 不是此服务器上的一个选项"
 	},
 	{
 		"key": "'{str:PlayerName}' has been infected",
-		"value": "'{str:PlayerName}' \u88ab\u611f\u67d3\u4e86"
+		"value": "'{str:PlayerName}' 被感染了"
 	},
 	{
 		"key": "'{str:Player}' called for vote to kick '{str:Player2}' ({str:Reason})",
-		"value": "'{str:Player}'\u63d0\u8bae\u8e22\u51fa'{str:Player2}' ({str:Reason})"
+		"value": "'{str:Player}'提议踢出'{str:Player2}' ({str:Reason})"
 	},
 	{
 		"key": "'{str:Player}' called for vote to kick you",
-		"value": "'{str:Player}' \u53d1\u8d77\u6295\u7968\u8e22\u4f60"
+		"value": "'{str:Player}' 发起投票踢你"
 	},
 	{
 		"key": "'{str:Player}' called for vote to move '{str:Player2}' to spectators ({str:Reason})",
-		"value": "'{str:Player}'\u63d0\u8bae\u79fb\u52a8'{str:Player2}'\u5230\u65c1\u89c2 ({str:Reason})"
+		"value": "'{str:Player}'提议移动'{str:Player2}'到旁观 ({str:Reason})"
 	},
 	{
 		"key": "'{str:Player}' called vote to change server option '{str:Option}' ({str:Reason})",
-		"value": "'{str:Player}' \u53d1\u8d77\u6295\u7968\u66f4\u6539\u670d\u52a1\u5668\u9009\u9879 '{str:Option}' ({str:Reason})"
+		"value": "'{str:Player}' 发起投票更改服务器选项 '{str:Option}' ({str:Reason})"
 	},
 	{
 		"key": "'{str:Player}' entered and joined the {lstr:Team}",
-		"value": "'{str:Player}' \u8fde\u63a5\u670d\u52a1\u5668\u5e76\u52a0\u5165{lstr:Team}"
+		"value": "'{str:Player}' 连接服务器并加入{lstr:Team}"
 	},
 	{
 		"key": "'{str:Player}' has left the game",
-		"value": "'{str:Player}'\u79bb\u5f00\u4e86\u6e38\u620f"
+		"value": "'{str:Player}'离开了游戏"
 	},
 	{
 		"key": "'{str:Player}' has left the game ({str:Reason})",
-		"value": "'{str:Player}'\u79bb\u5f00\u4e86\u6e38\u620f ({str:Reason})"
+		"value": "'{str:Player}'离开了游戏 ({str:Reason})"
 	},
 	{
 		"key": "'{str:Player}' joined the {lstr:Team}",
-		"value": "'{str:Player}' \u52a0\u5165\u4e86{lstr:Team}"
+		"value": "'{str:Player}' 加入了{lstr:Team}"
 	},
 	{
 		"key": "Available languages: {str:List}",
-		"value": "\u53ef\u7528\u8bed\u8a00\ufe30 {str:List}"
+		"value": "可用语言︰ {str:List}"
 	},
 	{
 		"key": "Based on the concept of infNext mod by pure_luck",
-		"value": "\u57fa\u4e8e pure_luck \u6240\u505a\u7684\u65b0\u611f\u67d3\u6a21\u5f0f"
+		"value": "基于 pure_luck 所做的新感染模式"
 	},
 	{
 		"key": "Boomer",
-		"value": "\u7206\u70b8\u8005"
+		"value": "爆炸者"
 	},
 	{
 		"key": "Captain",
-		"value": "\u8239\u957f"
+		"value": "船长"
 	},
 	{
 		"key": "Help us to translation mod on Crowdin!",
-		"value": "\u5e2e\u52a9\u6211\u4eec\u5728Crowdin\u4e0a\u8fdb\u884c\u7ffb\u8bd1\uff01"
+		"value": "帮助我们在Crowdin上进行翻译！"
 	},
 	{
 		"key": "Hunter",
-		"value": "\u730e\u4eba"
+		"value": "猎人"
 	},
 	{
 		"key": "INF| Humans win!",
-		"value": "INF| \u4eba\u7c7b\u80dc\u5229\uff01"
+		"value": "INF| 人类胜利！"
 	},
 	{
 		"key": "INF| Infects win!",
-		"value": "INF| \u611f\u67d3\u80dc\u5229\uff01"
+		"value": "INF| 感染胜利！"
 	},
 	{
 		"key": "Infection is coming in {sec:Time}!",
-		"value": "\u611f\u67d3\u5c06\u5728{sec:Time}\u540e\u6765\u4e34!"
+		"value": "感染将在{sec:Time}后来临!"
 	},
 	{
 		"key": "Invalid client id to kick",
-		"value": "\u65e0\u6548\u7684\u5ba2\u6237\u7aef ID"
+		"value": "无效的客户端 ID"
 	},
 	{
 		"key": "Invalid client id to move",
-		"value": "\u65e0\u6548\u7684\u5ba2\u6237\u7aef ID"
+		"value": "无效的客户端 ID"
 	},
 	{
 		"key": "Invalid spectator id used",
-		"value": "\u65e0\u6548\u7684\u65c1\u89c2\u8005ID"
+		"value": "无效的旁观者ID"
 	},
 	{
 		"key": "Kick voting requires {int:Num} players on the server",
-		"value": "\u53d1\u8d77\u8e22\u4eba\u6295\u7968\u9700\u8981\u6709 {int:Num} \u540d\u73a9\u5bb6"
+		"value": "发起踢人投票需要有 {int:Num} 名玩家"
 	},
 	{
 		"key": "Language successfully switched to English",
-		"value": "\u8bed\u8a00\u5df2\u6210\u529f\u5207\u6362\u5230\u4e2d\u6587"
+		"value": "语言已成功切换到中文"
 	},
 	{
 		"key": "Looper",
-		"value": "\u5faa\u73af\u8005"
+		"value": "循环者"
 	},
 	{
 		"key": "Medic",
-		"value": "\u533b\u7597\u5175"
+		"value": "医疗兵"
 	},
 	{
 		"key": "Only {int:Num} active players are allowed",
-		"value": "\u53ea\u5141\u8bb8 {int:Num} \u540d\u73a9\u5bb6\u6e38\u73a9"
+		"value": "只允许 {int:Num} 名玩家游玩"
 	},
 	{
 		"key": "Queen",
-		"value": "\u5973\u738b"
+		"value": "女王"
 	},
 	{
 		"key": "Server does not allow voting to kick players",
-		"value": "\u670d\u52a1\u5668\u4e0d\u5141\u8bb8\u6295\u7968\u8e22\u73a9\u5bb6"
+		"value": "服务器不允许投票踢玩家"
 	},
 	{
 		"key": "Server does not allow voting to move players to spectators",
-		"value": "\u670d\u52a1\u5668\u4e0d\u5141\u8bb8\u6295\u7968\u5c06\u73a9\u5bb6\u79fb\u52a8\u5230\u65c1\u89c2\u8005"
+		"value": "服务器不允许投票将玩家移动到旁观者"
 	},
 	{
 		"key": "Smoker",
-		"value": "\u5438\u70df\u8005"
+		"value": "吸烟者"
 	},
 	{
 		"key": "Sniper",
-		"value": "\u72d9\u51fb\u624b"
+		"value": "狙击手"
 	},
 	{
 		"key": "Spectators aren't allowed to start a vote.",
-		"value": "\u65c1\u89c2\u8005\u4e0d\u80fd\u53d1\u8d77\u6295\u7968"
+		"value": "旁观者不能发起投票"
 	},
 	{
 		"key": "Teams must be balanced, please join other team",
-		"value": "\u961f\u4f0d\u5fc5\u987b\u5e73\u8861, \u8bf7\u52a0\u5165\u5176\u4ed6\u961f\u4f0d"
+		"value": "队伍必须平衡, 请加入其他队伍"
 	},
 	{
 		"key": "Thanks {str:List}",
-		"value": "\u611f\u8c22 {str:List}"
+		"value": "感谢 {str:List}"
 	},
 	{
 		"key": "The game has been canceled",
-		"value": "\u6e38\u620f\u5df2\u7ecf\u88ab\u53d6\u6d88"
+		"value": "游戏已经被取消"
 	},
 	{
 		"key": "The queen '{str:Queen}' was killed by human '{str:Player}'!",
-		"value": "\u5973\u738b'{str:Queen}'\u5728\u4eba\u7c7b'{str:Player}'\u7684\u523a\u6740\u4e0b\u9a7e\u5d29\u4e86!"
+		"value": "女王'{str:Queen}'在人类'{str:Player}'的刺杀下驾崩了!"
 	},
 	{
 		"key": "The queen '{str:Queen}' was killed by infected '{str:Player}'!?",
-		"value": "\u5973\u738b'{str:Queen}'\u5728\u611f\u67d3\u8005'{str:Player}'\u7684\u53cd\u5411\u4fdd\u62a4\u4e0b\u9a7e\u5d29\u4e86!"
+		"value": "女王'{str:Queen}'在感染者'{str:Player}'的反向保护下驾崩了!"
 	},
 	{
 		"key": "Time to wait before changing team: {sec:Time}",
-		"value": "\u5fc5\u987b\u7b49\u5f85{sec:Time}\u624d\u80fd\u66f4\u6539\u961f\u4f0d"
+		"value": "必须等待{sec:Time}才能更改队伍"
 	},
 	{
 		"key": "Unknown language or no input language code",
-		"value": "\u672a\u77e5\u8bed\u8a00\u6216\u6ca1\u6709\u8f93\u5165\u8bed\u8a00\u4ee3\u7801"
+		"value": "未知语言或没有输入语言代码"
 	},
 	{
 		"key": "Vote aborted",
-		"value": "\u6295\u7968\u4e2d\u6b62"
+		"value": "投票中止"
 	},
 	{
 		"key": "Vote failed",
-		"value": "\u6295\u7968\u5931\u8d25"
+		"value": "投票失败"
 	},
 	{
 		"key": "Vote passed",
-		"value": "\u6295\u7968\u901a\u8fc7"
+		"value": "投票通过"
 	},
 	{
 		"key": "Wait for current vote to end before calling a new one.",
-		"value": "\u7b49\u5f85\u5f53\u524d\u6295\u7968\u7ed3\u675f\u540e\u518d\u53d1\u8d77\u4e00\u4e2a\u65b0\u6295\u7968\u3002"
+		"value": "等待当前投票结束后再发起一个新投票。"
 	},
 	{
 		"key": "Wait game start!",
-		"value": "\u7b49\u5f85\u6e38\u620f\u5f00\u59cb!"
+		"value": "等待游戏开始!"
 	},
 	{
 		"key": "What? You killed your teammates?!",
-		"value": "\u4ec0\u4e48? \u4f60\u6740\u6b7b\u4e86\u4f60\u7684\u961f\u53cb?!"
+		"value": "什么? 你杀死了你的队友?!"
 	},
 	{
 		"key": "What? You were killed by your teammates?!",
-		"value": "\u4ec0\u4e48? \u4f60\u88ab\u4f60\u7684\u961f\u53cb\u6740\u4e86?"
+		"value": "什么? 你被你的队友杀了?"
 	},
 	{
 		"key": "You are '{lstr:Class}'",
-		"value": "\u4f60\u662f '{lstr:Class}'"
+		"value": "你是 '{lstr:Class}'"
 	},
 	{
 		"key": "You are dehydrated: {sec:Time}",
-		"value": "\u4f60\u5df2\u8131\u6c34\uff1a {sec:Time}"
+		"value": "你已脱水： {sec:Time}"
 	},
 	{
 		"key": "You can't kick admins",
-		"value": "\u4f60\u4e0d\u80fd\u8e22\u7ba1\u7406\u5458"
+		"value": "你不能踢管理员"
 	},
 	{
 		"key": "You can't kick yourself",
-		"value": "\u4f60\u4e0d\u80fd\u8e22\u51fa\u4f60\u81ea\u5df1"
+		"value": "你不能踢出你自己"
 	},
 	{
 		"key": "You can't move yourself",
-		"value": "\u4f60\u4e0d\u80fd\u79fb\u52a8\u81ea\u5df1"
+		"value": "你不能移动自己"
 	},
 	{
 		"key": "You infected '{str:Player}'",
-		"value": "\u4f60\u611f\u67d3\u4e86'{str:Player}'"
+		"value": "你感染了'{str:Player}'"
 	},
 	{
 		"key": "You killed the queen, +5 score!",
-		"value": "\u4f60\u6740\u6b7b\u4e86\u5973\u738b, +5\u5206!"
+		"value": "你杀死了女王, +5分!"
 	},
 	{
 		"key": "You killed the queen, -5 score!",
-		"value": "\u4f60\u6740\u6b7b\u4e86\u5973\u738b, -5\u5206!"
+		"value": "你杀死了女王, -5分!"
 	},
 	{
 		"key": "You must wait {sec:Time} before making another vote",
-		"value": "\u4f60\u5fc5\u987b\u7b49\u5f85 {sec:Time} \u624d\u80fd\u518d\u8fdb\u884c\u4e00\u6b21\u6295\u7968"
+		"value": "你必须等待 {sec:Time} 才能再进行一次投票"
 	},
 	{
 		"key": "You were infected by '{str:Player}'",
-		"value": "\u4f60\u88ab'{str:Player}'\u611f\u67d3\u4e86"
+		"value": "你被'{str:Player}'感染了"
 	},
 	{
 		"key": "You're infected by '{str:Player}'",
-		"value": "\u4f60\u88ab'{str:Player}' \u611f\u67d3\u4e86"
+		"value": "你被'{str:Player}' 感染了"
 	},
 	{
 		"key": "admin forced server option '{str:Value}' ({str:Reason})",
-		"value": "\u7ba1\u7406\u901a\u8fc7\u670d\u52a1\u5668\u9009\u9879 '{str:Value}' ({str:Reason})"
+		"value": "管理通过服务器选项 '{str:Value}' ({str:Reason})"
 	},
 	{
 		"key": "admin forced vote no",
-		"value": "\u7ba1\u7406\u5458\u5426\u51b3\u6295\u7968"
+		"value": "管理员否决投票"
 	},
 	{
 		"key": "admin forced vote yes",
-		"value": "\u7ba1\u7406\u5458\u901a\u8fc7\u6295\u7968"
+		"value": "管理员通过投票"
 	},
 	{
 		"key": "admin moved '{str:Player}' to spectator ({str:Reason})",
-		"value": "\u7ba1\u7406\u5458\u79fb\u52a8'{str:Player}'\u5230\u65c1\u89c2\u8005({str:Reason})"
+		"value": "管理员移动'{str:Player}'到旁观者({str:Reason})"
 	},
 	{
 		"key": "blue team",
-		"value": "\u84dd\u961f"
+		"value": "蓝队"
 	},
 	{
 		"key": "game",
-		"value": "\u6e38\u620f"
+		"value": "游戏"
 	},
 	{
 		"key": "red team",
-		"value": "\u7ea2\u961f"
+		"value": "红队"
 	},
 	{
 		"key": "spectators",
-		"value": "\u65c1\u89c2\u8005"
+		"value": "旁观者"
 	},
-]}
+]

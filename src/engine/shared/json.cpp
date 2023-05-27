@@ -23,7 +23,7 @@ const struct _json_value *json_array_get(const json_value *array, int index)
 	return array->u.array.values[index];
 }
 
-int json_array_length(const json_value *array)
+unsigned int json_array_length(const json_value *array)
 {
 	return array->u.array.length;
 }
@@ -33,7 +33,7 @@ const char *json_string_get(const json_value *string)
 	return string->u.string.ptr;
 }
 
-int json_int_get(const json_value *integer)
+int64_t json_int_get(const json_value *integer)
 {
 	return integer->u.integer;
 }

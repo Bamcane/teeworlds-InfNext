@@ -2180,43 +2180,27 @@ bool CServer::LoadMapConfigInJson(const char* pFileName, const char *pMapName)
 	char aBuf[IO_MAX_PATH_LENGTH];
 	str_format(aBuf, sizeof(aBuf), "maps/%s", pFileName);
 
-	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
-	if(!File)
+	void* pBuf;
+	unsigned Length;
+	
+	if(!Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pBuf, &Length))
 	{
-		str_format(aBuf, sizeof(aBuf), "Can't load the map config file %s", aBuf);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+		dbg_msg("Localization", "Couldn't open %s", aBuf);
 		return false;
 	}
+	
+	json_value *rStart = json_parse( (json_char *) pBuf, Length);
 
-	// load the file as a string
-	int FileSize = (int)io_length(File);
-	int FileDataSize = FileSize + 1;
-	char *pFileData = new char[FileDataSize];
-	io_read(File, pFileData, FileSize);
-	pFileData[FileSize] = 0;
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
-	if(pJsonData == 0)
+	if(rStart->type == json_array)
 	{
-		str_format(aBuf, sizeof(aBuf), "Can't load the map config file %s : %s", aBuf, aError);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
-		delete[] pFileData;
-		return false;
-	}
-
-	const json_value &rStart = (*pJsonData)["maps"];
-	if(rStart.type == json_array)
-	{
-		for(unsigned i = 0; i < rStart.u.array.length; ++i)
+		for(unsigned i = 0; i < json_array_length(rStart); ++i)
 		{
-			if(str_comp((const char *)rStart[i]["name"], pMapName))
+			const json_value *pCurrent = json_array_get(rStart, i);
+
+			if(str_comp(json_string_get(json_object_get(pCurrent, "name")), pMapName))
 				continue;
-			long TimeLimit = (long)rStart[i]["timelimit"];
+			
+			long TimeLimit = json_int_get(json_object_get(pCurrent, "timelimit"));
 
 			if(TimeLimit)
 			{
@@ -2229,10 +2213,6 @@ bool CServer::LoadMapConfigInJson(const char* pFileName, const char *pMapName)
 			}
 		}
 	}
-
-	// clean up
-	json_value_free(pJsonData);
-	delete[] pFileData;
 	
 	return true;
 }
@@ -2706,20 +2686,9 @@ static CServer *CreateServer() { return new CServer(); }
 
 int main(int argc, const char **argv) // ignore_convention
 {
-#if defined(CONF_FAMILY_WINDOWS)
-	for(int i = 1; i < argc; i++) // ignore_convention
-	{
-		if(str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0) // ignore_convention
-		{
-			ShowWindow(GetConsoleWindow(), SW_HIDE);
-			break;
-		}
-	}
-#endif
-
 	if(secure_random_init() != 0)
 	{
-		dbg_msg("secure", "could not initialize secure RNG");
+		dbg_msg("Secure", "Couldn't initialize secure RNG");
 		return -1;
 	}
 
@@ -2763,7 +2732,7 @@ int main(int argc, const char **argv) // ignore_convention
 	pServer->m_pLocalization = new CLocalization(pStorage);
 	if(!pServer->m_pLocalization->Init())
 	{
-		dbg_msg("localization", "could not initialize localization");
+		dbg_msg("Localization", "Couldn't initialize localization");
 		return -1;
 	}
 

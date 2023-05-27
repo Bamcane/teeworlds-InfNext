@@ -2646,53 +2646,34 @@ void CGameContext::LoadMapInJson(const char* pFileName)
 	char aBuf[IO_MAX_PATH_LENGTH];
 	str_format(aBuf, sizeof(aBuf), "maps/%s", pFileName);
 
-	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
-	if(!File)
+	void* pBuf;
+	unsigned Length;
+	
+	if(!Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pBuf, &Length))
 	{
-		str_format(aBuf, sizeof(aBuf), "Couldn't load the map config file %s", aBuf);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+		dbg_msg("Map", "Couldn't open %s", aBuf);
 		return;
 	}
+	
+	json_value *rStart = json_parse( (json_char *) pBuf, Length);
 
-	// load the file as a string
-	int FileSize = (int)io_length(File);
-	int FileDataSize = FileSize + 1;
-	char *pFileData = new char[FileDataSize];
-	io_read(File, pFileData, FileSize);
-	pFileData[FileSize] = 0;
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
-	if(pJsonData == 0)
+	if(rStart->type == json_array)
 	{
-		str_format(aBuf, sizeof(aBuf), "Couldn't load the map config file %s : %s", aBuf, aError);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
-		delete[] pFileData;
-		return;
-	}
-
-	const json_value &rStart = (*pJsonData)["maps"];
-	if(rStart.type == json_array)
-	{
-		for(unsigned i = 0; i < rStart.u.array.length; ++i)
+		for(unsigned i = 0; i < json_array_length(rStart); ++i)
 		{
-			const char* pMapName = (const char *)rStart[i]["name"];
+			const json_value *pCurrent = json_array_get(rStart, i);
+
+			const char* pMapName = json_string_get(json_object_get(pCurrent, "name"));
+
 			if(!pMapName || !pMapName[0])
 				continue;
+
 			char aCommand[256];
 			str_format(aCommand, sizeof(aCommand), "change_map \"%s\"", pMapName);
 			AddVote(pMapName, aCommand);
 		}
 	}
 
-	// clean up
-	json_value_free(pJsonData);
-	delete[] pFileData;
-	
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "added maps to votes");
 
 	return;
