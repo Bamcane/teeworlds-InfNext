@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: teeworlds-infnext\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-28 12:07+0800\n"
+"POT-Creation-Date: 2023-05-28 17:17+0800\n"
 "PO-Revision-Date: 2023-05-10 13:09\n"
 "Last-Translator: \n"
 "Language-Team: Classical Chinese\n"
@@ -49,15 +49,15 @@ msgstr "'{str:Player}' 上奏求更'{str:Option}'一條，因是({str:Reason})�
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr "'{str:Player}'入室去{lstr:Team}也。"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:293
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:291
 msgid "'{str:Player}' has left the game"
 msgstr "'{str:Player}'出室也。"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:288
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:286
 msgid "'{str:Player}' has left the game ({str:Reason})"
 msgstr "'{str:Player}' 因 ({str:Reason}) 出室也。"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:381
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:379
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr "'{str:Player}' 入 {lstr:Team} 也。"
 
@@ -213,7 +213,7 @@ msgstr ""
 msgid "What? You were killed by your teammates?!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:485
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:483
 msgid "You are '{lstr:Class}'"
 msgstr "君乃 '{lstr:Class}' 也"
 

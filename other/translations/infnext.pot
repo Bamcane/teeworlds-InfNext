@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-28 16:08+0800\n"
+"POT-Creation-Date: 2023-05-28 17:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,15 +53,15 @@ msgstr ""
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:293
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:291
 msgid "'{str:Player}' has left the game"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:288
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:286
 msgid "'{str:Player}' has left the game ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:381
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:379
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr ""
 
@@ -217,7 +217,7 @@ msgstr ""
 msgid "What? You were killed by your teammates?!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:485
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:483
 msgid "You are '{lstr:Class}'"
 msgstr ""
 

@@ -123,7 +123,6 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 	
 	if(!pStorage->ReadFile(aBuf, IStorage::TYPE_ALL, &pBuf, &Length))
 	{
-		dbg_msg("Localization", "Couldn't open %s", aBuf);
 		return false;
 	}
 

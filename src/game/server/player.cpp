@@ -223,10 +223,8 @@ void CPlayer::Snap(int SnappingClient)
 		if(SnappingClient != -1 && m_Team == TEAM_SPECTATORS && (SnappingClient == m_SpectatorID))
 			pPlayerInfo->m_PlayerFlags |= protocol7::PLAYERFLAG_WATCHING;
 
-		// Times are in milliseconds for 0.7
 		pPlayerInfo->m_Score = Score;
 		pPlayerInfo->m_Latency = Latency;
-		
 	}
 
 	if(m_ClientID == SnappingClient && m_Team == TEAM_SPECTATORS)
