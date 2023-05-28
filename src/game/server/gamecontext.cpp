@@ -2281,7 +2281,7 @@ void CGameContext::ConAbout(IConsole::IResult *pResult, void *pUserData)
 
 	char aThanksList[256];
 
-	str_copy(aThanksList, "pure_luck, necropotame");
+	str_copy(aThanksList, "pure_luck, necropotame, DDNet Team, Kaffeine");
 	// infNext by pure_luck , necropotame made this frame
 
 	pSelf->SendChatTarget(ClientID, "=====InfNext=====");

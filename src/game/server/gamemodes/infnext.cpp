@@ -220,7 +220,6 @@ void CGameControllerNext::Snap(int SnappingClient)
 	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
 	pGameInfoObj->m_RoundCurrent = m_RoundCount+1;
 
-	const int TIMESHIFT_MENUCLASS_MASK = Classes()->m_HumanClasses.size()+1;
 	int ClassMask = 0;
 	int MASK_ALL = 0;
 	int ClassesNum[Classes()->m_HumanClasses.size()];
@@ -247,11 +246,14 @@ void CGameControllerNext::Snap(int SnappingClient)
 		}
 	}
 
+	ClassMask |= 1<<0;
+	MASK_ALL |= 1<<0;
+
 	for(unsigned int i = 0; i < Classes()->m_HumanClasses.size(); i++) 
 	{
 		if(Classes()->m_HumanClasses[i].m_Value && ClassesNum[i] < Classes()->m_HumanClasses[i].m_Limit)
-			ClassMask |= 1<<i;
-		MASK_ALL |= 1<<i;
+			ClassMask |= 1<<(i+1);
+		MASK_ALL |= 1<<(i+1);
 	}
 
 	if(SnappingClient != -1)
@@ -263,7 +265,7 @@ void CGameControllerNext::Snap(int SnappingClient)
 			if(!GameServer()->m_apPlayers[SnappingClient]->GetClass())
 			{
 				int Item = GameServer()->m_apPlayers[SnappingClient]->m_MapMenuItem;
-				Page = TIMESHIFT_MENUCLASS + 3*((Item+1) + ClassMask*TIMESHIFT_MENUCLASS_MASK) + 1;
+				Page = TIMESHIFT_MENUCLASS + 3*((Item+1) + ClassMask*(Classes()->m_HumanClasses.size()+2)) + 1;
 			}
 			
 			if(Page >= 0)
@@ -305,8 +307,10 @@ void CGameControllerNext::Snap(int SnappingClient)
 	}
 }
 
-void CGameControllerNext::CheckNoClass()
+int CGameControllerNext::RandomClass()
 {
+	int Class = 0;
+
 	unsigned int Size = (unsigned int)Classes()->m_HumanClasses.size();
 	int ClassesNum[Size];
 	for(unsigned int i = 0; i < Size; i ++)
@@ -332,6 +336,17 @@ void CGameControllerNext::CheckNoClass()
 		}
 	}
 
+	do
+	{
+		// random a enable class
+		Class = random_int(0, Classes()->m_HumanClasses.size()-1);
+	}while(!Classes()->m_HumanClasses[Class].m_Value || ClassesNum[Class] >= Classes()->m_HumanClasses[Class].m_Limit);
+
+	return Class;
+}
+
+void CGameControllerNext::CheckNoClass()
+{
 	for(int i = 0;i < MAX_CLIENTS; i ++)
 	{
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
@@ -345,16 +360,58 @@ void CGameControllerNext::CheckNoClass()
 		if(pPlayer->GetClass())
 			continue;
 
-		int Class = 0;
-		do
-		{
-			// random a enable class
-			Class = random_int(0, Classes()->m_HumanClasses.size()-1);
-		}while(!Classes()->m_HumanClasses[Class].m_Value || ClassesNum[i] >= Classes()->m_HumanClasses[i].m_Limit);
-
+		int Class = RandomClass();
 		// set class
 		pPlayer->SetClass(Classes()->m_HumanClasses[Class].m_pClass->CreateNewOne(GameServer(), pPlayer));
 	}
+}
+
+int CGameControllerNext::ChooseInfect(std::vector<int>& vInfects)
+{
+	int BestScore=0;
+	int InfectID = -1;
+
+	for(int i = 0; i < MAX_CLIENTS; i ++)
+	{
+		if(!GameServer()->m_apPlayers[i])
+			continue;
+		if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+			continue;
+		if(GameServer()->m_apPlayers[i]->GetClass() && GameServer()->m_apPlayers[i]->GetClass()->m_Infect)
+			continue;
+		
+		bool Next = false;
+		for(unsigned int j = 0;j < (unsigned int) vInfects.size();j ++)
+		{
+			if(vInfects[j] == i)
+			{
+				Next = true;
+				break;
+			}
+		}
+
+		if(Next)
+			continue;
+
+		float Scoremod = 1.0f;
+		int Score = 10;
+		
+		// if this player has infected last round and his game technology is good, his scoremod will lower 
+		if(PlayerInfected(i))
+		{
+			Scoremod = 0.6f;
+			if(GameServer()->m_apPlayers[i]->m_LastScore)
+				Scoremod -= max(0.f, GameServer()->m_apPlayers[i]->m_LastScore/120.0f);
+		}
+		
+		Score *= Scoremod;
+		if(Score > BestScore)
+		{
+			InfectID = i;
+			BestScore = Score;
+		}
+	}
+	return InfectID;
 }
 
 void CGameControllerNext::CreateInfects()
@@ -381,60 +438,22 @@ void CGameControllerNext::CreateInfects()
 	if(InfectNum <= 0)
 		return;
 
-	std::vector<int> tmpList;
+	std::vector<int> vTempList;
 
 	for(int i = 0;i < InfectNum;i ++)
 	{
-		int BestScore=0;
-
-		int InfectID=-1;
-
-		for(int j = 0; j < MAX_CLIENTS; j ++)
+		int InfectID;
+		do
 		{
-			if(!GameServer()->m_apPlayers[j])
-				continue;
-			if(GameServer()->m_apPlayers[j]->GetTeam() == TEAM_SPECTATORS)
-				continue;
-			if(GameServer()->m_apPlayers[i]->GetClass() && GameServer()->m_apPlayers[i]->GetClass()->m_Infect)
-				continue;
-			
-			bool Next = false;
-			for(unsigned int k = 0;k < (unsigned int) tmpList.size();k ++)
-			{
-				if(tmpList[k] == j)
-				{
-					Next = true;
-					break;
-				}
-			}
+			InfectID = ChooseInfect(vTempList);
+		}while(!GameServer()->m_apPlayers[InfectID]);
 
-			if(Next)
-				continue;
-
-			float Scoremod = 1.0f;
-			int Score = 10;
-			
-			// if this player has infected last round and his game technology is good, his scoremod will lower 
-			if(PlayerInfected(j))
-			{
-				Scoremod = 0.6f;
-				if(GameServer()->m_apPlayers[j]->m_LastScore)
-					Scoremod -= max(0.f, GameServer()->m_apPlayers[j]->m_LastScore/120.0f);
-			}
-			
-			Score *= Scoremod;
-			if(Score > BestScore)
-			{
-				InfectID = j;
-				BestScore = Score;
-			}
-		};
 		GameServer()->m_apPlayers[InfectID]->Infect();
 
 		GameServer()->SendChatTarget_Localization(-1, _("'{str:PlayerName}' has been infected"), 
 			"PlayerName", Server()->ClientName(InfectID), NULL);
 		
-		tmpList.push_back(InfectID);
+		vTempList.push_back(InfectID);
 
 		// send debug info
 		char aBuf[256];
@@ -444,8 +463,9 @@ void CGameControllerNext::CreateInfects()
 	}
 
 	// clear infects
-	m_LastInfect.clear();
-	m_LastInfect = tmpList;
+	m_vLastInfect.clear();
+
+	m_vLastInfect = vTempList;
 }
 
 bool CGameControllerNext::PlayerInfected(int ClientID)
@@ -456,9 +476,9 @@ bool CGameControllerNext::PlayerInfected(int ClientID)
 	if(!GameServer()->m_apPlayers[ClientID])
 		return true;
 
-	for(unsigned int i = 0;i < m_LastInfect.size();i ++)
+	for(unsigned int i = 0;i < m_vLastInfect.size();i ++)
 	{
-		if(m_LastInfect[i] == ClientID)
+		if(m_vLastInfect[i] == ClientID)
 			return true;
 	}
 	return false;
@@ -543,6 +563,7 @@ void CGameControllerNext::OnPlayerSelectClass(CPlayer* pPlayer)
 {
 	if(!pPlayer)
 		return;
+	
 	if(!pPlayer->GetCharacter())
 		return;
 
@@ -551,15 +572,16 @@ void CGameControllerNext::OnPlayerSelectClass(CPlayer* pPlayer)
 
 	CCharacter *pChr = pPlayer->GetCharacter();
 
-	CClass *NewClass = Classes()->m_HumanClasses[Class].m_pClass->CreateNewOne(GameServer(), pPlayer);
+	CClass *NewClass =  Classes()->m_HumanClasses[Class == 0 ? (RandomClass()) : (Class - 1)].m_pClass->CreateNewOne(GameServer(), pPlayer);
 
 	if(pChr->GetLatestInput()->m_Fire&1)
 	{
 		pPlayer->SetClass(NewClass);
+		return;
 	}
-	else 
-	{
-		GameServer()->SendBroadcast_Localization(ClientID, NewClass->m_ClassName, 2, BROADCAST_CLASS);
-		delete NewClass;
-	}
+	
+	if(Class == 0)
+		GameServer()->SendBroadcast_Localization(ClientID, _("Random Class"), 2, BROADCAST_CLASS);
+	else GameServer()->SendBroadcast_Localization(ClientID, NewClass->m_ClassName, 2, BROADCAST_CLASS);
+	delete NewClass;
 }

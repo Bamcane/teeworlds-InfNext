@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: teeworlds-infnext\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-25 20:07+0800\n"
+"POT-Creation-Date: 2023-05-28 12:07+0800\n"
 "PO-Revision-Date: 2023-05-20 04:37\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
@@ -25,7 +25,7 @@ msgstr "'{str:OldName}' 已改名为'{str:NewName}'"
 msgid "'{str:Option}' isn't an option on this server"
 msgstr "'{str:Option}' 不是此服务器上的一个选项"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:434
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:453
 msgid "'{str:PlayerName}' has been infected"
 msgstr "'{str:PlayerName}' 被感染了"
 
@@ -133,6 +133,10 @@ msgstr "只允许 {int:Num} 名玩家游玩"
 msgid "Queen"
 msgstr "女王"
 
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:584
+msgid "Random Class"
+msgstr ""
+
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1537
 msgid "Server does not allow voting to kick players"
 msgstr "服务器不允许投票踢玩家"
@@ -209,7 +213,7 @@ msgstr "什么? 你杀死了你的队友?!"
 msgid "What? You were killed by your teammates?!"
 msgstr "什么? 你被你的队友杀了?"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:484
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:485
 msgid "You are '{lstr:Class}'"
 msgstr "你是 '{lstr:Class}'"
 

@@ -583,8 +583,8 @@ void CCharacter::HandleMenu()
 	if(length(CursorPos) > 80.0f)
 	{
 		float Angle = 2.0f*pi+atan2(CursorPos.x, -CursorPos.y);
-		float AngleStep = 2.0f*pi/static_cast<float>(Server()->Classes()->m_HumanClasses.size());
-		m_pPlayer->m_MapMenuItem = ((int)((Angle+AngleStep/2.0f)/AngleStep))%Server()->Classes()->m_HumanClasses.size();
+		float AngleStep = 2.0f * pi / static_cast<float>(Server()->Classes()->m_HumanClasses.size() + 1);// 1 = random
+		m_pPlayer->m_MapMenuItem = ((int) ((Angle + AngleStep / 2.0f) / AngleStep)) % (Server()->Classes()->m_HumanClasses.size() + 1);
 		
 		GameServer()->m_pController->OnPlayerSelectClass(m_pPlayer);
 	}
@@ -832,6 +832,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon, int Mode)
 
 		if(GameServer()->m_apPlayers[From])
 			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_CTF_GRAB_PL, CmaskOne(From));
+		
 		return false;
 	}
 

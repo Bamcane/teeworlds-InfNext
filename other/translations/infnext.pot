@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-27 21:43+0800\n"
+"POT-Creation-Date: 2023-05-28 12:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "'{str:Option}' isn't an option on this server"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:434
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:453
 msgid "'{str:PlayerName}' has been infected"
 msgstr ""
 
@@ -137,6 +137,10 @@ msgstr ""
 msgid "Queen"
 msgstr ""
 
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:584
+msgid "Random Class"
+msgstr ""
+
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1537
 msgid "Server does not allow voting to kick players"
 msgstr ""
@@ -213,7 +217,7 @@ msgstr ""
 msgid "What? You were killed by your teammates?!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:484
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:485
 msgid "You are '{lstr:Class}'"
 msgstr ""
 

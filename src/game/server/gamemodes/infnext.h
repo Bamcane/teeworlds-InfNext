@@ -28,9 +28,12 @@ public:
 	int RoundTick() const;
 	int RoundSecond() const;
 
-	std::vector<int> m_LastInfect;
+	std::vector<int> m_vLastInfect;
 
+	int RandomClass();
 	void CheckNoClass();
+
+	int ChooseInfect(std::vector<int>& vInfects);
 	void CreateInfects();
 
 	bool PlayerInfected(int ClientID);

@@ -468,7 +468,8 @@ void CPlayer::SetClass(CClass *pClass)
 
 	if(m_pClass)
 		delete m_pClass;
-	
+	m_pClass = 0;
+
 	m_pClass = pClass;
 	m_TeeInfos = m_pClass->m_Skin;
 	
@@ -541,6 +542,18 @@ void CPlayer::CureToDefault()
 		m_pCharacter->GetCore()->m_Infect = false;
 		m_pCharacter->DestroyChildEntites();
 	}
+
+	Server()->ExpireServerInfo();
+			
+	protocol7::CNetMsg_Sv_GameInfo GameInfoMsg;
+	GameInfoMsg.m_GameFlags = 0;
+	GameInfoMsg.m_ScoreLimit = g_Config.m_SvScorelimit;
+	GameInfoMsg.m_TimeLimit = g_Config.m_SvTimelimit;
+	GameInfoMsg.m_MatchNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
+	GameInfoMsg.m_MatchCurrent = GameServer()->m_pController->m_RoundCount + 1;
+
+	protocol7::CNetMsg_Sv_GameInfo *pInfoMsg = &GameInfoMsg;
+	Server()->SendPackMsg(pInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, m_ClientID);
 }
 
 void CPlayer::Infect()

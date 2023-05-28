@@ -35,8 +35,10 @@ CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, co
 {
 	str_copy(m_aName, pName, sizeof(m_aName));
 	str_copy(m_aFilename, pFilename, sizeof(m_aFilename));
-	str_copy(m_aParentFilename, pParentFilename, sizeof(m_aParentFilename));
-	
+	if(pParentFilename)
+		str_copy(m_aParentFilename, pParentFilename, sizeof(m_aParentFilename));
+	else
+		m_aParentFilename[0] = 0;
 	UErrorCode Status;
 	
 	Status = U_ZERO_ERROR;

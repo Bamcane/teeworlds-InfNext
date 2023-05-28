@@ -243,7 +243,7 @@ void CMapConverter::AddImageQuad(const char* pName, int ImageID, int GridX, int 
 	m_DataFile.AddItem(MAPITEMTYPE_LAYER, m_NumLayers++, sizeof(Item), &Item);
 }
 
-void CMapConverter::AddTeeLayer(const char* pName, int ImageID, vec2 Pos, float Size, int Env)
+void CMapConverter::AddTeeLayer(const char* pName, int ImageID, vec2 Pos, float Size, int Env, bool Black)
 {
 	array<CQuad> aQuads;
 	CQuad Quad;
@@ -275,56 +275,58 @@ void CMapConverter::AddTeeLayer(const char* pName, int ImageID, vec2 Pos, float 
 	Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*96.0f/128.0f;
 	aQuads.add(Quad);
 	
-	//BackFeet, Color
-	InitQuad(&Quad, Pos+vec2(-7.0f, 10.0f), vec2(Size, Size/2.0f));
-	Quad.m_ColorEnv = Env;
-	Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*192.0f/256.0f;
-	Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f;
-	Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*32.0f/128.0f;
-	Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*64.0f/128.0f;
-	aQuads.add(Quad);
-	
-	//Body, Color
-	InitQuad(&Quad, Pos+vec2(0.0f, -4.0f), vec2(Size, Size));
-	Quad.m_ColorEnv = Env;
-	Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 0;
-	Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f*96.0f/256.0f;
-	Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 0;
-	Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*96.0f/128.0f;
-	aQuads.add(Quad);
-	
-	//FrontFeet, Color
-	InitQuad(&Quad, Pos+vec2(7.0f, 10.0f), vec2(Size, Size/2.0f));
-	Quad.m_ColorEnv = Env;
-	Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*192.0f/256.0f;
-	Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f;
-	Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*32.0f/128.0f;
-	Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*64.0f/128.0f;
-	aQuads.add(Quad);
-	
-	//Eyes
-	vec2 Direction = normalize(vec2(1.0f, -0.5f));
-	float EyeSeparation = (0.075f - 0.010f*absolute(Direction.x))*Size;
-	vec2 Offset = vec2(Direction.x*0.125f, -0.05f+Direction.y*0.10f)*Size;
-	
-		//Left
-	InitQuad(&Quad, Pos+vec2(Offset.x-EyeSeparation, Offset.y-4.0f), vec2(Size*0.40f, Size*0.40f));
-	Quad.m_ColorEnv = Env;
-	Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*64.0f/256.0f;
-	Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f*96.0f/256.0f;
-	Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*96.0f/128.0f;
-	Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*128.0f/128.0f;
-	aQuads.add(Quad);
-	
-		//Right
-	InitQuad(&Quad, Pos+vec2(Offset.x+EyeSeparation, Offset.y-4.0f), vec2(-Size*0.40f, Size*0.40f));
-	Quad.m_ColorEnv = Env;
-	Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*64.0f/256.0f;
-	Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f*96.0f/256.0f;
-	Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*96.0f/128.0f;
-	Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*128.0f/128.0f;
-	aQuads.add(Quad);
-	
+	if(!Black)
+		{
+		//BackFeet, Color
+		InitQuad(&Quad, Pos+vec2(-7.0f, 10.0f), vec2(Size, Size/2.0f));
+		Quad.m_ColorEnv = Env;
+		Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*192.0f/256.0f;
+		Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f;
+		Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*32.0f/128.0f;
+		Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*64.0f/128.0f;
+		aQuads.add(Quad);
+		
+		//Body, Color
+		InitQuad(&Quad, Pos+vec2(0.0f, -4.0f), vec2(Size, Size));
+		Quad.m_ColorEnv = Env;
+		Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 0;
+		Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f*96.0f/256.0f;
+		Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 0;
+		Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*96.0f/128.0f;
+		aQuads.add(Quad);
+		
+		//FrontFeet, Color
+		InitQuad(&Quad, Pos+vec2(7.0f, 10.0f), vec2(Size, Size/2.0f));
+		Quad.m_ColorEnv = Env;
+		Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*192.0f/256.0f;
+		Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f;
+		Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*32.0f/128.0f;
+		Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*64.0f/128.0f;
+		aQuads.add(Quad);
+		
+		//Eyes
+		vec2 Direction = normalize(vec2(1.0f, -0.5f));
+		float EyeSeparation = (0.075f - 0.010f*absolute(Direction.x))*Size;
+		vec2 Offset = vec2(Direction.x*0.125f, -0.05f+Direction.y*0.10f)*Size;
+		
+			//Left
+		InitQuad(&Quad, Pos+vec2(Offset.x-EyeSeparation, Offset.y-4.0f), vec2(Size*0.40f, Size*0.40f));
+		Quad.m_ColorEnv = Env;
+		Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*64.0f/256.0f;
+		Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f*96.0f/256.0f;
+		Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*96.0f/128.0f;
+		Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*128.0f/128.0f;
+		aQuads.add(Quad);
+		
+			//Right
+		InitQuad(&Quad, Pos+vec2(Offset.x+EyeSeparation, Offset.y-4.0f), vec2(-Size*0.40f, Size*0.40f));
+		Quad.m_ColorEnv = Env;
+		Quad.m_aTexcoords[0].x = Quad.m_aTexcoords[2].x = 1024.0f*64.0f/256.0f;
+		Quad.m_aTexcoords[1].x = Quad.m_aTexcoords[3].x = 1024.0f*96.0f/256.0f;
+		Quad.m_aTexcoords[0].y = Quad.m_aTexcoords[1].y = 1024.0f*96.0f/128.0f;
+		Quad.m_aTexcoords[2].y = Quad.m_aTexcoords[3].y = 1024.0f*128.0f/128.0f;
+		aQuads.add(Quad);
+	}
 	
 	CMapItemLayerQuads Item;
 	Item.m_Version = Item.m_Layer.m_Version = 2;
@@ -700,7 +702,7 @@ int CMapConverter::AddExternalImage(const char* pImageName, int Width, int Heigh
 
 void CMapConverter::Finalize()
 {	
-	int ClassNum = (int)Classes()->m_HumanClasses.size();
+	int ClassNum = (int)Classes()->m_HumanClasses.size() + 1; // 1 = random
 	//Menu Group
 	{
 		CMapItemGroup Item;
@@ -898,11 +900,29 @@ void CMapConverter::Finalize()
 				{
 					CreateCircle(&aQuads, m_MenuPosition+rotate(vec2(MenuRadius, 0.0f), MenuAngleStart+MenuAngleStep*i), 96.0f, vec4(1.0f, 1.0f, 1.0f, 0.5f), m_NumEnvs-1);
 				}
+				else if(i == 0)
+				{
+					vec2 Pos = m_MenuPosition+rotate(vec2(MenuRadius, 0.0f), MenuAngleStart + MenuAngleStep*i);
+					
+					char aSkinPath[IO_MAX_PATH_LENGTH];
+
+					str_copy(aSkinPath, "../skins/twinbop");
+
+					char aBuf[256];
+					str_format(aBuf, sizeof(aBuf), "Use skins file: %s", aSkinPath);
+					Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "MapConverter", aBuf);
+
+					int ImageID = AddExternalImage(aSkinPath, 256, 128);
+					
+					AddTeeLayer("Random", ImageID, Pos, 64.0f, m_NumEnvs - 1, true);
+				}
 				else
 				{
 					vec2 Pos = m_MenuPosition+rotate(vec2(MenuRadius, 0.0f), MenuAngleStart+MenuAngleStep*i);
 					
-					CClass *NewClass = Classes()->m_HumanClasses[i].m_pClass->CreateNewOne(0, 0);
+					dbg_msg("yee", "%d", i);
+
+					CClass *NewClass = Classes()->m_HumanClasses[i-1].m_pClass->CreateNewOne(0, 0);
 
 					const char* SkinName = NewClass->m_Skin.m_aSkinName;
 					const char* ClassName = NewClass->m_ClassName;
