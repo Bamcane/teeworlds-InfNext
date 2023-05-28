@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: teeworlds-infnext\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-28 12:07+0800\n"
-"PO-Revision-Date: 2023-05-20 04:37\n"
+"PO-Revision-Date: 2023-05-28 08:08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -135,7 +135,7 @@ msgstr "女王"
 
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:584
 msgid "Random Class"
-msgstr ""
+msgstr "随机职业"
 
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1537
 msgid "Server does not allow voting to kick players"
@@ -233,7 +233,8 @@ msgstr "你不能踢出你自己"
 msgid "You can't move yourself"
 msgstr "你不能移动自己"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:817 /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:817
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
 msgid "You infected '{str:Player}'"
 msgstr "你感染了'{str:Player}'"
 
@@ -288,3 +289,4 @@ msgstr "红队"
 #: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontroller.cpp:103
 msgid "spectators"
 msgstr "旁观者"
+

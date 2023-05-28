@@ -116,6 +116,10 @@
 		"value": "女王"
 	},
 	{
+		"key": "Random Class",
+		"value": "随机职业"
+	},
+	{
 		"key": "Server does not allow voting to kick players",
 		"value": "服务器不允许投票踢玩家"
 	},
