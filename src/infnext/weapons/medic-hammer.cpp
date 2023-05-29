@@ -52,7 +52,7 @@ void CWeaponMedicHammer::Fire(vec2 Pos, vec2 Direction, int Owner)
 
     // if we Hit anything, we have to wait for the reload
     if(Hits)
-        pOwnerChr->SetReloadTimer(GameServer()->Server()->TickSpeed()/3);
+        pOwnerChr->SetReloadTimer(Server()->TickSpeed()/3);
 
     
     return;
