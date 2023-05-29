@@ -788,10 +788,6 @@ void CCharacter::Die(int Killer, int Weapon)
 	// a nice sound
 	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
 
-	// infection
-	if(m_pPlayer->IsHuman() && GameServer()->m_pController->IsInfectionStarted())
-		m_pPlayer->Infect();
-
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
 	
