@@ -82,10 +82,17 @@ inline void StrToInts(int *pInts, int Num, const char *pStr)
 	int Index = 0;
 	while(Num)
 	{
-		char aBuf[4] = {0,0,0,0};
+		char aBuf[4] = {0, 0, 0, 0};
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds" // false positive
+#endif
 		for(int c = 0; c < 4 && pStr[Index]; c++, Index++)
 			aBuf[c] = pStr[Index];
-		*pInts = ((aBuf[0]+128)<<24)|((aBuf[1]+128)<<16)|((aBuf[2]+128)<<8)|(aBuf[3]+128);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+		*pInts = ((aBuf[0] + 128) << 24) | ((aBuf[1] + 128) << 16) | ((aBuf[2] + 128) << 8) | (aBuf[3] + 128);
 		pInts++;
 		Num--;
 	}
@@ -98,17 +105,24 @@ inline void IntsToStr(const int *pInts, int Num, char *pStr)
 {
 	while(Num)
 	{
-		pStr[0] = (((*pInts)>>24)&0xff)-128;
-		pStr[1] = (((*pInts)>>16)&0xff)-128;
-		pStr[2] = (((*pInts)>>8)&0xff)-128;
-		pStr[3] = ((*pInts)&0xff)-128;
+		pStr[0] = (((*pInts) >> 24) & 0xff) - 128;
+		pStr[1] = (((*pInts) >> 16) & 0xff) - 128;
+		pStr[2] = (((*pInts) >> 8) & 0xff) - 128;
+		pStr[3] = ((*pInts) & 0xff) - 128;
 		pStr += 4;
 		pInts++;
 		Num--;
 	}
 
+#if defined(__GNUC__) && __GNUC__ >= 7
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow" // false positive
+#endif
 	// null terminate
 	pStr[-1] = 0;
+#if defined(__GNUC__) && __GNUC__ >= 7
+#pragma GCC diagnostic pop
+#endif
 }
 
 inline vec2 CalcPos(vec2 Pos, vec2 Velocity, float Curvature, float Speed, float Time)
