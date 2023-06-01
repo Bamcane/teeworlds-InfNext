@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include <base/math.h>
+#include <base/logger.h>
 #include <base/system.h>
 
 #include <engine/config.h>
@@ -35,6 +36,7 @@
 
 #include "register.h"
 #include "server.h"
+#include "server_logger.h"
 
 #include "mapconverter.h"
 
@@ -97,7 +99,6 @@ void CSnapIDPool::Reset()
 	m_InUsage = 0;
 }
 
-
 void CSnapIDPool::RemoveFirstTimeout()
 {
 	int NextTimed = m_aIDs[m_FirstTimed].m_Next;
@@ -117,7 +118,7 @@ void CSnapIDPool::RemoveFirstTimeout()
 
 int CSnapIDPool::NewID()
 {
-	int64 Now = time_get();
+	int64_t Now = time_get();
 
 	// process timed ids
 	while(m_FirstTimed != -1 && m_aIDs[m_FirstTimed].m_Timeout < Now)
@@ -346,6 +347,11 @@ CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
 
 CServer::~CServer()
 {
+	for(auto &pCurrentMapData : m_apCurrentMapData)
+	{
+		free(pCurrentMapData);
+	}
+
 	delete m_pRegister;
 }
 
@@ -458,7 +464,7 @@ void CServer::Kick(int ClientID, const char *pReason)
 	return m_CurrentGameTick;
 }*/
 
-int64 CServer::TickStartTime(int Tick)
+int64_t CServer::TickStartTime(int Tick)
 {
 	return m_GameStartTime + (time_freq()*Tick)/SERVER_TICK_SPEED;
 }
@@ -483,6 +489,18 @@ int CServer::Init()
 	m_CurrentGameTick = 0;
 
 	return 0;
+}
+
+void CServer::SendLogLine(const CLogMessage *pMessage)
+{
+	if(pMessage->m_Level <= IConsole::ToLogLevel(g_Config.m_ConsoleOutputLevel))
+	{
+		SendRconLogLine(-1, pMessage);
+	}
+	if(pMessage->m_Level <= IConsole::ToLogLevel(g_Config.m_EcOutputLevel))
+	{
+		m_Econ.Send(-1, pMessage->m_aLine);
+	}
 }
 
 void CServer::SetRconCID(int ClientID)
@@ -984,12 +1002,12 @@ void CServer::SendMapData(int ClientID, int Chunk)
 	int Last = 0;
 
 	// drop faulty map data requests
-	if(Chunk < 0 || (int) Offset > m_aCurrentMapSize[MapType])
+	if(Chunk < 0 || Offset > m_aCurrentMapSize[MapType])
 		return;
 
-	if((int)Offset + (int)ChunkSize >= m_aCurrentMapSize[MapType])
+	if(Offset + ChunkSize >= m_aCurrentMapSize[MapType])
 	{
-		ChunkSize = (unsigned int)m_aCurrentMapSize[MapType] - Offset;
+		ChunkSize = m_aCurrentMapSize[MapType] - Offset;
 		Last = 1;
 	}
 
@@ -1011,6 +1029,7 @@ void CServer::SendMapData(int ClientID, int Chunk)
 		Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 	}
 }
+
 void CServer::SendConnectionReady(int ClientID)
 {
 	CMsgPacker Msg(NETMSG_CON_READY, true);
@@ -1040,6 +1059,50 @@ void CServer::SendRconLineAuthed(const char *pLine, void *pUser)
 	}
 
 	ReentryGuard--;
+}
+
+void CServer::SendRconLogLine(int ClientID, const CLogMessage *pMessage)
+{
+	const char *pLine = pMessage->m_aLine;
+	const char *pStart = str_find(pLine, "<{");
+	const char *pEnd = pStart == NULL ? NULL : str_find(pStart + 2, "}>");
+	const char *pLineWithoutIps;
+	char aLine[512];
+	char aLineWithoutIps[512];
+	aLine[0] = '\0';
+	aLineWithoutIps[0] = '\0';
+
+	if(pStart == NULL || pEnd == NULL)
+	{
+		pLineWithoutIps = pLine;
+	}
+	else
+	{
+		str_append(aLine, pLine, pStart - pLine + 1);
+		str_append(aLine, pStart + 2, pStart - pLine + pEnd - pStart - 1);
+		str_append(aLine, pEnd + 2, sizeof(aLine));
+
+		str_append(aLineWithoutIps, pLine, pStart - pLine + 1);
+		str_append(aLineWithoutIps, "XXX", sizeof(aLineWithoutIps));
+		str_append(aLineWithoutIps, pEnd + 2, sizeof(aLineWithoutIps));
+
+		pLine = aLine;
+		pLineWithoutIps = aLineWithoutIps;
+	}
+
+	if(ClientID == -1)
+	{
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(m_aClients[i].m_State != CClient::STATE_EMPTY && m_aClients[i].m_Authed >= AUTHED_ADMIN)
+				SendRconLine(i, pLineWithoutIps);
+		}
+	}
+	else
+	{
+		if(m_aClients[ClientID].m_State != CClient::STATE_EMPTY)
+			SendRconLine(ClientID, pLineWithoutIps);
+	}
 }
 
 void CServer::SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID)
@@ -1209,7 +1272,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
 
 				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "player is ready. ClientID=%x addr=%s secure=%s", ClientID, aAddrStr, m_NetServer.HasSecurityToken(ClientID)?"yes":"no");
+				str_format(aBuf, sizeof(aBuf), "player is ready. ClientID=%d addr=%s secure=%s", ClientID, aAddrStr, m_NetServer.HasSecurityToken(ClientID)?"yes":"no");
 				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
 				m_aClients[ClientID].m_State = CClient::STATE_READY;
 				GameServer()->OnClientConnected(ClientID);
@@ -2084,91 +2147,93 @@ int CServer::LoadMap(const char *pMapName)
 	// reinit snapshot ids
 	m_IDPool.TimeoutIDs();
 
-	{
-		CDataFileReader dfServerMap;
-		dfServerMap.Open(Storage(), aBuf, IStorage::TYPE_ALL);
-		unsigned ServerMapCrc = dfServerMap.Crc();
-		SHA256_DIGEST ServerMapSha256 = dfServerMap.Sha256();
-		char aServerSha256[SHA256_MAXSTRSIZE];
-		sha256_str(ServerMapSha256, aServerSha256, sizeof(aServerSha256));
-		dfServerMap.Close();
-		
-		char aClientMapName[256];
-		str_format(aClientMapName, sizeof(aClientMapName), "clientmaps/next/%s.map", pMapName);
-		
-		CMapConverter MapConverter(Storage(), m_pMap, Console(), Classes());
-		if(!MapConverter.Load())
-			return 0;
-			
-		m_TimeShiftUnit = MapConverter.GetTimeShiftUnit();
-		
-		CDataFileReader dfClientMap;
-		//The map must be converted
-		
-		char aClientMapDir[256];
-		str_format(aClientMapDir, sizeof(aClientMapDir), "clientmaps");
-		
-		if(!Storage()->CreateFolder(aClientMapDir, IStorage::TYPE_SAVE))
-		{
-			dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
-		}
-		
-		str_format(aClientMapDir, sizeof(aClientMapDir), "clientmaps/next");
-		
-		if(!Storage()->CreateFolder(aClientMapDir, IStorage::TYPE_SAVE))
-		{
-			dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
-		}
-				
-		if(!MapConverter.CreateMap(aClientMapName, pMapName))
-			return 0;
-			
-		CDataFileReader dfGeneratedMap;
-		dfGeneratedMap.Open(Storage(), aClientMapName, IStorage::TYPE_ALL);
-		m_aCurrentMapCrc[MAP_TYPE_SIX] = dfGeneratedMap.Crc();
-
-		m_aCurrentMapSha256[MAP_TYPE_SIX] = dfGeneratedMap.Sha256();
-		dfGeneratedMap.Close();
-		char aSha256[SHA256_MAXSTRSIZE];
-		sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIX], aSha256, sizeof(aSha256));
 	
-		char aBufMsg[128];
-		str_format(aBufMsg, sizeof(aBufMsg), "map crc is %08x, generated map crc is %08x", ServerMapCrc, m_aCurrentMapCrc[MAP_TYPE_SIX]);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
-		str_format(aBufMsg, sizeof(aBufMsg), "map sha256 is %s, generated map sha256 is %s", aServerSha256, aSha256);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
+	CDataFileReader dfServerMap;
+	dfServerMap.Open(Storage(), aBuf, IStorage::TYPE_ALL);
+	unsigned ServerMapCrc = dfServerMap.Crc();
+	SHA256_DIGEST ServerMapSha256 = dfServerMap.Sha256();
+	char aServerSha256[SHA256_MAXSTRSIZE];
+	sha256_str(ServerMapSha256, aServerSha256, sizeof(aServerSha256));
+	dfServerMap.Close();
+	
+	char aClientMapName[256];
+	str_format(aClientMapName, sizeof(aClientMapName), "clientmaps/next/%s.map", pMapName);
+	
+	CMapConverter MapConverter(Storage(), m_pMap, Console(), Classes());
+	if(!MapConverter.Load())
+		return 0;
 		
-		//Download the generated map in memory to send it to clients
-		IOHANDLE File = Storage()->OpenFile(aClientMapName, IOFLAG_READ, IStorage::TYPE_ALL);
-		m_aCurrentMapSize[MAP_TYPE_SIX] = (int)io_length(File);
-		if(m_apCurrentMapData[MAP_TYPE_SIX])
-			mem_free(m_apCurrentMapData[MAP_TYPE_SIX]);
-		m_apCurrentMapData[MAP_TYPE_SIX] = (unsigned char *)mem_alloc(m_aCurrentMapSize[MAP_TYPE_SIX], 1);
-		io_read(File, m_apCurrentMapData[MAP_TYPE_SIX], m_aCurrentMapSize[MAP_TYPE_SIX]);
-		io_close(File);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", "map 06 version loaded in memory");
-	}
-	str_copy(m_aCurrentMap, pMapName);
-	// load complete map07 into memory for download
+	m_TimeShiftUnit = MapConverter.GetTimeShiftUnit();
+	
+	CDataFileReader dfClientMap;
+	//The map must be converted
+	
+	char aClientMapDir[256];
+	str_format(aClientMapDir, sizeof(aClientMapDir), "clientmaps");
+	
+	if(!Storage()->CreateFolder(aClientMapDir, IStorage::TYPE_SAVE))
 	{
-		char aBufMsg[128];
+		dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
+	}
+	
+	str_format(aClientMapDir, sizeof(aClientMapDir), "clientmaps/next");
+	
+	if(!Storage()->CreateFolder(aClientMapDir, IStorage::TYPE_SAVE))
+	{
+		dbg_msg("infNext", "Can't create the directory '%s'", aClientMapDir);
+	}
+			
+	if(!MapConverter.CreateMap(aClientMapName, pMapName))
+		return 0;
+		
+	CDataFileReader dfGeneratedMap;
+	dfGeneratedMap.Open(Storage(), aClientMapName, IStorage::TYPE_ALL);
+
+	// get the crc of the map
+	m_aCurrentMapCrc[MAP_TYPE_SIX] = dfGeneratedMap.Crc();
+	m_aCurrentMapSha256[MAP_TYPE_SIX] = dfGeneratedMap.Sha256();
+
+	dfGeneratedMap.Close();
+
+	char aSha256[SHA256_MAXSTRSIZE];
+	sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIX], aSha256, sizeof(aSha256));
+
+	char aBufMsg[128];
+	str_format(aBufMsg, sizeof(aBufMsg), "map crc is %08x, generated map crc is %08x", ServerMapCrc, m_aCurrentMapCrc[MAP_TYPE_SIX]);
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
+	str_format(aBufMsg, sizeof(aBufMsg), "map sha256 is %s, generated map sha256 is %s", aServerSha256, aSha256);
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
+
+	str_copy(m_aCurrentMap, pMapName);
+
+	// load complete map into memory for download
+	{	
+		free(m_apCurrentMapData[MAP_TYPE_SIX]);
+		void *pData;
+		Storage()->ReadFile(aClientMapName, IStorage::TYPE_ALL, &pData, &m_aCurrentMapSize[MAP_TYPE_SIX]);
+		m_apCurrentMapData[MAP_TYPE_SIX] = (unsigned char *)pData;
+	}
+
+	// load sixup version of the map
+	{
 		str_format(aBuf, sizeof(aBuf), "clientmaps/next/%s7.map", pMapName);
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
-		m_aCurrentMapSize[MAP_TYPE_SIXUP] = (int)io_length(File);
-		if(m_apCurrentMapData[MAP_TYPE_SIXUP])
-			mem_free(m_apCurrentMapData[MAP_TYPE_SIXUP]);
-		m_apCurrentMapData[MAP_TYPE_SIXUP] = (unsigned char *)mem_alloc(m_aCurrentMapSize[MAP_TYPE_SIXUP], 1);
-		io_read(File, m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
-		io_close(File);
-		
-		m_aCurrentMapSha256[MAP_TYPE_SIXUP] = sha256(m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
-		m_aCurrentMapCrc[MAP_TYPE_SIXUP] = crc32(0, m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
-		
-		char aSha256[SHA256_MAXSTRSIZE];
-		sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIXUP], aSha256, sizeof(aSha256));
-		
-		str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
+		void *pData;
+		if(!Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pData, &m_aCurrentMapSize[MAP_TYPE_SIXUP]))
+		{
+			str_format(aBufMsg, sizeof(aBufMsg), "couldn't load map %s", aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
+		}
+		else
+		{
+			free(m_apCurrentMapData[MAP_TYPE_SIXUP]);
+			m_apCurrentMapData[MAP_TYPE_SIXUP] = (unsigned char *)pData;
+
+			m_aCurrentMapSha256[MAP_TYPE_SIXUP] = sha256(m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
+			m_aCurrentMapCrc[MAP_TYPE_SIXUP] = crc32(0, m_apCurrentMapData[MAP_TYPE_SIXUP], m_aCurrentMapSize[MAP_TYPE_SIXUP]);
+			sha256_str(m_aCurrentMapSha256[MAP_TYPE_SIXUP], aSha256, sizeof(aSha256));
+			str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "sixup", aBufMsg);
+		}
 	}
 
 	LoadMapConfig(pMapName);
@@ -2200,14 +2265,14 @@ bool CServer::LoadMapConfigInJson(const char* pFileName, const char *pMapName)
 			if(str_comp(json_string_get(json_object_get(pCurrent, "name")), pMapName))
 				continue;
 			
-			long TimeLimit = json_int_get(json_object_get(pCurrent, "timelimit"));
+			int TimeLimit = json_int_get(json_object_get(pCurrent, "timelimit"));
 
 			if(TimeLimit)
 			{
 				g_Config.m_SvTimelimit = TimeLimit;
 
-				str_format(aBuf, sizeof(aBuf), "Time limit: %dmin", TimeLimit);
-
+				str_format(aBuf, sizeof(aBuf), "Map time limit: %dmin", TimeLimit);
+				
 				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "Map", aBuf);
 				return true;
 			}
@@ -2436,11 +2501,6 @@ int CServer::Run()
 
 	GameServer()->OnShutdown();
 	m_pMap->Unload();
-
-	if(m_apCurrentMapData[MAP_TYPE_SIX])
-		mem_free(m_apCurrentMapData[MAP_TYPE_SIX]);
-	if(m_apCurrentMapData[MAP_TYPE_SIXUP])
-		mem_free(m_apCurrentMapData[MAP_TYPE_SIXUP]);
 
 	m_pRegister->OnShutdown();
 	return 0;
@@ -2690,17 +2750,49 @@ static CServer *CreateServer() { return new CServer(); }
 
 int main(int argc, const char **argv) // ignore_convention
 {
+	bool Silent = false;
+
+	for(int i = 1; i < argc; i++)
+	{
+		if(str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0)
+		{
+			Silent = true;
+#if defined(CONF_FAMILY_WINDOWS)
+			ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+			break;
+		}
+	}
+
 	if(secure_random_init() != 0)
 	{
 		dbg_msg("Secure", "Couldn't initialize secure RNG");
 		return -1;
 	}
 
+	std::vector<std::shared_ptr<ILogger>> vpLoggers;
+#if defined(CONF_PLATFORM_ANDROID)
+	vpLoggers.push_back(std::shared_ptr<ILogger>(log_logger_android()));
+#else
+	if(!Silent)
+	{
+		vpLoggers.push_back(std::shared_ptr<ILogger>(log_logger_stdout()));
+	}
+#endif
+	std::shared_ptr<CFutureLogger> pFutureFileLogger = std::make_shared<CFutureLogger>();
+	vpLoggers.push_back(pFutureFileLogger);
+	std::shared_ptr<CFutureLogger> pFutureConsoleLogger = std::make_shared<CFutureLogger>();
+	vpLoggers.push_back(pFutureConsoleLogger);
+	std::shared_ptr<CFutureLogger> pFutureAssertionLogger = std::make_shared<CFutureLogger>();
+	vpLoggers.push_back(pFutureAssertionLogger);
+	log_set_global_logger(log_logger_collection(std::move(vpLoggers)).release());
+
+
 	CServer *pServer = CreateServer();
 	IKernel *pKernel = IKernel::Create();
 
 	// create the components
-	IEngine *pEngine = CreateEngine("Teeworlds", 2);
+	IEngine *pEngine = CreateEngine("Teeworlds", pFutureConsoleLogger, 2);
 
 	IEngineMap *pEngineMap = CreateEngineMap();
 	IGameServer *pGameServer = CreateGameServer();
@@ -2747,21 +2839,34 @@ int main(int argc, const char **argv) // ignore_convention
 	// restore empty config strings to their defaults
 	pConfig->RestoreStrings();
 
+	log_set_loglevel((LEVEL)g_Config.m_Loglevel);
+	if(g_Config.m_Logfile[0])
+	{
+		IOHANDLE Logfile = pStorage->OpenFile(g_Config.m_Logfile, IOFLAG_WRITE, IStorage::TYPE_ALL);
+		if(Logfile)
+		{
+			pFutureFileLogger->Set(log_logger_file(Logfile));
+		}
+		else
+		{
+			dbg_msg("server", "failed to open '%s' for logging", g_Config.m_Logfile);
+		}
+	}
+	auto pServerLogger = std::make_shared<CServerLogger>(pServer);
+	pEngine->SetAdditionalLogger(pServerLogger);
 	// run the server
 	dbg_msg("server", "starting...");
 	pServer->Run();
+
+	secure_random_uninit();
+	
+	pServerLogger->OnServerDeletion();
 
 	// free
 	delete pServer->m_pLocalization;
 	delete pServer->m_pClasses;
 	
-	delete pServer;
 	delete pKernel;
-	delete pEngineMap;
-	delete pGameServer;
-	delete pConsole;
-	delete pStorage;
-	delete pConfig;
 	return 0;
 	
 }

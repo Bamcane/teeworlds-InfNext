@@ -4,6 +4,12 @@
 #define ENGINE_CONSOLE_H
 
 #include "kernel.h"
+#include <base/color.h>
+#include <engine/storage.h>
+
+#include <memory>
+
+enum LEVEL : char;
 
 class IConsole : public IInterface
 {
@@ -40,9 +46,10 @@ public:
 		IResult() { m_NumArgs = 0; }
 		virtual ~IResult() {}
 
-		virtual int GetInteger(unsigned Index) = 0;
-		virtual float GetFloat(unsigned Index) = 0;
-		virtual const char *GetString(unsigned Index) = 0;
+		virtual int GetInteger(unsigned Index) const = 0;
+		virtual float GetFloat(unsigned Index) const = 0;
+		virtual const char *GetString(unsigned Index) const = 0;
+		virtual ColorHSLA GetColor(unsigned Index, bool Light) const = 0;
 
 		void SetClientID(int ClientID) { m_ClientID = ClientID; }
 		int GetClientID() { return m_ClientID; }
@@ -96,6 +103,8 @@ public:
 	virtual void Print(int Level, const char *pFrom, const char *pStr) = 0;
 
 	virtual void SetAccessLevel(int AccessLevel) = 0;
+
+	static LEVEL ToLogLevel(int ConsoleLevel);
 };
 
 extern IConsole *CreateConsole(int FlagMask);

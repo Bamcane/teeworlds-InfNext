@@ -112,9 +112,10 @@ class CConsole : public IConsole
 			m_apArgs[m_NumArgs++] = pArg;
 		}
 
-		virtual const char *GetString(unsigned Index);
-		virtual int GetInteger(unsigned Index);
-		virtual float GetFloat(unsigned Index);
+		const char *GetString(unsigned Index) const override;
+		int GetInteger(unsigned Index) const override;
+		float GetFloat(unsigned Index) const override;
+		ColorHSLA GetColor(unsigned Index, bool Light) const override;
 	};
 
 	int ParseStart(CResult *pResult, const char *pString, int Length);

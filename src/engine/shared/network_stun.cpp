@@ -1,5 +1,6 @@
 #include "network.h"
 
+#include <base/log.h>
 #include <base/system.h>
 
 static int IndexFromNetType(int NetType)
@@ -72,7 +73,7 @@ void CStun::CProtocol::Update()
 	int Size = StunMessagePrepare(aBuf, sizeof(aBuf), &m_Stun);
 	if(net_udp_send(m_Socket, &m_StunServer, aBuf, Size) == -1)
 	{
-		dbg_msg(IndexToSystem(m_Index), "couldn't send stun request");
+		log_debug(IndexToSystem(m_Index), "couldn't send stun request");
 		return;
 	}
 }
@@ -93,7 +94,7 @@ bool CStun::CProtocol::OnPacket(NETADDR Addr, unsigned char *pData, int DataSize
 	if(!Success)
 	{
 		m_HaveAddr = false;
-		dbg_msg(IndexToSystem(m_Index), "got error response");
+		log_debug(IndexToSystem(m_Index), "got error response");
 		return true;
 	}
 	m_NextTry = -1;
@@ -103,7 +104,7 @@ bool CStun::CProtocol::OnPacket(NETADDR Addr, unsigned char *pData, int DataSize
 
 	char aStunAddr[NETADDR_MAXSTRSIZE];
 	net_addr_str(&StunAddr, aStunAddr, sizeof(aStunAddr), true);
-	dbg_msg(IndexToSystem(m_Index), "got address: %s", aStunAddr);
+	log_debug(IndexToSystem(m_Index), "got address: %s", aStunAddr);
 	return true;
 }
 

@@ -147,7 +147,7 @@ public:
 
 	int m_VoteType;
 	int m_VoteCreator;
-	int64 m_VoteCloseTime;
+	int64_t m_VoteCloseTime;
 	bool m_VoteUpdate;
 	int m_VotePos;
 	char m_aVoteDescription[VOTE_DESC_LENGTH];

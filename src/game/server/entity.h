@@ -5,21 +5,20 @@
 
 #include <new>
 #include <base/vmath.h>
+#include <base/system.h>
 #include <game/server/gameworld.h>
 
 #define MACRO_ALLOC_HEAP() \
 	public: \
 	void *operator new(size_t Size) \
 	{ \
-		void *p = mem_alloc(Size, 1); \
-		/*dbg_msg("", "++ %p %d", p, size);*/ \
+		void *p = malloc(Size); \
 		mem_zero(p, Size); \
 		return p; \
 	} \
 	void operator delete(void *pPtr) \
 	{ \
-		/*dbg_msg("", "-- %p", p);*/ \
-		mem_free(pPtr); \
+		free(pPtr); \
 	} \
 	private:
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: teeworlds-infnext\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-28 17:17+0800\n"
+"POT-Creation-Date: 2023-06-01 19:50+0800\n"
 "PO-Revision-Date: 2023-05-28 08:08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
@@ -17,11 +17,11 @@ msgstr ""
 "X-Crowdin-File: infnext.pot\n"
 "X-Crowdin-File-ID: 25\n"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1726
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1727
 msgid "'{str:OldName}' changed name to '{str:NewName}'"
 msgstr "'{str:OldName}' 已改名为'{str:NewName}'"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1529
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1530
 msgid "'{str:Option}' isn't an option on this server"
 msgstr "'{str:Option}' 不是此服务器上的一个选项"
 
@@ -29,23 +29,23 @@ msgstr "'{str:Option}' 不是此服务器上的一个选项"
 msgid "'{str:PlayerName}' has been infected"
 msgstr "'{str:PlayerName}' 被感染了"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1580
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1581
 msgid "'{str:Player}' called for vote to kick '{str:Player2}' ({str:Reason})"
 msgstr "'{str:Player}'提议踢出'{str:Player2}' ({str:Reason})"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1574
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1575
 msgid "'{str:Player}' called for vote to kick you"
 msgstr "'{str:Player}' 发起投票踢你"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1618
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1619
 msgid "'{str:Player}' called for vote to move '{str:Player2}' to spectators ({str:Reason})"
 msgstr "'{str:Player}'提议移动'{str:Player2}'到旁观 ({str:Reason})"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1515
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1516
 msgid "'{str:Player}' called vote to change server option '{str:Option}' ({str:Reason})"
 msgstr "'{str:Player}' 发起投票更改服务器选项 '{str:Option}' ({str:Reason})"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:925
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:926
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr "'{str:Player}' 连接服务器并加入{lstr:Team}"
 
@@ -61,11 +61,11 @@ msgstr "'{str:Player}'离开了游戏 ({str:Reason})"
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr "'{str:Player}' 加入了{lstr:Team}"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2346
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2347
 msgid "Available languages: {str:List}"
 msgstr "可用语言︰ {str:List}"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2290
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2291
 msgid "Based on the concept of infNext mod by pure_luck"
 msgstr "基于 pure_luck 所做的新感染模式"
 
@@ -77,7 +77,7 @@ msgstr "爆炸者"
 msgid "Captain"
 msgstr "船长"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:930
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:931
 msgid "Help us to translation mod on Crowdin!"
 msgstr "帮助我们在Crowdin上进行翻译！"
 
@@ -97,23 +97,23 @@ msgstr "INF| 感染胜利！"
 msgid "Infection is coming in {sec:Time}!"
 msgstr "感染将在{sec:Time}后来临!"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1559
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1560
 msgid "Invalid client id to kick"
 msgstr "无效的客户端 ID"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1607
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1608
 msgid "Invalid client id to move"
 msgstr "无效的客户端 ID"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1706
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1707
 msgid "Invalid spectator id used"
 msgstr "无效的旁观者ID"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1551
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1552
 msgid "Kick voting requires {int:Num} players on the server"
 msgstr "发起踢人投票需要有 {int:Num} 名玩家"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2323
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2324
 msgid "Language successfully switched to English"
 msgstr "语言已成功切换到中文"
 
@@ -125,7 +125,7 @@ msgstr "循环者"
 msgid "Medic"
 msgstr "医疗兵"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1685
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1686
 msgid "Only {int:Num} active players are allowed"
 msgstr "只允许 {int:Num} 名玩家游玩"
 
@@ -137,11 +137,11 @@ msgstr "女王"
 msgid "Random Class"
 msgstr "随机职业"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1537
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1538
 msgid "Server does not allow voting to kick players"
 msgstr "服务器不允许投票踢玩家"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1600
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1601
 msgid "Server does not allow voting to move players to spectators"
 msgstr "服务器不允许投票将玩家移动到旁观者"
 
@@ -153,15 +153,15 @@ msgstr "吸烟者"
 msgid "Sniper"
 msgstr "狙击手"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1484
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1485
 msgid "Spectators aren't allowed to start a vote."
 msgstr "旁观者不能发起投票"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1680
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1681
 msgid "Teams must be balanced, please join other team"
 msgstr "队伍必须平衡, 请加入其他队伍"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2289
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2290
 msgid "Thanks {str:List}"
 msgstr "感谢 {str:List}"
 
@@ -177,27 +177,27 @@ msgstr "女王'{str:Queen}'在人类'{str:Player}'的刺杀下驾崩了!"
 msgid "The queen '{str:Queen}' was killed by infected '{str:Player}'!?"
 msgstr "女王'{str:Queen}'在感染者'{str:Player}'的反向保护下驾崩了!"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1664
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1665
 msgid "Time to wait before changing team: {sec:Time}"
 msgstr "必须等待{sec:Time}才能更改队伍"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2331
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2332
 msgid "Unknown language or no input language code"
 msgstr "未知语言或没有输入语言代码"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:758
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:759
 msgid "Vote aborted"
 msgstr "投票中止"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:821
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:822
 msgid "Vote failed"
 msgstr "投票失败"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:813
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:814
 msgid "Vote passed"
 msgstr "投票通过"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1490
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1491
 msgid "Wait for current vote to end before calling a new one."
 msgstr "等待当前投票结束后再发起一个新投票。"
 
@@ -221,19 +221,19 @@ msgstr "你是 '{lstr:Class}'"
 msgid "You are dehydrated: {sec:Time}"
 msgstr "你已脱水： {sec:Time}"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1573
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1574
 msgid "You can't kick admins"
 msgstr "你不能踢管理员"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1564
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1565
 msgid "You can't kick yourself"
 msgstr "你不能踢出你自己"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1612
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1613
 msgid "You can't move yourself"
 msgstr "你不能移动自己"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:817 /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:813 /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
 msgid "You infected '{str:Player}'"
 msgstr "你感染了'{str:Player}'"
 
@@ -245,7 +245,7 @@ msgstr "你杀死了女王, +5分!"
 msgid "You killed the queen, -5 score!"
 msgstr "你杀死了女王, -5分!"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1498
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:1499
 msgid "You must wait {sec:Time} before making another vote"
 msgstr "你必须等待 {sec:Time} 才能再进行一次投票"
 
@@ -253,23 +253,23 @@ msgstr "你必须等待 {sec:Time} 才能再进行一次投票"
 msgid "You were infected by '{str:Player}'"
 msgstr "你被'{str:Player}'感染了"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:818
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:814
 msgid "You're infected by '{str:Player}'"
 msgstr "你被'{str:Player}' 感染了"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2163
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2164
 msgid "admin forced server option '{str:Value}' ({str:Reason})"
 msgstr "管理通过服务器选项 '{str:Value}' ({str:Reason})"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2249
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2250
 msgid "admin forced vote no"
 msgstr "管理员否决投票"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2244
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2245
 msgid "admin forced vote yes"
 msgstr "管理员通过投票"
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2211
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamecontext.cpp:2212
 msgid "admin moved '{str:Player}' to spectator ({str:Reason})"
 msgstr "管理员移动'{str:Player}'到旁观者({str:Reason})"
 

@@ -7,7 +7,7 @@ bool CNetClient::Open(NETADDR BindAddr)
 {
 	// open socket
 	NETSOCKET Socket;
-	Socket = net_udp_create(BindAddr, 0);
+	Socket = net_udp_create(BindAddr);
 	if(!Socket)
 		return false;
 

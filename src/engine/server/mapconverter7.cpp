@@ -1,13 +1,13 @@
-/* (c) DDNet developers. See licence.txt in the root of the distribution for more information. */
-/* If you are missing that file, acquire a complete release at teeworlds.com.  */
-
+// from DDNet
+#include <base/logger.h>
 #include <base/system.h>
+#include <engine/external/pnglite/pnglite.h>
+#include <engine/gfx/image_loader.h>
 #include <engine/graphics.h>
 #include <engine/shared/datafile.h>
 #include <engine/storage.h>
 #include <game/gamecore.h>
 #include <game/mapitems.h>
-#include <engine/external/pnglite/pnglite.h>
 #include "mapconverter.h"
 /*
 	Usage: map_convert_07 <source map filepath> <dest map filepath>
@@ -25,58 +25,45 @@ int g_NextDataItemID = -1;
 
 int g_aImageIDs[64];
 
-int CMapConverter::LoadPNG(CImageInfo *pImg, const char *pFilename)
+int LoadPNG(CImageInfo *pImg, const char *pFilename)
 {
-	char aCompleteFilename[512];
-	unsigned char *pBuffer;
-	png_t Png; // ignore_convention
-
-	// open file for reading
-	png_init(0,0); // ignore_convention
-
-	IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL, aCompleteFilename, sizeof(aCompleteFilename));
+	IOHANDLE File = io_open(pFilename, IOFLAG_READ);
 	if(File)
+	{
+		io_seek(File, 0, IOSEEK_END);
+		unsigned int FileSize = io_tell(File);
+		io_seek(File, 0, IOSEEK_START);
+		TImageByteBuffer ByteBuffer;
+		SImageByteBuffer ImageByteBuffer(&ByteBuffer);
+
+		ByteBuffer.resize(FileSize);
+		io_read(File, &ByteBuffer.front(), FileSize);
+
 		io_close(File);
+
+		uint8_t *pImgBuffer = NULL;
+		EImageFormat ImageFormat;
+		int PngliteIncompatible;
+		if(LoadPNG(ImageByteBuffer, pFilename, PngliteIncompatible, pImg->m_Width, pImg->m_Height, pImgBuffer, ImageFormat))
+		{
+			pImg->m_pData = pImgBuffer;
+
+			if(ImageFormat == IMAGE_FORMAT_RGBA && pImg->m_Width <= (2 << 13) && pImg->m_Height <= (2 << 13))
+			{
+				pImg->m_Format = CImageInfo::FORMAT_RGBA;
+			}
+			else
+			{
+				dbg_msg("map_convert_07", "invalid image format. filename='%s'", pFilename);
+				return 0;
+			}
+		}
+		else
+			return 0;
+	}
 	else
-	{
-		dbg_msg("game/png", "failed to open file. filename='%s'", pFilename);
 		return 0;
-	}
-
-	int Error = png_open_file(&Png, aCompleteFilename); // ignore_convention
-	if(Error != PNG_NO_ERROR)
-	{
-		dbg_msg("game/png", "failed to open file. filename='%s'", aCompleteFilename);
-		if(Error != PNG_FILE_ERROR)
-			png_close_file(&Png); // ignore_convention
-		return 0;
-	}
-
-	if(Png.depth != 8 || (Png.color_type != PNG_TRUECOLOR && Png.color_type != PNG_TRUECOLOR_ALPHA)) // ignore_convention
-	{
-		dbg_msg("game/png", "invalid format. filename='%s'", aCompleteFilename);
-		png_close_file(&Png); // ignore_convention
-		return 0;
-	}
-
-	pBuffer = (unsigned char *)mem_alloc(Png.width * Png.height * Png.bpp, 1); // ignore_convention
-	png_get_data(&Png, pBuffer); // ignore_convention
-	png_close_file(&Png); // ignore_convention
-
-	pImg->m_Width = Png.width; // ignore_convention
-	pImg->m_Height = Png.height; // ignore_convention
-	if(Png.color_type == PNG_TRUECOLOR) // ignore_convention
-		pImg->m_Format = CImageInfo::FORMAT_RGB;
-	else if(Png.color_type == PNG_TRUECOLOR_ALPHA) // ignore_convention
-		pImg->m_Format = CImageInfo::FORMAT_RGBA;
-	pImg->m_pData = pBuffer;
 	return 1;
-}
-
-void FreePNG(CImageInfo *pImg)
-{
-	mem_free(pImg->m_pData);
-	pImg->m_pData = nullptr;
 }
 
 bool CMapConverter::CheckImageDimensions(void *pLayerItem, int LayerType, const char *pFilename)

@@ -439,7 +439,7 @@ void CDemoPlayer::ScanFile()
 	}
 
 	// copy all the frames to an array instead for fast access
-	m_pKeyFrames = (CKeyFrame*)mem_alloc(m_Info.m_SeekablePoints*sizeof(CKeyFrame), 1);
+	m_pKeyFrames = (CKeyFrame*)malloc(m_Info.m_SeekablePoints*sizeof(CKeyFrame));
 	for(pCurrentKey = pFirstKey, i = 0; pCurrentKey; pCurrentKey = pCurrentKey->m_pNext, i++)
 		m_pKeyFrames[i] = pCurrentKey->m_Frame;
 
@@ -656,7 +656,7 @@ int CDemoPlayer::Load(class IStorage *pStorage, class IConsole *pConsole, const 
 	else if(MapSize > 0)
 	{
 		// get map data
-		unsigned char *pMapData = (unsigned char *)mem_alloc(MapSize, 1);
+		unsigned char *pMapData = (unsigned char *)malloc(MapSize);
 		io_read(m_File, pMapData, MapSize);
 
 		// save map
@@ -665,7 +665,7 @@ int CDemoPlayer::Load(class IStorage *pStorage, class IConsole *pConsole, const 
 		io_close(MapFile);
 
 		// free data
-		mem_free(pMapData);
+		free(pMapData);
 	}
 
 	if(m_Info.m_Header.m_Version > gs_OldVersion)
@@ -756,8 +756,8 @@ void CDemoPlayer::SetSpeed(float Speed)
 
 int CDemoPlayer::Update()
 {
-	int64 Now = time_get();
-	int64 Deltatime = Now-m_Info.m_LastUpdate;
+	int64_t Now = time_get();
+	int64_t Deltatime = Now-m_Info.m_LastUpdate;
 	m_Info.m_LastUpdate = Now;
 
 	if(!IsPlaying())
@@ -769,12 +769,12 @@ int CDemoPlayer::Update()
 	}
 	else
 	{
-		int64 Freq = time_freq();
-		m_Info.m_CurrentTime += (int64)(Deltatime*(double)m_Info.m_Info.m_Speed);
+		int64_t Freq = time_freq();
+		m_Info.m_CurrentTime += (int64_t)(Deltatime*(double)m_Info.m_Info.m_Speed);
 
 		while(1)
 		{
-			int64 CurtickStart = (m_Info.m_Info.m_CurrentTick)*Freq/SERVER_TICK_SPEED;
+			int64_t CurtickStart = (m_Info.m_Info.m_CurrentTick)*Freq/SERVER_TICK_SPEED;
 
 			// break if we are ready
 			if(CurtickStart > m_Info.m_CurrentTime)
@@ -789,8 +789,8 @@ int CDemoPlayer::Update()
 
 		// update intratick
 		{
-			int64 CurtickStart = (m_Info.m_Info.m_CurrentTick)*Freq/SERVER_TICK_SPEED;
-			int64 PrevtickStart = (m_Info.m_PreviousTick)*Freq/SERVER_TICK_SPEED;
+			int64_t CurtickStart = (m_Info.m_Info.m_CurrentTick)*Freq/SERVER_TICK_SPEED;
+			int64_t PrevtickStart = (m_Info.m_PreviousTick)*Freq/SERVER_TICK_SPEED;
 			m_Info.m_IntraTick = (m_Info.m_CurrentTime - PrevtickStart) / (float)(CurtickStart-PrevtickStart);
 			m_Info.m_TickTime = (m_Info.m_CurrentTime - PrevtickStart) / (float)Freq;
 		}
@@ -816,7 +816,7 @@ int CDemoPlayer::Stop()
 	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", "Stopped playback");
 	io_close(m_File);
 	m_File = 0;
-	mem_free(m_pKeyFrames);
+	free(m_pKeyFrames);
 	m_pKeyFrames = 0;
 	str_copy(m_aFilename, "", sizeof(m_aFilename));
 	return 0;

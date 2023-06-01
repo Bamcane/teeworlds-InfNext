@@ -7,7 +7,7 @@ const struct _json_value *json_object_get(const json_value *object, const char *
 const struct _json_value *json_array_get(const json_value *array, int index);
 unsigned int json_array_length(const json_value *array);
 const char *json_string_get(const json_value *string);
-int64_t json_int_get(const json_value *integer);
+int json_int_get(const json_value *integer);
 int json_boolean_get(const json_value *boolean);
 
 char *EscapeJson(char *pBuffer, int BufferSize, const char *pString);

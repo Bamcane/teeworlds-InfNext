@@ -1,7 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <new>
 
+#include <base/color.h>
+#include <base/log.h>
 #include <base/math.h>
 #include <base/system.h>
 
@@ -13,27 +14,106 @@
 #include "console.h"
 #include "linereader.h"
 
+#include <iterator> // std::size
+#include <new>
+
 // todo: rework this
 
-const char *CConsole::CResult::GetString(unsigned Index)
+const char *CConsole::CResult::GetString(unsigned Index) const
 {
-	if (Index >= m_NumArgs)
+	if(Index >= m_NumArgs)
 		return "";
 	return m_apArgs[Index];
 }
 
-int CConsole::CResult::GetInteger(unsigned Index)
+int CConsole::CResult::GetInteger(unsigned Index) const
 {
-	if (Index >= m_NumArgs)
+	if(Index >= m_NumArgs)
 		return 0;
 	return str_toint(m_apArgs[Index]);
 }
 
-float CConsole::CResult::GetFloat(unsigned Index)
+float CConsole::CResult::GetFloat(unsigned Index) const
 {
-	if (Index >= m_NumArgs)
+	if(Index >= m_NumArgs)
 		return 0.0f;
 	return str_tofloat(m_apArgs[Index]);
+}
+
+ColorHSLA CConsole::CResult::GetColor(unsigned Index, bool Light) const
+{
+	if(Index >= m_NumArgs)
+		return ColorHSLA(0, 0, 0);
+
+	const char *pStr = m_apArgs[Index];
+	if(str_isallnum(pStr) || ((pStr[0] == '-' || pStr[0] == '+') && str_isallnum(pStr + 1))) // Teeworlds Color (Packed HSL)
+	{
+		const ColorHSLA Hsla = ColorHSLA(str_toulong_base(pStr, 10), true);
+		if(Light)
+			return Hsla.UnclampLighting();
+		return Hsla;
+	}
+	else if(*pStr == '$') // Hex RGB/RGBA
+	{
+		ColorRGBA Rgba = ColorRGBA(0, 0, 0, 1);
+		const int Len = str_length(pStr);
+		if(Len == 4)
+		{
+			const unsigned Num = str_toulong_base(pStr + 1, 16);
+			Rgba.r = (((Num >> 8) & 0x0F) + ((Num >> 4) & 0xF0)) / 255.0f;
+			Rgba.g = (((Num >> 4) & 0x0F) + ((Num >> 0) & 0xF0)) / 255.0f;
+			Rgba.b = (((Num >> 0) & 0x0F) + ((Num << 4) & 0xF0)) / 255.0f;
+		}
+		else if(Len == 5)
+		{
+			const unsigned Num = str_toulong_base(pStr + 1, 16);
+			Rgba.r = (((Num >> 12) & 0x0F) + ((Num >> 8) & 0xF0)) / 255.0f;
+			Rgba.g = (((Num >> 8) & 0x0F) + ((Num >> 4) & 0xF0)) / 255.0f;
+			Rgba.b = (((Num >> 4) & 0x0F) + ((Num >> 0) & 0xF0)) / 255.0f;
+			Rgba.a = (((Num >> 0) & 0x0F) + ((Num << 4) & 0xF0)) / 255.0f;
+		}
+		else if(Len == 7)
+		{
+			const unsigned Num = str_toulong_base(pStr + 1, 16);
+			Rgba.r = ((Num >> 16) & 0xFF) / 255.0f;
+			Rgba.g = ((Num >> 8) & 0xFF) / 255.0f;
+			Rgba.b = ((Num >> 0) & 0xFF) / 255.0f;
+		}
+		else if(Len == 9)
+		{
+			const unsigned Num = str_toulong_base(pStr + 1, 16);
+			Rgba.r = ((Num >> 24) & 0xFF) / 255.0f;
+			Rgba.g = ((Num >> 16) & 0xFF) / 255.0f;
+			Rgba.b = ((Num >> 8) & 0xFF) / 255.0f;
+			Rgba.a = ((Num >> 0) & 0xFF) / 255.0f;
+		}
+		else
+		{
+			return ColorHSLA(0, 0, 0);
+		}
+
+		return color_cast<ColorHSLA>(Rgba);
+	}
+	else if(!str_comp_nocase(pStr, "red"))
+		return ColorHSLA(0.0f / 6.0f, 1, .5f);
+	else if(!str_comp_nocase(pStr, "yellow"))
+		return ColorHSLA(1.0f / 6.0f, 1, .5f);
+	else if(!str_comp_nocase(pStr, "green"))
+		return ColorHSLA(2.0f / 6.0f, 1, .5f);
+	else if(!str_comp_nocase(pStr, "cyan"))
+		return ColorHSLA(3.0f / 6.0f, 1, .5f);
+	else if(!str_comp_nocase(pStr, "blue"))
+		return ColorHSLA(4.0f / 6.0f, 1, .5f);
+	else if(!str_comp_nocase(pStr, "magenta"))
+		return ColorHSLA(5.0f / 6.0f, 1, .5f);
+	else if(!str_comp_nocase(pStr, "white"))
+		return ColorHSLA(0, 0, 1);
+	else if(!str_comp_nocase(pStr, "gray"))
+		return ColorHSLA(0, 0, .5f);
+	else if(!str_comp_nocase(pStr, "black"))
+		return ColorHSLA(0, 0, 0);
+
+	return ColorHSLA(0, 0, 0);
 }
 
 const IConsole::CCommandInfo *CConsole::CCommand::NextCommandInfo(int AccessLevel, int FlagMask) const
@@ -176,6 +256,21 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 	return Error;
 }
 
+LEVEL IConsole::ToLogLevel(int Level)
+{
+	switch(Level)
+	{
+	case IConsole::OUTPUT_LEVEL_STANDARD:
+		return LEVEL_INFO;
+	case IConsole::OUTPUT_LEVEL_ADDINFO:
+		return LEVEL_DEBUG;
+	case IConsole::OUTPUT_LEVEL_DEBUG:
+		return LEVEL_TRACE;
+	}
+	dbg_assert(0, "invalid log level");
+	return LEVEL_INFO;
+}
+
 int CConsole::RegisterPrintCallback(int OutputLevel, FPrintCallback pfnPrintCallback, void *pUserData)
 {
 	if(m_NumPrintCB == MAX_PRINT_CB)
@@ -200,7 +295,6 @@ void CConsole::SetPrintOutputLevel_Hard(int Index, int OutputLevel)
 
 void CConsole::Print(int Level, const char *pFrom, const char *pStr)
 {
-	dbg_msg(pFrom ,"%s", pStr);
 	for(int i = 0; i < m_NumPrintCB; ++i)
 	{
 		if(!m_aPrintCB[i].m_pfnPrintCallback)
@@ -218,6 +312,8 @@ void CConsole::Print(int Level, const char *pFrom, const char *pStr)
 			m_aPrintCB[i].m_pfnPrintCallback(aBuf, m_aPrintCB[i].m_pPrintCallbackUserdata);
 		}
 	}
+	LEVEL LogLevel = IConsole::ToLogLevel(Level);
+	log_log(LogLevel, pFrom, "%s", pStr);
 }
 
 bool CConsole::LineIsValid(const char *pStr)
@@ -779,7 +875,7 @@ void CConsole::Register(const char *pName, const char *pParams,
 	bool DoAdd = false;
 	if(pCommand == 0)
 	{
-		pCommand = new(mem_alloc(sizeof(CCommand), sizeof(void*))) CCommand;
+		pCommand = new CCommand();
 		DoAdd = true;
 	}
 	pCommand->m_pfnCallback = pfnFunc;

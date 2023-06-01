@@ -1,6 +1,7 @@
 #include "http.h"
 
 #include <base/math.h>
+#include <base/logger.h>
 #include <base/system.h>
 #include <engine/external/json-parser/json.h>
 #include <engine/shared/config.h>
@@ -63,7 +64,7 @@ int CurlDebug(CURL *pHandle, curl_infotype Type, char *pData, size_t DataSize, v
 	while(const char *pLineEnd = (const char *)memchr(pData, '\n', DataSize))
 	{
 		int LineLength = pLineEnd - pData;
-		dbg_msg("curl", "%c %.*s", TypeChar, LineLength, pData);
+		log_debug("curl", "%c %.*s", TypeChar, LineLength, pData);
 		pData += LineLength + 1;
 		DataSize -= LineLength + 1;
 	}

@@ -1,6 +1,7 @@
 #include "register.h"
 
 #include <base/lock_scope.h>
+#include <base/log.h>
 #include <engine/console.h>
 #include <engine/engine.h>
 #include <engine/shared/config.h>
@@ -9,8 +10,6 @@
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/uuid_manager.h>
-
-#include <bits/stdc++.h>
 
 #include <mastersrv/mastersrv.h>
 
@@ -81,7 +80,7 @@ class CRegister : public IRegister
 			int m_InfoSerial;
 			std::shared_ptr<CShared> m_pShared;
 			std::unique_ptr<CHttpRequest> m_pRegister;
-			void Run();
+			void Run() override;
 
 		public:
 			CJob(int Protocol, int ServerPort, int Index, int InfoSerial, std::shared_ptr<CShared> pShared, std::unique_ptr<CHttpRequest> &&pRegister) :
@@ -180,8 +179,6 @@ const char *CRegister::ProtocolToScheme(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
-
-	return "invalid protocol";
 }
 
 const char *CRegister::ProtocolToString(int Protocol)
@@ -195,8 +192,6 @@ const char *CRegister::ProtocolToString(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
-
-	return "invalid protocol";
 }
 
 bool CRegister::ProtocolFromString(int *pResult, const char *pString)
@@ -236,8 +231,6 @@ const char *CRegister::ProtocolToSystem(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
-
-	return "invalid protocol";
 }
 
 IPRESOLVE CRegister::ProtocolToIpresolve(int Protocol)
@@ -251,8 +244,6 @@ IPRESOLVE CRegister::ProtocolToIpresolve(int Protocol)
 	}
 	dbg_assert(false, "invalid protocol");
 	dbg_break();
-
-	return IPRESOLVE::ERROR;
 }
 
 void CRegister::ConchainOnConfigChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
@@ -321,7 +312,7 @@ void CRegister::CProtocol::SendRegister()
 		CLockScope ls(m_pShared->m_Lock);
 		if(m_pShared->m_LatestResponseStatus != STATUS_OK)
 		{
-			dbg_msg(ProtocolToSystem(m_Protocol), "registering...");
+			log_info(ProtocolToSystem(m_Protocol), "registering...");
 		}
 		RequestIndex = m_pShared->m_NumTotalRequests;
 		m_pShared->m_NumTotalRequests += 1;
@@ -365,7 +356,7 @@ void CRegister::CProtocol::SendDeleteIfRegistered(bool Shutdown)
 		// On shutdown, wait at most 1 second for the delete requests.
 		pDelete->Timeout(CTimeout{1000, 1000, 0, 0});
 	}
-	dbg_msg(ProtocolToSystem(m_Protocol), "deleting...");
+	log_info(ProtocolToSystem(m_Protocol), "deleting...");
 	m_pParent->m_pEngine->AddJob(std::move(pDelete));
 }
 
@@ -412,7 +403,7 @@ void CRegister::CProtocol::OnToken(const char *pToken)
 {
 	m_NewChallengeToken = true;
 	m_HaveChallengeToken = true;
-	str_copy(m_aChallengeToken, pToken, sizeof(m_aChallengeToken));
+	str_copy(m_aChallengeToken, pToken);
 
 	CheckChallengeStatus();
 	if(time_get() >= m_NextRegister)
@@ -428,13 +419,13 @@ void CRegister::CProtocol::CJob::Run()
 	{
 		// TODO: log the error response content from master
 		// TODO: exponential backoff
-		dbg_msg(ProtocolToSystem(m_Protocol), "error response from master");
+		log_error(ProtocolToSystem(m_Protocol), "error response from master");
 		return;
 	}
 	json_value *pJson = m_pRegister->ResultJson();
 	if(!pJson)
 	{
-		dbg_msg(ProtocolToSystem(m_Protocol), "non-JSON response from master");
+		log_error(ProtocolToSystem(m_Protocol), "non-JSON response from master");
 		return;
 	}
 	const json_value &Json = *pJson;
@@ -442,13 +433,13 @@ void CRegister::CProtocol::CJob::Run()
 	if(StatusString.type != json_string)
 	{
 		json_value_free(pJson);
-		dbg_msg(ProtocolToSystem(m_Protocol), "invalid JSON response from master");
+		log_error(ProtocolToSystem(m_Protocol), "invalid JSON response from master");
 		return;
 	}
 	int Status;
 	if(StatusFromString(&Status, StatusString))
 	{
-		dbg_msg(ProtocolToSystem(m_Protocol), "invalid status from master: %s", (const char *)StatusString);
+		log_error(ProtocolToSystem(m_Protocol), "invalid status from master: %s", (const char *)StatusString);
 		json_value_free(pJson);
 		return;
 	}
@@ -456,12 +447,12 @@ void CRegister::CProtocol::CJob::Run()
 		CLockScope ls(m_pShared->m_Lock);
 		if(Status != STATUS_OK || Status != m_pShared->m_LatestResponseStatus)
 		{
-			dbg_msg(ProtocolToSystem(m_Protocol), "status: %s", (const char *)StatusString);
+			log_debug(ProtocolToSystem(m_Protocol), "status: %s", (const char *)StatusString);
 		}
 		if(Status == m_pShared->m_LatestResponseStatus && Status == STATUS_NEEDCHALLENGE)
 		{
-			dbg_msg(ProtocolToSystem(m_Protocol), "ERROR: the master server reports that clients can not connect to this server.");
-			dbg_msg(ProtocolToSystem(m_Protocol), "ERROR: configure your firewall/nat to let through udp on port %d.", m_ServerPort);
+			log_error(ProtocolToSystem(m_Protocol), "ERROR: the master server reports that clients can not connect to this server.");
+			log_error(ProtocolToSystem(m_Protocol), "ERROR: configure your firewall/nat to let through udp on port %d.", m_ServerPort);
 		}
 		json_value_free(pJson);
 		if(m_Index > m_pShared->m_LatestResponseIndex)
@@ -511,6 +502,7 @@ CRegister::CRegister(IConsole *pConsole, IEngine *pEngine, int ServerPort, unsig
 	str_format(m_aConnlessTokenHex, sizeof(m_aConnlessTokenHex), "%08x", bytes_be_to_uint(aTokenBytes));
 
 	m_pConsole->Chain("sv_register", ConchainOnConfigChange, this);
+	m_pConsole->Chain("sv_sixup", ConchainOnConfigChange, this);
 }
 
 void CRegister::Update()
@@ -597,27 +589,28 @@ void CRegister::OnConfigChange()
 			}
 			else
 			{
-				dbg_msg("register", "unknown protocol '%s'", aBuf);
+				log_warn("register", "unknown protocol '%s'", aBuf);
 				continue;
 			}
 		}
 	}
+
 	m_NumExtraHeaders = 0;
 	const char *pRegisterExtra = g_Config.m_SvRegisterExtra;
 	char aHeader[128];
 	while((pRegisterExtra = str_next_token(pRegisterExtra, ",", aHeader, sizeof(aHeader))))
 	{
-		if(m_NumExtraHeaders == (int)sizeof(m_aaExtraHeaders)/sizeof(m_aaExtraHeaders[0]))
+		if(m_NumExtraHeaders == (int)std::size(m_aaExtraHeaders))
 		{
-			dbg_msg("register", "reached maximum of %d extra headers, dropping '%s' and all further headers", m_NumExtraHeaders, aHeader);
+			log_warn("register", "reached maximum of %d extra headers, dropping '%s' and all further headers", m_NumExtraHeaders, aHeader);
 			break;
 		}
 		if(!str_find(aHeader, ": "))
 		{
-			dbg_msg("register", "header '%s' doesn't contain mandatory ': ', ignoring", aHeader);
+			log_warn("register", "header '%s' doesn't contain mandatory ': ', ignoring", aHeader);
 			continue;
 		}
-		str_copy(m_aaExtraHeaders[m_NumExtraHeaders], aHeader, sizeof(m_aaExtraHeaders[m_NumExtraHeaders]));
+		str_copy(m_aaExtraHeaders[m_NumExtraHeaders], aHeader);
 		m_NumExtraHeaders += 1;
 	}
 	// Don't start registering before the first `CRegister::Update` call.
@@ -658,15 +651,15 @@ bool CRegister::OnPacket(const CNetChunk *pPacket)
 		const char *pToken = Unpacker.GetString(0);
 		if(Unpacker.Error())
 		{
-			dbg_msg("register", "got erroneous challenge packet from master");
+			log_error("register", "got erroneous challenge packet from master");
 			return true;
 		}
 
-		dbg_msg("register", "got challenge token, protocol='%s' token='%s'", pProtocol, pToken);
+		log_debug("register", "got challenge token, protocol='%s' token='%s'", pProtocol, pToken);
 		int Protocol;
 		if(ProtocolFromString(&Protocol, pProtocol))
 		{
-			dbg_msg("register", "got challenge packet with unknown protocol");
+			log_error("register", "got challenge packet with unknown protocol");
 			return true;
 		}
 		m_aProtocols[Protocol].OnToken(pToken);
@@ -677,13 +670,14 @@ bool CRegister::OnPacket(const CNetChunk *pPacket)
 
 void CRegister::OnNewInfo(const char *pInfo)
 {
+	log_trace("register", "info: %s", pInfo);
 	if(m_GotServerInfo && str_comp(m_aServerInfo, pInfo) == 0)
 	{
 		return;
 	}
 
 	m_GotServerInfo = true;
-	str_copy(m_aServerInfo, pInfo, sizeof(m_aServerInfo));
+	str_copy(m_aServerInfo, pInfo);
 	{
 		CLockScope ls(m_pGlobal->m_Lock);
 		m_pGlobal->m_InfoSerial += 1;

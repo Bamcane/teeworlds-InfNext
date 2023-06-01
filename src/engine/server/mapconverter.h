@@ -76,7 +76,6 @@ protected:
 	// 0.7
 	bool CheckImageDimensions(void *pLayerItem, int LayerType, const char *pFilename);
 	void *ReplaceImageItem(void *pItem, int Type, CMapItemImage *pNewImgItem);
-	int LoadPNG(class CImageInfo *pImg, const char *pFilename);
 	int ConvertMapTo7(const char* pFilename);
 
 public:

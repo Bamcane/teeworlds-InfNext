@@ -5,6 +5,9 @@
 
 #include "kernel.h"
 
+#include <set>
+#include <string>
+
 class IStorage : public IInterface
 {
 	MACRO_INTERFACE("storage", 0)

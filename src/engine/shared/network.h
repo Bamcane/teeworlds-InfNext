@@ -428,8 +428,6 @@ public:
 
 	//
 	void SetMaxClientsPerIP(int Max);
-	bool SetTimedOut(int ClientID, int OrigID);
-	void SetTimeoutProtected(int ClientID);
 
 	int ResetErrorString(int ClientID);
 	const char *ErrorString(int ClientID);

@@ -175,7 +175,7 @@ public:
 
 	IEngineMap *m_pMap;
 
-	int64 m_GameStartTime;
+	int64_t m_GameStartTime;
 	//int m_CurrentGameTick;
 	int m_RunServer;
 	int m_MapReload;
@@ -184,7 +184,7 @@ public:
 	int m_RconAuthLevel;
 	int m_PrintCBIndex;
 
-	int64 m_Lastheartbeat;
+	int64_t m_Lastheartbeat;
 	//static NETADDR4 master_server;
 	enum
 	{
@@ -197,10 +197,10 @@ public:
 	SHA256_DIGEST m_aCurrentMapSha256[NUM_MAP_TYPES];
 	unsigned m_aCurrentMapCrc[NUM_MAP_TYPES];
 	unsigned char *m_apCurrentMapData[NUM_MAP_TYPES];
-	int m_aCurrentMapSize[NUM_MAP_TYPES];
+	unsigned int m_aCurrentMapSize[NUM_MAP_TYPES];
 
 	bool m_ServerInfoHighLoad;
-	int64 m_ServerInfoFirstRequest;
+	int64_t m_ServerInfoFirstRequest;
 	int m_ServerInfoNumRequests;
 
 	CDemoRecorder m_DemoRecorder;
@@ -221,11 +221,12 @@ public:
 	bool DemoRecorder_IsRecording();
 
 	//int Tick()
-	int64 TickStartTime(int Tick);
+	int64_t TickStartTime(int Tick);
 	//int TickSpeed()
 
 	int Init();
 
+	void SendLogLine(const CLogMessage *pMessage);
 	void SetRconCID(int ClientID);
 	bool IsAuthed(int ClientID);
 	bool GetClientInfo(int ClientID, CClientInfo *pInfo) const override;
@@ -254,6 +255,8 @@ public:
 	void SendConnectionReady(int ClientID);
 	void SendRconLine(int ClientID, const char *pLine);
 	static void SendRconLineAuthed(const char *pLine, void *pUser);
+	// Accepts -1 as ClientID to mean "all clients with at least auth level admin"
+	void SendRconLogLine(int ClientID, const CLogMessage *pMessage);
 
 	void SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
 	void SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int ClientID);

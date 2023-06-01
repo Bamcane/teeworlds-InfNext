@@ -7,7 +7,7 @@ class CKernel : public IKernel
 {
 	enum
 	{
-		MAX_INTERFACES=32,
+		MAX_INTERFACES = 32,
 	};
 
 	class CInterfaceInfo
@@ -17,10 +17,12 @@ class CKernel : public IKernel
 		{
 			m_aName[0] = 0;
 			m_pInterface = 0x0;
+			m_AutoDestroy = false;
 		}
 
 		char m_aName[64];
 		IInterface *m_pInterface;
+		bool m_AutoDestroy;
 	};
 
 	CInterfaceInfo m_aInterfaces[MAX_INTERFACES];
@@ -37,14 +39,34 @@ class CKernel : public IKernel
 	}
 
 public:
-
 	CKernel()
 	{
 		m_NumInterfaces = 0;
 	}
 
+	void Shutdown() override
+	{
+		for(int i = m_NumInterfaces - 1; i >= 0; i--)
+		{
+			if(m_aInterfaces[i].m_AutoDestroy)
+				m_aInterfaces[i].m_pInterface->Shutdown();
+		}
+	}
 
-	virtual bool RegisterInterfaceImpl(const char *pName, IInterface *pInterface)
+	virtual ~CKernel()
+	{
+		// delete interfaces in reverse order just the way it would happen to objects on the stack
+		for(int i = m_NumInterfaces - 1; i >= 0; i--)
+		{
+			if(m_aInterfaces[i].m_AutoDestroy)
+			{
+				delete m_aInterfaces[i].m_pInterface;
+				m_aInterfaces[i].m_pInterface = 0;
+			}
+		}
+	}
+
+	bool RegisterInterfaceImpl(const char *pName, IInterface *pInterface, bool Destroy) override
 	{
 		// TODO: More error checks here
 		if(!pInterface)
@@ -67,17 +89,18 @@ public:
 
 		pInterface->m_pKernel = this;
 		m_aInterfaces[m_NumInterfaces].m_pInterface = pInterface;
-		str_copy(m_aInterfaces[m_NumInterfaces].m_aName, pName, sizeof(m_aInterfaces[m_NumInterfaces].m_aName));
+		str_copy(m_aInterfaces[m_NumInterfaces].m_aName, pName);
+		m_aInterfaces[m_NumInterfaces].m_AutoDestroy = Destroy;
 		m_NumInterfaces++;
 
 		return true;
 	}
 
-	virtual bool ReregisterInterfaceImpl(const char *pName, IInterface *pInterface)
+	bool ReregisterInterfaceImpl(const char *pName, IInterface *pInterface) override
 	{
 		if(FindInterfaceInfo(pName) == 0)
 		{
-			dbg_msg("kernel", "ERROR: couldn't reregister interface '%s'. interface doesn't exist");
+			dbg_msg("kernel", "ERROR: couldn't reregister interface '%s'. interface doesn't exist", pName);
 			return false;
 		}
 
@@ -86,7 +109,7 @@ public:
 		return true;
 	}
 
-	virtual IInterface *RequestInterfaceImpl(const char *pName)
+	IInterface *RequestInterfaceImpl(const char *pName) override
 	{
 		CInterfaceInfo *pInfo = FindInterfaceInfo(pName);
 		if(!pInfo)

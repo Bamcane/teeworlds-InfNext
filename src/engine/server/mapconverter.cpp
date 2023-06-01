@@ -919,8 +919,6 @@ void CMapConverter::Finalize()
 				else
 				{
 					vec2 Pos = m_MenuPosition+rotate(vec2(MenuRadius, 0.0f), MenuAngleStart+MenuAngleStep*i);
-					
-					dbg_msg("yee", "%d", i);
 
 					CClass *NewClass = Classes()->m_HumanClasses[i-1].m_pClass->CreateNewOne(0, 0);
 

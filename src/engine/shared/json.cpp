@@ -33,7 +33,7 @@ const char *json_string_get(const json_value *string)
 	return string->u.string.ptr;
 }
 
-int64_t json_int_get(const json_value *integer)
+int json_int_get(const json_value *integer)
 {
 	return integer->u.integer;
 }

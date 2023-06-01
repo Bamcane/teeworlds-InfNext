@@ -6,17 +6,18 @@
 #include "kernel.h"
 
 #include <base/color.h>
-#include <stddef.h>
-#include <stdint.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
-
 #include <vector>
+
 #define GRAPHICS_TYPE_UNSIGNED_BYTE 0x1401
 #define GRAPHICS_TYPE_UNSIGNED_SHORT 0x1403
 #define GRAPHICS_TYPE_INT 0x1404
 #define GRAPHICS_TYPE_UNSIGNED_INT 0x1405
 #define GRAPHICS_TYPE_FLOAT 0x1406
+
 struct SBufferContainerInfo
 {
 	int m_Stride;
@@ -116,9 +117,9 @@ struct GL_STexCoord3D
 
 	GL_STexCoord3D &operator=(const vec3 &TexCoord)
 	{
-		u = TexCoord.x;
-		v = TexCoord.y;
-		w = TexCoord.z;
+		u = TexCoord.u;
+		v = TexCoord.v;
+		w = TexCoord.w;
 		return *this;
 	}
 
@@ -128,5 +129,83 @@ struct GL_STexCoord3D
 typedef ColorRGBA GL_SColorf;
 //use normalized color values
 typedef vector4_base<unsigned char> GL_SColor;
+
+struct GL_SVertex
+{
+	GL_SPoint m_Pos;
+	GL_STexCoord m_Tex;
+	GL_SColor m_Color;
+};
+
+struct GL_SVertexTex3D
+{
+	GL_SPoint m_Pos;
+	GL_SColorf m_Color;
+	GL_STexCoord3D m_Tex;
+};
+
+struct GL_SVertexTex3DStream
+{
+	GL_SPoint m_Pos;
+	GL_SColor m_Color;
+	GL_STexCoord3D m_Tex;
+};
+
+static constexpr size_t gs_GraphicsMaxQuadsRenderCount = 256;
+static constexpr size_t gs_GraphicsMaxParticlesRenderCount = 512;
+
+enum EGraphicsDriverAgeType
+{
+	GRAPHICS_DRIVER_AGE_TYPE_LEGACY = 0,
+	GRAPHICS_DRIVER_AGE_TYPE_DEFAULT,
+	GRAPHICS_DRIVER_AGE_TYPE_MODERN,
+
+	GRAPHICS_DRIVER_AGE_TYPE_COUNT,
+};
+
+enum EBackendType
+{
+	BACKEND_TYPE_OPENGL = 0,
+	BACKEND_TYPE_OPENGL_ES,
+	BACKEND_TYPE_VULKAN,
+
+	// special value to tell the backend to identify the current backend
+	BACKEND_TYPE_AUTO,
+
+	BACKEND_TYPE_COUNT,
+};
+
+struct STWGraphicGPU
+{
+	enum ETWGraphicsGPUType
+	{
+		GRAPHICS_GPU_TYPE_DISCRETE = 0,
+		GRAPHICS_GPU_TYPE_INTEGRATED,
+		GRAPHICS_GPU_TYPE_VIRTUAL,
+		GRAPHICS_GPU_TYPE_CPU,
+
+		// should stay at last position in this enum
+		GRAPHICS_GPU_TYPE_INVALID,
+	};
+
+	struct STWGraphicGPUItem
+	{
+		char m_aName[256];
+		ETWGraphicsGPUType m_GPUType;
+	};
+	std::vector<STWGraphicGPUItem> m_vGPUs;
+	STWGraphicGPUItem m_AutoGPU;
+};
+
+typedef STWGraphicGPU TTWGraphicsGPUList;
+
+typedef std::function<void()> WINDOW_RESIZE_FUNC;
+typedef std::function<void()> WINDOW_PROPS_CHANGED_FUNC;
+
+namespace client_data7 {
+struct CDataSprite; // NOLINT(bugprone-forward-declaration-namespace)
+}
+
+typedef std::function<bool(uint32_t &Width, uint32_t &Height, uint32_t &Format, std::vector<uint8_t> &vDstData)> TGLBackendReadPresentedImageData;
 
 #endif

@@ -33,7 +33,7 @@ CJobPool::CJobPool()
 	m_NumThreads = 0;
 	m_Shutdown = false;
 	m_Lock = lock_create();
-	semaphore_init(&m_Semaphore);
+	sphore_init(&m_Semaphore);
 	m_pFirstJob = 0;
 	m_pLastJob = 0;
 }
@@ -55,7 +55,7 @@ void CJobPool::WorkerThread(void *pUser)
 		std::shared_ptr<IJob> pJob = 0;
 
 		// fetch job from queue
-		semaphore_wait(&pPool->m_Semaphore);
+		sphore_wait(&pPool->m_Semaphore);
 		{
 			CLockScope ls(pPool->m_Lock);
 			if(pPool->m_pFirstJob)
@@ -87,14 +87,14 @@ void CJobPool::Destroy()
 {
 	m_Shutdown = true;
 	for(int i = 0; i < m_NumThreads; i++)
-		semaphore_signal(&m_Semaphore);
+		sphore_signal(&m_Semaphore);
 	for(int i = 0; i < m_NumThreads; i++)
 	{
 		if(m_apThreads[i])
 			thread_wait(m_apThreads[i]);
 	}
 	lock_destroy(m_Lock);
-	semaphore_destroy(&m_Semaphore);
+	sphore_destroy(&m_Semaphore);
 }
 
 void CJobPool::Add(std::shared_ptr<IJob> pJob)
@@ -109,7 +109,7 @@ void CJobPool::Add(std::shared_ptr<IJob> pJob)
 			m_pFirstJob = m_pLastJob;
 	}
 
-	semaphore_signal(&m_Semaphore);
+	sphore_signal(&m_Semaphore);
 }
 
 void CJobPool::RunBlocking(IJob *pJob)

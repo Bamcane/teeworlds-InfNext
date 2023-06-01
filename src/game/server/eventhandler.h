@@ -3,11 +3,10 @@
 #ifndef GAME_SERVER_EVENTHANDLER_H
 #define GAME_SERVER_EVENTHANDLER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <engine/shared/protocol.h>
 
-//
 class CEventHandler
 {
 	enum
@@ -33,6 +32,13 @@ public:
 
 	CEventHandler();
 	void *Create(int Type, int Size, CClientMask Mask = CClientMask().set());
+
+	template<typename T>
+	T *Create(CClientMask Mask = CClientMask().set())
+	{
+		return static_cast<T *>(Create(T::ms_MsgID, sizeof(T), Mask));
+	}
+
 	void Clear();
 	void Snap(int SnappingClient);
 

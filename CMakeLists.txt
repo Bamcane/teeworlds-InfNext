@@ -78,9 +78,9 @@ option(LOCALIZE "Generate localize" OFF)
 # Set the default build type to Release
 if(NOT(CMAKE_BUILD_TYPE))
   if(DEV)
-    set(CMAKE_BUILD_TYPE Release)
-  else()
     set(CMAKE_BUILD_TYPE Debug)
+  else()
+    set(CMAKE_BUILD_TYPE Release)
   endif()
 endif()
 
@@ -254,7 +254,7 @@ find_package(ZLIB)
 find_package(Git)
 find_package(PythonInterp)
 find_package(Curl)
-find_package(OpenSSL)
+find_package(PNG)
 
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
@@ -295,7 +295,6 @@ function(show_dependency_status OUTPUT_NAME NAME)
 endfunction()
 
 show_dependency_status("Curl" CURL)
-show_dependency_status("OpenSSL" OPENSSL FALSE)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Dmg tools" DMGTOOLS)
@@ -305,7 +304,7 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
 endif()
 show_dependency_status("PythonInterp" PYTHONINTERP)
 show_dependency_status("Curl" CURL)
-show_dependency_status("OpenSSL Crypto" CRYPTO)
+show_dependency_status("PNG" PNG)
 show_dependency_status("Zlib" ZLIB)
 
 if(NOT(PYTHONINTERP_FOUND))
@@ -313,6 +312,9 @@ if(NOT(PYTHONINTERP_FOUND))
 endif()
 if(NOT(CURL_FOUND))
   message(SEND_ERROR "You must install curl to compile Teeworlds")
+endif()
+if(NOT(PNG_FOUND))
+  message(SEND_ERROR "You must install libpng to compile ${CMAKE_PROJECT_NAME}")
 endif()
 
 if(TARGET_OS STREQUAL "windows")
@@ -456,11 +458,23 @@ generate_maps("src/game/generated/protocolglue.cpp" "map_source")
 ########################################################################
 
 # Sources
-file(GLOB_RECURSE BASE "src/base/*.cpp" "src/base/*.h")
+file(GLOB BASE_MAIN "src/base/*.cpp" "src/base/*.h")
+
+file(GLOB BASE_TL "src/base/tl/*.h")
+
+file(GLOB BASE_UNICODE "src/base/unicode/*.cpp" "src/base/unicode/*.h")
+
+set(BASE
+  ${BASE_MAIN}
+  ${BASE_TL}
+  ${BASE_UNICODE}
+)
 
 file(GLOB ENGINE_INTERFACE "src/engine/*.cpp" "src/engine/*.h")
 
 file(GLOB ENGINE_SHARED "src/engine/shared/*.cpp" "src/engine/shared/*.h")
+
+file(GLOB ENGINE_GFX "src/engine/gfx/*.cpp" "src/engine/gfx/*.h")
 
 set(ENGINE_GENERATED_SHARED src/game/generated/protocol.cpp src/game/generated/protocol.h)
 file(GLOB GAME_SHARED "src/game/*.cpp" "src/game/*.h")
@@ -499,6 +513,7 @@ set(LIBS
   ${CMAKE_THREAD_LIBS_INIT}
   ${CRYPTO_LIBRARIES}
   ${CURL_LIBRARIES}
+  ${PNG_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${PLATFORM_LIBS}
   ICU::i18n
@@ -506,7 +521,7 @@ set(LIBS
 )
 
 # Targets
-add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_UUID_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
+add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GFX} ${ENGINE_UUID_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
 list(APPEND TARGETS_OWN engine-shared game-shared)
 
