@@ -261,6 +261,7 @@ LEVEL IConsole::ToLogLevel(int Level)
 	switch(Level)
 	{
 	case IConsole::OUTPUT_LEVEL_STANDARD:
+	case IConsole::OUTPUT_LEVEL_CHAT:
 		return LEVEL_INFO;
 	case IConsole::OUTPUT_LEVEL_ADDINFO:
 		return LEVEL_DEBUG;
