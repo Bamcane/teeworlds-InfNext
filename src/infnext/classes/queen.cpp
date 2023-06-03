@@ -96,7 +96,8 @@ int CClassQueen::OnPlayerDeath(int KillerID, vec2 Pos)
             NULL);
     }
 
-    Player()->ChangeClass();
+    if(Player())
+        Player()->ChangeClass();
 
     return 5;
 }

@@ -278,6 +278,7 @@ void CPlayer::FakeSnap(int SnappingClient)
 
 void CPlayer::OnDisconnect(const char *pReason)
 {
+	CureToDefault(); // fix
 	KillCharacter();
 
 	if(Server()->ClientIngame(m_ClientID))
