@@ -9,6 +9,8 @@ public:
     CClassSniper(CGameContext *pGameServer, CPlayer *pOwner);
 
     int OnPlayerDeath(int KillerID, vec2 Pos) override;
+    
+    void OnPlayerKill(int VictimID, int Weapon) override;
 
     CClass *CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) override;
 };

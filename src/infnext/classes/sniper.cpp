@@ -50,6 +50,14 @@ int CClassSniper::OnPlayerDeath(int KillerID, vec2 Pos)
     return 1;
 }
 
+void CClassSniper::OnPlayerKill(int VictimID, int Weapon)
+{
+    CPlayer *pKiller = GameServer()->m_apPlayers[VictimID];
+    
+    if(Character() && pKiller && pKiller->IsInfect() && Weapon == WEAPON_RIFLE)
+        Character()->AddWeaponAmmo(WEAPON_RIFLE, 1); // give 1 ammo
+}
+
 CClass *CClassSniper::CreateNewOne(CGameContext *pGameServer, CPlayer *pOwner) 
 { 
     return new CClassSniper(pGameServer, pOwner);

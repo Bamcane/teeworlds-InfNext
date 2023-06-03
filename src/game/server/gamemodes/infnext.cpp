@@ -103,10 +103,13 @@ int CGameControllerNext::OnCharacterDeath(class CCharacter *pVictim, class CPlay
 	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 
-	int Score = pVictim->GetClass()->OnPlayerDeath(pKiller->GetCID(), pVictim->GetPos());
+	int Score = pVictim->GetClass() ? pVictim->GetClass()->OnPlayerDeath(pKiller->GetCID(), pVictim->GetPos()) : 3;
 
 	if(pVictim->GetPlayer() == pKiller)
 		return 0;
+
+	if(pKiller->GetClass())
+		pKiller->GetClass()->OnPlayerKill(pVictim->GetCID(), Weapon);
 
 	if(pKiller->IsInfect() == pVictim->IsInfect())
 	{
@@ -582,6 +585,8 @@ void CGameControllerNext::OnPlayerSelectClass(CPlayer* pPlayer)
 	
 	if(Class == 0)
 		GameServer()->SendBroadcast_Localization(ClientID, _("Random Class"), 2, BROADCAST_CLASS);
-	else GameServer()->SendBroadcast_Localization(ClientID, NewClass->m_ClassName, 2, BROADCAST_CLASS);
+	else 
+		GameServer()->SendBroadcast_Localization(ClientID, NewClass->m_ClassName, 2, BROADCAST_CLASS);
+	
 	delete NewClass;
 }

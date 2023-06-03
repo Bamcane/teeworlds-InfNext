@@ -38,7 +38,9 @@ public:
 
     virtual bool OnPlayerSpawn(bool IsInfected, vec2* Pos) { return false; }
 
-    virtual void OnTick() {};
+    virtual void OnPlayerKill(int VictimID, int Weapon) {}
+
+    virtual void OnTick() {}
     virtual void OnCharacterSnap(class CNetObj_Character *pCharacter) {}
     virtual void OnCharacterSnap(class protocol7::CNetObj_Character *pCharacter) {}
     virtual void OnDDNetCharacterSnap(class CNetObj_DDNetCharacter *pCharacter) {}

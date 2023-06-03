@@ -376,10 +376,29 @@ void CCharacter::HandleWeapons()
 
 bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 {
-	if(m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got)
+	if(!GetClass())
+		return false;
+	if(!GetClass()->m_pWeapons[Weapon])
+		return false;
+	if(m_aWeapons[Weapon].m_Ammo < GetClass()->m_pWeapons[Weapon]->GetMaxAmmo() || !m_aWeapons[Weapon].m_Got)
 	{
 		m_aWeapons[Weapon].m_Got = true;
-		m_aWeapons[Weapon].m_Ammo = min(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo);
+		m_aWeapons[Weapon].m_Ammo = min(GetClass()->m_pWeapons[Weapon]->GetMaxAmmo(), Ammo);
+		return true;
+	}
+	return false;
+}
+
+bool CCharacter::AddWeaponAmmo(int Weapon, int Ammo)
+{
+	if(!GetClass())
+		return false;
+	if(!GetClass()->m_pWeapons[Weapon])
+		return false;
+	if(m_aWeapons[Weapon].m_Ammo < GetClass()->m_pWeapons[Weapon]->GetMaxAmmo() || !m_aWeapons[Weapon].m_Got)
+	{
+		m_aWeapons[Weapon].m_Got = true;
+		m_aWeapons[Weapon].m_Ammo = min(GetClass()->m_pWeapons[Weapon]->GetMaxAmmo(), m_aWeapons[Weapon].m_Ammo + Ammo);
 		return true;
 	}
 	return false;
@@ -1180,8 +1199,7 @@ void CCharacter::InitClassWeapon()
 
 		if(!m_pPlayer->GetClass()->m_pWeapons[i])
 			continue;
-		
-		m_aWeapons[i].m_Ammo = m_pPlayer->GetClass()->m_pWeapons[i]->GetInitAmmo();
-		m_aWeapons[i].m_Got = true;
+
+		GiveWeapon(i, m_pPlayer->GetClass()->m_pWeapons[i]->GetInitAmmo());
 	}
 }

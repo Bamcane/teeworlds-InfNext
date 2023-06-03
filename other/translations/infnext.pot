@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-01 21:10+0800\n"
+"POT-Creation-Date: 2023-06-03 11:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "'{str:Option}' isn't an option on this server"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:453
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:456
 msgid "'{str:PlayerName}' has been infected"
 msgstr ""
 
@@ -53,15 +53,15 @@ msgstr ""
 msgid "'{str:Player}' entered and joined the {lstr:Team}"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:291
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:292
 msgid "'{str:Player}' has left the game"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:286
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:287
 msgid "'{str:Player}' has left the game ({str:Reason})"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:379
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:380
 msgid "'{str:Player}' joined the {lstr:Team}"
 msgstr ""
 
@@ -137,7 +137,7 @@ msgstr ""
 msgid "Queen"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:584
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:587
 msgid "Random Class"
 msgstr ""
 
@@ -209,15 +209,15 @@ msgstr ""
 msgid "Wait game start!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:113
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:116
 msgid "What? You killed your teammates?!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:114
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:117
 msgid "What? You were killed by your teammates?!"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:483
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/player.cpp:484
 msgid "You are '{lstr:Class}'"
 msgstr ""
 
@@ -237,8 +237,8 @@ msgstr ""
 msgid "You can't move yourself"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:813
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:124
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:832
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:127
 msgid "You infected '{str:Player}'"
 msgstr ""
 
@@ -254,11 +254,11 @@ msgstr ""
 msgid "You must wait {sec:Time} before making another vote"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:125
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/gamemodes/infnext.cpp:128
 msgid "You were infected by '{str:Player}'"
 msgstr ""
 
-#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:814
+#: /home/power/code/teeworlds-mods/teeworlds-InfNext/src/game/server/entities/character.cpp:833
 msgid "You're infected by '{str:Player}'"
 msgstr ""
 
