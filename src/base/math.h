@@ -64,7 +64,7 @@ inline bool random_prob(float f)
 	return random_float() < f;
 }
 
-int random_distribution(int* probs);
+int random_distribution(int probs[]);
 inline float frandom() { return rand()/(float)(RAND_MAX); }
 
 // float to fixed

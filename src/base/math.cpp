@@ -1,6 +1,6 @@
 #include "math.h"
 
-int random_distribution(int* probs)
+int random_distribution(int probs[])
 {
     if(!probs[0])
         return 0;
